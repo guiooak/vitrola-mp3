@@ -30,11 +30,12 @@ Design comes before code. Each step starts only after the previous one is approv
 1. **Logo:** done, in [`design/01-logo/`](design/01-logo/)
 2. **Style guide:** done, in [`design/02-style-guide/`](design/02-style-guide/)
 3. **HTML mockup:** ready for review, in [`design/03-mockup/`](design/03-mockup/)
-4. **Android app:** planning and building, only after the mockup is approved
+4. **Android app:** to be built by another agent, starting from [`.ai/`](.ai/README.md)
 
 ## Structure
 
 ```
+.ai/                handoff for the agent implementing the Android app
 design/
   01-logo/          logo pages, exported SVGs and export scripts
   02-style-guide/   style guide, design tokens and generator
@@ -65,6 +66,7 @@ Then open:
 ## Documentation
 
 - [Project decisions](docs/decisions.md)
+- [Implementation handoff (.ai/)](.ai/README.md)
 - [Design: logo](docs/design/01-logo.md)
 - [Design: style guide](docs/design/02-style-guide.md)
 - [Design: mockup](docs/design/03-mockup.md)

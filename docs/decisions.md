@@ -103,3 +103,8 @@ The `design/` folder becomes a GitHub Pages site (https://guiooak.github.io/vitr
 All documentation, code (identifiers, comments, file names, design tokens), user-facing text in the design pages and the mockup, and commit messages are written in US English, even when the conversation with the maintainer happens in Brazilian Portuguese. The rule lives in [`CLAUDE.md`](../CLAUDE.md).
 - Proper names and real titles (artists, albums, songs) are not translated.
 - The app's UI copy is written in English. Other languages (such as Brazilian Portuguese) can be added later as Android string translations.
+
+### D16 · Implementation handoff in `.ai/`
+**2026-10-25**
+
+The Android app will be implemented by another AI agent. Every relevant decision, requirement and spec for that work is consolidated in [`.ai/`](../.ai/README.md) (context, product requirements, architecture, design system, screens, UI copy, edge cases/QA and open questions). This log stays the source of truth: new decisions go here first and `.ai/` is updated to match.

@@ -1,0 +1,55 @@
+# 05 · Screens and navigation
+
+The mockup is the visual reference: https://guiooak.github.io/vitrola-mp3/03-mockup/ (use the side panel to jump to each screen). Copy for every screen is in [06-copy.md](06-copy.md).
+
+## Navigation model (D11)
+
+```
+Welcome ──► System folder picker ──► Allow access ──► Scan ──► Library (Artists)
+                                                                  │
+Bottom navigation (always visible on main screens):               ▼
+  Library · Playlists · Search · Settings      + Mini player pinned above it
+        │
+        ├─ Library ─► Album · Artist · Folder (push)
+        ├─ Playlists ─► Playlist · Favorite albums (push)
+        ├─ Search ─► Artist · Album (push)
+        └─ Settings ─► (system folder picker, dialogs, sheets)
+
+Now playing = full-screen overlay above everything (from the mini player or after Play/Shuffle)
+Sheets: song menu, album menu, playlist menu, add to playlist, sort, queue, sleep timer
+Dialogs: file details, new/rename playlist, delete playlist, remove folder, lost access
+```
+
+- Each tab keeps its own back stack (Navigation Compose nested graphs). Re-selecting the current tab scrolls to top / pops to the tab root.
+- System back: closes sheet/dialog → collapses Now playing → pops the stack → leaves the app.
+- Welcome and Scan hide the bottom bar and the mini player.
+
+## Screen list
+
+| # | Screen | Key behavior | Mockup panel shortcut |
+|---|---|---|---|
+| 1 | **Welcome** | Record illustration (arm drops after ~500 ms, then spins), "Vitrola Mp3" in display style, tagline, three promises, primary button "Choose music folder". | Welcome |
+| 2 | **System folder picker** | Android's own UI (not ours). We only launch it and handle the result. | Folder picker |
+| 3 | **Scan** | Spinning record, "Looking for songs…", live count, current file path (ellipsized), striped progress bar. End: "All set!", "54 songs in 10 albums", "Found 8 covers and 7 artist photos", button "Open library". Empty result: empty state + "Choose folder". | Scan |
+| 4 | **Library** | Title "Library", chips Artists (default) / Songs / Albums / Folders. See 02-product-requirements §2. Empty states: no folder chosen; no songs found (with a shortcut to Settings when subfolders are off). | Library · … |
+| 5 | **Album** | Top bar: back + ⋮ (album menu). Cover 220dp radius l elevation 3, title, artist chip, meta line, Play / Shuffle / heart, numbered rows (row subtitle = artist; for "Unknown album" = file name), folder breadcrumb at the bottom. | Album |
+| 6 | **Artist** | Hero photo (320dp) with back button over it, name + "N albums · N songs", Play / Shuffle, "Albums" horizontal scroller (136dp cards), "Songs" list. | Artist |
+| 7 | **Folder** | Title = folder name, breadcrumb "Internal storage › Music › MPB", Play / Shuffle, highlighted image files, subfolder rows (with artist photo / album cover thumbnails), then files by file name. | Folder |
+| 8 | **Search** | Title "Search", pill field (auto-focus when empty), results in three sections (see 02 §8). | Search |
+| 9 | **Playlists** | Title + "+" (new playlist). "Automatic" group and "Your playlists" group (last row "New playlist"). | Playlists |
+| 9b | **Favorite albums** | Small title, count, albums grid; empty state. | — |
+| 10 | **Playlist** | ⋮ (rename/delete) only for user playlists. Art (icon tile for automatic lists, mosaic for user lists), name, meta, Play / Shuffle, rows; empty states. | Playlist |
+| 11 | **Settings** | Groups: Library folders, Playback, battery tip card, Appearance (segmented Automatic/Light/Dark), About. | Settings |
+| 12 | **Now playing** | See 02 §5 and the record spec in 04. | Now playing |
+| 13 | **Queue** (sheet) | Title "Queue" + "N songs up next"; labels "Now playing" / "Up next"; played rows at 50% opacity; drag handle; remove (×) on upcoming rows; opens scrolled to the current song. | Queue |
+| 14 | **Song menu** (sheet) | Header (cover, title, artist). Play next · Add to end of queue · Add to playlist · Add to/Remove from favorite songs · Go to album · Go to artist · File details. Album/artist entries hidden for "Unknown album". | Song menu |
+| 15 | **Sleep timer** (sheet) | Explanation line, 2×2 grid (15 min, 30 min, 45 min, 1 hour), full-width "At the end of this song" (selected state), "Turn off timer" in error color when active. | Sleep timer |
+| 16 | **Empty library** | Empty state with "Choose folder". | Empty library |
+
+Other overlays (no shortcut): album menu, playlist menu, add-to-playlist sheet, sort sheet, new/rename/delete playlist dialogs, remove folder dialog, file details dialog, lost-access dialog, snackbars.
+
+## System surfaces
+
+- **Media notification:** small icon, app name · source name, title, artist, large cover, previous / play-pause / next, progress, heart (custom command). Tinted with the album color where the system allows.
+- **Lock screen:** the same media session controls.
+- The mockup's "Simulate" panel shows the expected behavior for notification, lock screen, reopening the app, unplugging headphones, a broken file and lost folder access.

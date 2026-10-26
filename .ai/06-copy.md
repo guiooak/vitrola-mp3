@@ -1,0 +1,149 @@
+# 06 · UI copy (US English)
+
+All UI text comes from `design/03-mockup/mockup.js` and the style guide's voice rules. Put it in `res/values/strings.xml` (use `<plurals>` for counts). Other languages can be added later as translations (D15); do not hardcode strings in Compose.
+
+**Voice:** short sentences, the tone of a friend who knows music. The turntable metaphor only in special moments (welcome, empty states), never on buttons. See the voice table in `docs/design/02-style-guide.md`.
+
+Suggested keys are given; adjust naming to your conventions.
+
+## Global
+
+| Key | Text |
+|---|---|
+| `app_name` | Vitrola Mp3 |
+| `tab_library` / `tab_playlists` / `tab_search` / `tab_settings` | Library / Playlists / Search / Settings |
+| `action_back` | Back |
+| `action_play` / `action_pause` | Play / Pause |
+| `action_shuffle` | Shuffle |
+| `action_cancel` / `action_close` / `action_save` / `action_create` / `action_remove` / `action_delete` / `action_undo` / `action_clear` | Cancel / Close / Save / Create / Remove / Delete / Undo / Clear |
+| `action_choose_folder` | Choose folder |
+| `cd_more_options` | More options |
+| `cd_more_options_for` | More options for %1$s |
+| `cd_next_song` / `cd_previous_song` | Next song / Previous song |
+| `cd_collapse_player` | Collapse player |
+| `cd_song_position` | Song position |
+| `unknown_artist` / `unknown_album` | Unknown artist / Unknown album |
+| plurals `songs` | %d song / %d songs |
+| plurals `albums` | %d album / %d albums |
+| plurals `artists` | %d artist / %d artists |
+
+## Welcome
+
+| Text |
+|---|
+| Vitrola **Mp3** (title; "Mp3" in the lighter weight) |
+| Your music, your way. No account, no internet, no ads. |
+| **Only the folders you choose** — WhatsApp audio and voice recordings stay out. |
+| **Plays with the screen off** — Controls in the notification, on the lock screen and on your headphones. |
+| **Nothing leaves your phone** — No account and no data collection. |
+| Button: Choose music folder |
+
+## Scan
+
+| Text |
+|---|
+| Looking for songs… |
+| %d songs (live count) |
+| All set! |
+| %1$s in %2$s (e.g. "54 songs in 10 albums") |
+| Found %1$s and %2$s (e.g. "Found 8 covers and 7 artist photos") |
+| Button: Open library |
+| Empty: **No music here** — We couldn't find any music files in "%s". Choose the folder where your music lives. |
+
+## Library
+
+| Text |
+|---|
+| Title: Library |
+| Chips: Artists · Songs · Albums · Folders |
+| Sort: A–Z · Recently added · Most played; sheet title "Sort songs" |
+| Folders view: group title = location ("Internal storage" / "SD card"); "Chosen folder · %s" |
+| Empty (no folder): **No record on the turntable** — Choose the folder where your music lives. Only that folder is read, nothing else on your phone. |
+| Empty (no songs, subfolders on): **No songs found** — The chosen folders have no music files. |
+| Empty (no songs, subfolders off): **No songs found** — Your music is in subfolders. Turn on "Include subfolders" in Settings. Button: Open Settings |
+
+## Album / Artist / Folder
+
+| Text |
+|---|
+| Meta: "%1$d · %2$s · %3$s" (year · songs · duration, e.g. "1972 · 8 songs · 27 min"; durations "27 min" or "1 h 12 min") |
+| Unknown album note: These files have no album or artist information. The app shows the file name. |
+| Favorite album button: Add to favorite albums / Remove from favorite albums |
+| Artist sections: Albums · Songs |
+| Folder breadcrumb root: Internal storage |
+| Folder image row: **%1$s** · used as the %2$s ("artist photo" / "album cover") |
+| Empty folder: **Empty folder** — No songs in this folder. |
+
+## Search
+
+| Text |
+|---|
+| Title: Search · Placeholder: Song, artist or album |
+| Recent searches · Clear |
+| Section titles: Artists · Albums · Songs (with counts) |
+| Button: See all %d songs |
+| Nothing found: **Nothing found** — No song, album or artist matches "%s". Check the spelling or try another word. |
+
+## Playlists
+
+| Text |
+|---|
+| Title: Playlists · Groups: Automatic · Your playlists · Row: New playlist |
+| Automatic lists: Favorite songs · Favorite albums · Most played · Recently added · label "Automatic" |
+| New playlist dialog: **New playlist**, placeholder "Playlist name", Cancel / Create |
+| Rename dialog: **Rename playlist**, Cancel / Save · snackbar "Playlist renamed" |
+| Delete dialog: **Delete "%s"?** — The playlist goes away, but the songs stay in your library and on your phone. Cancel / Delete · snackbar "Playlist "%s" deleted" + Undo |
+| Add to playlist sheet: **Add to playlist** · New playlist · snackbars "Added to "%s"" (+ Undo), "Already in "%s"" |
+| Empty favorites: **Nothing here yet** — Tap the heart on a song, in the player or in the ⋮ menu, to see it here. |
+| Empty user playlist: **Nothing here yet** — Use the ⋮ menu on any song and choose "Add to playlist". |
+| Empty favorite albums: **No favorite albums** — Tap the heart on an album page, or use its ⋮ menu, to see it here. |
+
+## Now playing, queue, menus
+
+| Text |
+|---|
+| Source labels: Playing from · Playing from album · Playing from artist · Playing from folder · Playing from playlist · Playing from search · (source names: "All songs", album/artist/folder/playlist name, `"query"`) |
+| Repeat descriptions: Repeat: off · Repeat: all · Repeat: one |
+| Snackbars: Shuffle on · Shuffle off · Repeat off · Repeating the queue · Repeating this song |
+| Song menu: Play next · Add to end of queue · Add to playlist · Add to favorite songs / Remove from favorite songs · Go to album · Go to artist · File details |
+| Snackbars: Will play next · Added to the end of the queue · %s will play next (album) · %s added to the queue (album) |
+| Favorites snackbars: Added to favorite songs · Removed from favorite songs · Album added to favorites · Album removed from favorites (all with Undo) |
+| Queue: **Queue** · %s up next · Now playing · Up next · Remove from queue · snackbar "Removed from queue" + Undo |
+| File details dialog: **File details** — File · Folder · Duration · Format · Cover ("cover.jpg (album folder)" / "Embedded in the file" / "Generated by the app") |
+
+## Sleep timer
+
+| Text |
+|---|
+| Sheet: **Sleep timer** — Music stops on its own after the chosen time. |
+| Options: 15 min · 30 min · 45 min · 1 hour · At the end of this song · Turn off timer |
+| Status: Pauses in %s · Pauses at the end of this song · Off |
+| Snackbars: Music will stop in %d min · Music will stop at the end of this track · Sleep timer off · Sleep timer ended. Good night! |
+
+## Settings
+
+| Text |
+|---|
+| Title: Settings · Groups: Library folders · Playback · Appearance |
+| Folder row: %1$s · %2$s ("Internal storage · 54 songs"); remove button "Remove folder %s" |
+| Add folder — Only chosen folders go into the library |
+| Include subfolders — Look for songs inside the chosen folders |
+| Use folder photos and covers — artist.jpg in the artist folder and cover.jpg in the album folder |
+| Look for new songs — Also happens automatically when you open the app |
+| Sleep timer — (status) |
+| Resume where you left off — When the app opens, the last song is ready to play |
+| Pause when headphones disconnect — Wired or Bluetooth |
+| Tip: **Music stops on its own?** Some phones (Xiaomi, Samsung, Motorola…) close background apps to save battery. Exempt Vitrola Mp3 from battery optimization. Button: Open battery settings |
+| Theme: Automatic · Light · Dark |
+| About: Version %s · No ads. Nothing leaves your phone. |
+| Remove folder dialog: **Remove "%s"?** — %s leave(s) the library. The files stay on your phone. Cancel / Remove · snackbar "Folder "%s" removed" + Undo |
+| Snackbars: Folder added · %s · Folder added · no songs found · "%s" is already in the library · Subfolders included · Only files directly in the chosen folders · %s · Using folder photos and covers · Using app-generated covers · Looking for new songs… · Library up to date · %s, nothing new |
+
+## Errors and system events
+
+| Situation | Text |
+|---|---|
+| Broken file | Couldn't play "%s". Skipped to the next one. |
+| Lost folder access (dialog) | **We lost access to the "%s" folder** — This happens when the folder is moved or renamed, or when access is revoked in Android settings. Choose the folder again to keep listening. Buttons: Not now / Choose folder |
+| Headphones disconnected | Headphones disconnected · music paused (action: Resume) |
+| Resume on launch | Picking up where you left off: "%1$s" at %2$s (action: Play) |
