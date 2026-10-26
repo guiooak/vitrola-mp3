@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" color="#000000">
+      <mask id="m-arm" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+        <rect width="200" height="200" fill="#fff"/>
+        <path d="M166 40 L157 116 L136 137" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="166" cy="40" r="24" fill="#000"/>
+      </mask>
+      <g mask="url(#m-arm)" fill="none" stroke="currentColor">
+        <circle cx="92" cy="110" r="64" stroke-width="12"/>
+        <circle cx="92" cy="110" r="45" stroke-width="5"/>
+      </g>
+      <path fill="currentColor" fill-rule="evenodd" d="M68 110 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z M87 110 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 Z"/>
+      <path d="M166 40 L157 116 L136 137" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="124" y="130" width="24" height="15" rx="3.5" transform="rotate(-45 136 137.5)" fill="currentColor"/>
+      <path fill="currentColor" fill-rule="evenodd" d="M150 40 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 Z M160.5 40 a5.5 5.5 0 1 0 11 0 a5.5 5.5 0 1 0 -11 0 Z"/>
+    
+</svg>

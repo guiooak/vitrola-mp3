@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrola – Logo Vinil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF7F0; --surface: #FFFFFF; --text: #1B1714; --muted: #6B625A; --border: #E6DFD3;
+    --creme: #F3E9D2; --vinho: #7A1F2B; --mostarda: #E0A526; --vinil: #1B1714; --sulco: #3A322C; --metal: #CFC8B8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #161311; --surface: #1F1B18; --text: #F3EDE4; --muted: #A79D92; --border: #342D28; }
+  }
+  :root[data-theme="dark"] { --bg: #161311; --surface: #1F1B18; --text: #F3EDE4; --muted: #A79D92; --border: #342D28; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Outfit", system-ui, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 16px 80px; }
+  h1 { font-family: "Fraunces", serif; font-weight: 800; font-size: clamp(32px, 5vw, 48px); margin: 0 0 8px; }
+  h2 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 56px 0 16px; }
+  p.lead { color: var(--muted); max-width: 680px; margin: 0; }
+  .toggle { margin-top: 16px; display: inline-flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+  .note { font-size: 14px; color: var(--muted); margin: 12px 0 0; }
+
+  /* Herói */
+  .hero { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; }
+  .hero-icon { width: 240px; height: 240px; border-radius: 54px; background: var(--creme); box-shadow: 0 12px 40px rgba(27,23,20,.18); overflow: hidden; }
+  .hero-icon svg { width: 100%; height: 100%; display: block; }
+  .hero h3 { font-family: "Fraunces", serif; font-size: 28px; margin: 0 0 8px; }
+  .hero ul { margin: 0 0 16px; padding-left: 18px; color: var(--muted); }
+
+  /* Animação do herói */
+  #hero .disc { transform-box: view-box; transform-origin: 92px 110px; }
+  #hero .arm { transform-box: view-box; transform-origin: 166px 38px; transition: transform .7s cubic-bezier(.4,.1,.2,1); }
+  #hero.paused .arm { transform: rotate(-26deg); }
+  #hero.playing .disc { animation: spin 1.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { #hero.playing .disc { animation-duration: 6s; } }
+
+  /* Construção */
+  .build { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; align-items: center; }
+  .build svg { width: 100%; max-width: 360px; display: block; margin: 0 auto; background: var(--creme); border-radius: 16px; }
+  .build dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 15px; }
+  .build dt { font-weight: 600; }
+  .build dd { margin: 0; color: var(--muted); }
+
+  /* Tamanhos */
+  .sizes { display: grid; grid-template-columns: 120px repeat(5, auto); gap: 18px 20px; align-items: end; overflow-x: auto; }
+  .sizes .lbl { font-size: 14px; font-weight: 500; align-self: center; }
+  .sizes figure { margin: 0; text-align: center; }
+  .sizes figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .ic { background: var(--creme); overflow: hidden; display: block; }
+  .ic svg { width: 100%; height: 100%; display: block; }
+
+  /* Máscaras adaptativas */
+  .masks { display: flex; gap: 28px; flex-wrap: wrap; }
+  .masks figure { margin: 0; text-align: center; }
+  .masks svg { width: 108px; height: 108px; display: block; }
+  .masks figcaption { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .m-circle { border-radius: 50%; }
+  .m-squircle { border-radius: 32%; }
+  .m-rounded { border-radius: 18%; }
+  .m-tear { border-radius: 50% 50% 50% 14%; }
+  .masks .wrapm { overflow: hidden; width: 108px; height: 108px; }
+
+  /* Ícone temático (Android 13+) */
+  .themed { display: flex; gap: 28px; flex-wrap: wrap; }
+  .themed .t { width: 108px; height: 108px; border-radius: 50%; display: grid; place-items: center; }
+  .themed .t svg { width: 70%; height: 70%; }
+
+  /* Assinaturas (logo + nome) */
+  .lockups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+  .lk { border-radius: 18px; padding: 28px 24px; display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 140px; }
+  .lk svg { width: 72px; height: 72px; flex: none; }
+  .wm { font-family: "Fraunces", serif; font-weight: 800; font-size: 44px; line-height: 1; letter-spacing: -.01em; font-variation-settings: "opsz" 144; }
+  .lk.v { flex-direction: column; gap: 8px; }
+  .lk.v svg { width: 96px; height: 96px; }
+  .lk.v .wm { font-size: 38px; }
+  .bg-creme { background: var(--creme); } .bg-vinil { background: var(--vinil); } .bg-vinho { background: var(--vinho); }
+
+  /* Paleta */
+  .palette { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .sw { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+  .sw .c { height: 72px; }
+  .sw .i { padding: 8px 12px; font-size: 13px; }
+  .sw .i b { display: block; font-weight: 600; }
+  .sw .i span { color: var(--muted); font-family: ui-monospace, monospace; }
+
+  /* Área de respiro */
+  .clear { display: flex; justify-content: center; }
+  .clear svg { width: 100%; max-width: 520px; }
+
+  @media (max-width: 640px) {
+    .hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .hero ul { text-align: left; }
+    .hero-icon { width: 200px; height: 200px; border-radius: 45px; }
+    .wm { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Símbolo detalhado: para 64px ou mais -->
+    <symbol id="s-full" viewBox="0 0 200 200">
+      <g class="disc">
+        <circle cx="92" cy="110" r="70" fill="#1B1714"/>
+        <circle cx="92" cy="110" r="68.5" fill="none" stroke="#6A5B50" stroke-width="3"/>
+        <circle cx="92" cy="110" r="61" fill="none" stroke="#3A322C" stroke-width="1.4"/>
+        <circle cx="92" cy="110" r="55" fill="none" stroke="#2C2521" stroke-width="1.4"/>
+        <circle cx="92" cy="110" r="49" fill="none" stroke="#3A322C" stroke-width="1.4"/>
+        <circle cx="92" cy="110" r="43" fill="none" stroke="#2C2521" stroke-width="1.4"/>
+        <circle cx="92" cy="110" r="37" fill="none" stroke="#3A322C" stroke-width="1.4"/>
+        <path d="M38 86 A59 59 0 0 1 70 56" fill="none" stroke="#FFFFFF" stroke-opacity=".2" stroke-width="7" stroke-linecap="round"/>
+        <path d="M146 134 A59 59 0 0 1 116 164" fill="none" stroke="#FFFFFF" stroke-opacity=".09" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="92" cy="110" r="25" fill="#7A1F2B"/>
+        <circle cx="92" cy="110" r="19" fill="none" stroke="#E0A526" stroke-width="1.6" stroke-opacity=".85"/>
+        <circle cx="92" cy="110" r="11" fill="none" stroke="#F3E9D2" stroke-width="1" stroke-opacity=".3"/>
+        <circle cx="92" cy="110" r="4" fill="#F3E9D2"/>
+      </g>
+      <g class="arm">
+        <rect x="159" y="12" width="15" height="14" rx="3.5" fill="#8E8676"/>
+        <path d="M166 38 L156 118 L134 140" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="translate(2 3)"/>
+        <path d="M166 38 L156 118 L134 140" fill="none" stroke="#CFC8B8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="124" y="134" width="20" height="12" rx="3" transform="rotate(-45 134 140)" fill="#E0A526"/>
+        <circle cx="166" cy="38" r="15" fill="#8E8676"/>
+        <circle cx="166" cy="38" r="11" fill="#E0A526"/>
+        <circle cx="166" cy="38" r="4.5" fill="#1B1714"/>
+      </g>
+    </symbol>
+
+    <!-- Símbolo simplificado: para 48px ou menos -->
+    <symbol id="s-small" viewBox="0 0 200 200">
+      <circle cx="92" cy="110" r="70" fill="#1B1714"/>
+      <circle cx="92" cy="110" r="68.5" fill="none" stroke="#6A5B50" stroke-width="3"/>
+      <circle cx="92" cy="110" r="56" fill="none" stroke="#3E3530" stroke-width="3.5"/>
+      <circle cx="92" cy="110" r="42" fill="none" stroke="#3E3530" stroke-width="3.5"/>
+      <path d="M38 86 A59 59 0 0 1 70 56" fill="none" stroke="#FFFFFF" stroke-opacity=".24" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="92" cy="110" r="28" fill="#7A1F2B"/>
+      <circle cx="92" cy="110" r="5.5" fill="#F3E9D2"/>
+      <path d="M166 40 L157 116 L136 137" fill="none" stroke="#CFC8B8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="124" y="130" width="24" height="15" rx="3.5" transform="rotate(-45 136 137.5)" fill="#E0A526"/>
+      <circle cx="166" cy="40" r="16" fill="#E0A526"/>
+      <circle cx="166" cy="40" r="5.5" fill="#1B1714"/>
+    </symbol>
+
+    <!-- Monocromático: ícone temático do Android e usos de uma cor só -->
+    <symbol id="s-mono" viewBox="0 0 200 200">
+      <mask id="m-arm" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+        <rect width="200" height="200" fill="#fff"/>
+        <path d="M166 40 L157 116 L136 137" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="166" cy="40" r="24" fill="#000"/>
+      </mask>
+      <g mask="url(#m-arm)" fill="none" stroke="currentColor">
+        <circle cx="92" cy="110" r="64" stroke-width="12"/>
+        <circle cx="92" cy="110" r="45" stroke-width="5"/>
+      </g>
+      <path fill="currentColor" fill-rule="evenodd" d="M68 110 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z M87 110 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 Z"/>
+      <path d="M166 40 L157 116 L136 137" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="124" y="130" width="24" height="15" rx="3.5" transform="rotate(-45 136 137.5)" fill="currentColor"/>
+      <path fill="currentColor" fill-rule="evenodd" d="M150 40 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 Z M160.5 40 a5.5 5.5 0 1 0 11 0 a5.5 5.5 0 1 0 -11 0 Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <h1>Vitrola — logo</h1>
+    <p class="lead">Conceito A refinado: o vinil clássico. Esta página reúne o símbolo, as variações para cada tamanho, o ícone do Android, as assinaturas com o nome e a paleta base. É a referência para o style guide.</p>
+    <div class="toggle">
+      <button data-t="light">Tema claro</button>
+      <button data-t="dark">Tema escuro</button>
+    </div>
+  </header>
+
+  <h2>Símbolo</h2>
+  <div class="card hero">
+    <div class="hero-icon"><svg id="hero" class="paused" viewBox="0 0 200 200" role="img" aria-label="Símbolo Vitrola"></svg></div>
+    <div>
+      <h3>Toca-discos, em uma olhada</h3>
+      <ul>
+        <li>Disco com sulcos alternados e dois reflexos, que dão volume sem gradiente.</li>
+        <li>Selo vinho com anel mostarda, a assinatura de cor da marca.</li>
+        <li>Braço com contrapeso, base e cápsula. A sombra leve descola o braço do disco.</li>
+        <li>Borda clara no disco, para ele não sumir em fundos escuros.</li>
+      </ul>
+      <button id="play">▶ Tocar</button>
+      <p class="note">O botão mostra a animação prevista para o app: o braço desce e o disco gira.</p>
+    </div>
+  </div>
+
+  <h2>Construção</h2>
+  <div class="card build">
+    <svg viewBox="0 0 200 200" aria-label="Grade de construção">
+      <use href="#s-full"/>
+      <g fill="none" stroke="#E0457B" stroke-width=".6" stroke-dasharray="3 2">
+        <circle cx="92" cy="110" r="70"/>
+        <circle cx="92" cy="110" r="25"/>
+        <line x1="92" y1="20" x2="92" y2="196"/>
+        <line x1="4" y1="110" x2="196" y2="110"/>
+        <line x1="166" y1="38" x2="134" y2="140"/>
+        <circle cx="166" cy="38" r="15"/>
+      </g>
+      <g fill="#E0457B" font-family="Outfit, sans-serif" font-size="7">
+        <text x="8" y="106">R = 70</text>
+        <text x="96" y="132">R = 25</text>
+        <text x="172" y="60">pivô</text>
+      </g>
+    </svg>
+    <dl>
+      <dt>Disco</dt><dd>Raio 70 numa grade de 200. Deslocado para a esquerda e para baixo, para abrir espaço ao braço.</dd>
+      <dt>Selo</dt><dd>Raio 25, cerca de 1/3 do disco, como num LP de verdade.</dd>
+      <dt>Braço</dt><dd>Vai do pivô (canto superior direito) até a agulha no terço externo do disco, onde a música começa.</dd>
+      <dt>Traço</dt><dd>Braço com espessura 7 no detalhado e 10 no simplificado.</dd>
+    </dl>
+  </div>
+
+  <h2>Tamanhos: detalhado × simplificado</h2>
+  <div class="card">
+    <div class="sizes" id="sizes"></div>
+    <p class="note">Abaixo de 48px, o detalhado vira "ruído". O simplificado tem menos sulcos, traços mais grossos e selo maior, e é o que vai na barra de status, nas notificações e no favicon.</p>
+  </div>
+
+  <h2>Ícone adaptativo do Android</h2>
+  <div class="card">
+    <div class="masks" id="masks"></div>
+    <p class="note">Cada fabricante corta o ícone num formato diferente. O símbolo fica dentro da zona segura central (66 de 108 unidades) e aparece inteiro em todas as máscaras.</p>
+  </div>
+
+  <h2>Ícone temático (Android 13+)</h2>
+  <div class="card">
+    <div class="themed">
+      <div class="t" style="background:#DCE7D4;color:#2F4A2A"><svg><use href="#s-mono"/></svg></div>
+      <div class="t" style="background:#D9E2F2;color:#26395A"><svg><use href="#s-mono"/></svg></div>
+      <div class="t" style="background:#F2DDD9;color:#5A2A26"><svg><use href="#s-mono"/></svg></div>
+      <div class="t" style="background:#2A2A2E;color:#E4E1EA"><svg><use href="#s-mono"/></svg></div>
+    </div>
+    <p class="note">Versão de uma cor só, que o Android pinta conforme o papel de parede do usuário. Ela também serve para a notificação da música.</p>
+  </div>
+
+  <h2>Assinaturas</h2>
+  <div class="lockups">
+    <div class="lk bg-creme"><svg><use href="#s-full"/></svg><span class="wm" style="color:#7A1F2B">Vitrola</span></div>
+    <div class="lk bg-vinil"><svg><use href="#s-full"/></svg><span class="wm" style="color:#F3E9D2">Vitrola</span></div>
+    <div class="lk bg-vinho"><svg><use href="#s-full"/></svg><span class="wm" style="color:#F3E9D2">Vitrola</span></div>
+    <div class="lk v bg-creme"><svg><use href="#s-full"/></svg><span class="wm" style="color:#7A1F2B">Vitrola</span></div>
+  </div>
+  <p class="note">Fonte do nome: <b>Fraunces ExtraBold</b>, uma serifa "macia" com cara de capa de disco dos anos 70, mas moderna. É gratuita (Google Fonts).</p>
+
+  <h2>Área de respiro</h2>
+  <div class="card clear">
+    <svg viewBox="0 0 520 180" aria-label="Área de respiro">
+      <rect x="0" y="0" width="520" height="180" rx="12" fill="#F3E9D2"/>
+      <rect x="20" y="20" width="480" height="140" fill="none" stroke="#E0457B" stroke-width="1" stroke-dasharray="4 3"/>
+      <use href="#s-full" x="50" y="30" width="120" height="120"/>
+      <text x="180" y="112" font-family="Fraunces, serif" font-weight="800" font-size="62" fill="#7A1F2B">Vitrola</text>
+      <g fill="#E0457B" font-family="Outfit, sans-serif" font-size="11">
+        <text x="24" y="14">margem mínima = raio do selo</text>
+      </g>
+    </svg>
+  </div>
+
+  <h2>Paleta da marca</h2>
+  <div class="palette">
+    <div class="sw"><div class="c" style="background:#F3E9D2"></div><div class="i"><b>Creme</b><span>#F3E9D2</span></div></div>
+    <div class="sw"><div class="c" style="background:#7A1F2B"></div><div class="i"><b>Vinho</b><span>#7A1F2B</span></div></div>
+    <div class="sw"><div class="c" style="background:#E0A526"></div><div class="i"><b>Mostarda</b><span>#E0A526</span></div></div>
+    <div class="sw"><div class="c" style="background:#1B1714"></div><div class="i"><b>Vinil</b><span>#1B1714</span></div></div>
+    <div class="sw"><div class="c" style="background:#3A322C"></div><div class="i"><b>Sulco</b><span>#3A322C</span></div></div>
+    <div class="sw"><div class="c" style="background:#CFC8B8"></div><div class="i"><b>Metal</b><span>#CFC8B8</span></div></div>
+  </div>
+  <p class="note">Esta é a paleta base da logo. O style guide vai expandi-la com tons de interface, estados e o tema escuro.</p>
+</div>
+
+<script>
+  // Tema
+  document.querySelectorAll('[data-t]').forEach(b =>
+    b.addEventListener('click', () => document.documentElement.dataset.theme = b.dataset.t));
+
+  // Herói: cópia inline do símbolo para poder animar braço e disco
+  const hero = document.getElementById('hero');
+  hero.innerHTML = document.getElementById('s-full').innerHTML;
+  const btn = document.getElementById('play');
+  btn.addEventListener('click', () => {
+    const playing = hero.classList.toggle('playing');
+    hero.classList.toggle('paused', !playing);
+    btn.textContent = playing ? '⏸ Pausar' : '▶ Tocar';
+  });
+
+  // Tabela de tamanhos
+  const sizes = [96, 64, 48, 32, 24];
+  const grid = document.getElementById('sizes');
+  const row = (label, id) => {
+    grid.insertAdjacentHTML('beforeend', `<div class="lbl">${label}</div>`);
+    sizes.forEach(s => grid.insertAdjacentHTML('beforeend',
+      `<figure><span class="ic" style="width:${s}px;height:${s}px;border-radius:${s*.22}px"><svg><use href="#${id}"/></svg></span><figcaption>${s}px</figcaption></figure>`));
+  };
+  row('Detalhado', 's-full');
+  row('Simplificado', 's-small');
+
+  // Máscaras adaptativas: área visível de 72 dentro da tela de 108
+  const masks = [['m-circle','Círculo'],['m-squircle','Squircle'],['m-rounded','Arredondado'],['m-tear','Gota']];
+  document.getElementById('masks').innerHTML = masks.map(([c, n]) =>
+    `<figure><div class="wrapm ${c}"><svg viewBox="18 18 72 72"><rect width="108" height="108" fill="#F3E9D2"/><use href="#s-full" x="23" y="24.2" width="62" height="62"/></svg></div><figcaption>${n}</figcaption></figure>`).join('');
+</script>
+</body>
+</html>
