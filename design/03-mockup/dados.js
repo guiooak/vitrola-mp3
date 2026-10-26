@@ -88,6 +88,7 @@
   ];
 
   const favoritas = ['elistom-1', 'clube-1', 'acabou-2', 'construcao-4'];
+  const albunsFavoritos = ['clube', 'transa'];
 
-  window.DADOS = { artistas, albuns, musicas, pastasSistema: [...pastasSistema], pastasEscolhidas, playlists, favoritas };
+  window.DADOS = { artistas, albuns, musicas, pastasSistema: [...pastasSistema], pastasEscolhidas, playlists, favoritas, albunsFavoritos };
 })();

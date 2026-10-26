@@ -436,3 +436,16 @@ svg.demo.baixo .gira { animation: spin var(--duracao-volta-disco) linear infinit
 .img-file { display: flex; align-items: center; gap: 10px; margin: 0 16px 10px; padding: 10px 12px; border-radius: var(--raio-m); background: var(--cor-destaque-container); color: var(--cor-sobre-destaque-container); font: var(--tipo-corpo-p); }
 .img-file .ms { font-size: 20px; }
 .img-file b { font-weight: 600; }
+
+/* ---------- Favoritos ---------- */
+.track .du { display: inline-flex; align-items: center; gap: 4px; }
+.fav-mini { font-size: 14px; color: var(--cor-primaria); display: none; }
+.track.fav .fav-mini { display: inline-block; }
+.album .art { position: relative; }
+.fav-badge { position: absolute; right: 8px; bottom: 8px; width: 28px; height: 28px; border-radius: 50%; background: var(--cor-superficie); color: var(--cor-primaria); display: none; place-items: center; box-shadow: var(--elevacao-1); }
+.fav-badge .ms { font-size: 16px; }
+.album.fav .fav-badge { display: grid; }
+.detail-actions .fav-album { box-shadow: inset 0 0 0 1.5px var(--cor-borda-forte); color: var(--cor-texto-2); }
+.detail-actions .fav-album.fav-on { color: var(--cor-primaria); box-shadow: inset 0 0 0 1.5px var(--cor-primaria); background: var(--cor-primaria-container); }
+.fav-album .ms.fill { animation: pulsar var(--duracao-media) var(--curva-padrao); }
+@keyframes pulsar { 50% { transform: scale(1.25); } }

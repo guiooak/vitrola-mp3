@@ -86,3 +86,8 @@ Cada pasta de artista tem uma foto (`artista.jpg`) e cada pasta de álbum tem a 
 - **Foto do artista:** imagem da pasta → capa do primeiro álbum em círculo.
 - O visual anterior (capa gerada, capa em círculo) passa a ser o substituto quando não há imagem, como pedido pelo usuário.
 - Detalhes, nomes de arquivo aceitos e onde cada imagem aparece: [03-mockup.md](design/03-mockup.md#fotos-de-artista-e-capas-de-álbum).
+
+### D13 · Favoritar músicas e álbuns
+**25/10/2026**
+
+Músicas e álbuns podem ser favoritados com o coração, em duas listas independentes (Playlists › Músicas favoritas e Álbuns favoritos). Favoritar um álbum não favorita as músicas dele. Detalhes em [03-mockup.md](design/03-mockup.md#favoritos).

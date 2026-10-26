@@ -27,7 +27,7 @@ Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mocku
 | 6 | **Artista** | Foto grande do artista no topo, com o nome por cima, e depois álbuns e músicas. Sem foto, a capa do álbum vira um fundo desfocado. |
 | 7 | **Pasta** | Navegação pela estrutura de pastas. Pastas de artista mostram a foto, pastas de álbum mostram a capa, e as imagens reconhecidas aparecem destacadas. |
 | 8 | **Busca** | Resultados sempre em três seções separadas: **Artistas**, **Álbuns** e **Músicas**. Cada camada traz o que bate com o texto e o que está ligado a isso (ver [regras da busca](#regras-da-busca)). Ignora acentos ("aguas" acha "Águas de Março"). Mostra buscas recentes e artistas para explorar. |
-| 9 | **Playlists** | Automáticas (Favoritas, Mais tocadas, Adicionadas recentemente) e as do usuário, com capa em mosaico. |
+| 9 | **Playlists** | Automáticas (Músicas favoritas, Álbuns favoritos, Mais tocadas, Adicionadas recentemente) e as do usuário, com capa em mosaico. |
 | 10 | **Playlist** | Tocar, Aleatório, renomear e excluir (com desfazer). |
 | 11 | **Ajustes** | Adicionar e remover pastas (com desfazer), incluir subpastas, procurar músicas novas, timer, retomar de onde parou, pausar ao tirar o fone, dica de bateria e tema. |
 | 12 | **Tocando agora** | A capa vira o selo do disco. O braço desce ao tocar e sobe ao pausar, e o disco desacelera. O fundo ganha um toque da cor da capa. Favoritar, aleatório, repetir (todas / uma) e barra de progresso arrastável. |
@@ -82,6 +82,19 @@ Music/
 **Ajuste:** em Ajustes, "Usar fotos e capas das pastas" liga e desliga o uso dessas imagens. Desligado, o app usa as capas embutidas ou as geradas.
 
 **No mockup** as imagens são simuladas. Fotos e capas "fotográficas" indicam que há imagem na pasta, e o visual antigo indica o substituto. Titãs e "Cabeça Dinossauro" estão sem imagem para mostrar o substituto. Para testar com imagens reais, coloque os arquivos em `design/03-mockup/imagens/` e preencha `url` no artista ou álbum em `dados.js`.
+
+## Favoritos
+
+Músicas e álbuns podem ser favoritados com o **coração**.
+
+| | Música | Álbum |
+|---|---|---|
+| **Onde favoritar** | Coração no "tocando agora", menu ⋮ da música, notificação | Coração ao lado de Tocar/Aleatório na página do álbum, menu ⋮ do álbum |
+| **Indicador** | Coraçãozinho vinho ao lado da duração, nas listas | Selo com coração no canto da capa, nos cartões de álbum |
+| **Onde aparecem** | Playlists › Músicas favoritas | Playlists › Álbuns favoritos (grade de capas) |
+| **Aviso** | "Adicionada às músicas favoritas", com Desfazer | "Álbum adicionado aos favoritos", com Desfazer |
+
+Favoritar um álbum **não** favorita as músicas dele: são duas listas independentes. O álbum "Sem álbum" (arquivos sem metadados) não pode ser favoritado.
 
 ## Regras da busca
 

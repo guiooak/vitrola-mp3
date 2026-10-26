@@ -46,6 +46,7 @@ const ESTADO_INICIAL = () => ({
   usarImagens: true,
   playlists: clone(D.playlists),
   favoritas: new Set(D.favoritas),
+  albunsFavoritos: new Set(D.albunsFavoritos),
   recentes: ['Milton', 'Águas de Março', 'Caetano'],
   libTab: 'musicas',
   ordem: 'az',
@@ -272,6 +273,7 @@ function render(anim = 'fade') {
   if (bar) el.addEventListener('scroll', () => bar.classList.toggle('scrolled', el.scrollTop > 4), { passive: true });
   atualizarChrome();
   marcarAtivas();
+  marcarFavoritos();
   sincronizarDiscos();
   atualizarPainel(def.chave ? def.chave(params) : nome);
 }
@@ -305,7 +307,7 @@ function linhaMusica(m, k, i, { numero = false, q = '' } = {}) {
   return `<div class="track" data-mid="${m.id}" data-a="tocar" data-ctx="${k}" data-i="${i}" tabindex="0">
     ${numero ? `<div class="num"><span class="n">${m.numero}</span>${eq}</div>` : `<div class="cover">${capa(a)}${eq}</div>`}
     <div style="min-width:0"><div class="ti">${realcar(m.titulo, q)}</div><div class="ar">${numero ? fmtArquivoSe(m) : realcar(m.artista, q)}</div></div>
-    <span class="du">${fmt(m.duracao)}</span>
+    <span class="du">${icone('favorite', 'fill fav-mini')}${fmt(m.duracao)}</span>
     <button class="icon-btn" data-a="menu" data-mid="${m.id}" aria-label="Mais opções de ${esc(m.titulo)}">${icone('more_vert')}</button>
   </div>`;
 }
@@ -318,7 +320,7 @@ function listaMusicas(ids, origem, opts = {}) {
 function cartaoAlbum(a) {
   const n = biblioteca().filter(m => m.album === a.id).length;
   return `<div class="album" data-a="album" data-id="${a.id}" tabindex="0">
-    <div class="art">${capa(a)}</div>
+    <div class="art">${capa(a)}<span class="fav-badge" aria-label="Álbum favorito">${icone('favorite', 'fill')}</span></div>
     <div class="ti">${esc(a.titulo)}</div>
     <div class="ar">${esc(a.artistaNome)}${a.ano ? ' · ' + a.ano : ''}</div>
   </div>`;
@@ -336,10 +338,26 @@ function vazioDisco(titulo, texto, botao = true) {
     ${botao ? `<button class="btn btn-pri" data-a="escolher-pasta">${icone('folder_open')}Escolher pasta</button>` : ''}
   </div>`;
 }
-const acoesTocar = k => `<div class="detail-actions">
+const acoesTocar = (k, albumId) => `<div class="detail-actions">
   <button class="btn btn-dest" data-a="tocar-tudo" data-ctx="${k}">${icone('play_arrow', 'fill')}Tocar</button>
   <button class="btn btn-ton" data-a="aleatorio-tudo" data-ctx="${k}">${icone('shuffle')}Aleatório</button>
+  ${albumId ? botaoFavAlbum(albumId) : ''}
 </div>`;
+function botaoFavAlbum(id) {
+  const on = S.albunsFavoritos.has(id);
+  return `<button class="icon-btn fav-album ${on ? 'fav-on' : ''}" data-a="favoritar-album" data-id="${id}" aria-pressed="${on}" aria-label="${on ? 'Remover dos álbuns favoritos' : 'Adicionar aos álbuns favoritos'}">${icone('favorite', on ? 'fill' : '')}</button>`;
+}
+// Atualiza os corações na tela sem re-renderizar (mantém a rolagem)
+function marcarFavoritos() {
+  $$('.track[data-mid]').forEach(r => r.classList.toggle('fav', S.favoritas.has(r.dataset.mid)));
+  $$('.album[data-id]').forEach(c => c.classList.toggle('fav', S.albunsFavoritos.has(c.dataset.id)));
+  $$('[data-a="favoritar-album"]').forEach(b => {
+    const on = S.albunsFavoritos.has(b.dataset.id);
+    b.classList.toggle('fav-on', on); b.setAttribute('aria-pressed', on);
+    b.setAttribute('aria-label', on ? 'Remover dos álbuns favoritos' : 'Adicionar aos álbuns favoritos');
+    $('.ms', b).classList.toggle('fill', on);
+  });
+}
 
 /* ============================================================
    Telas
@@ -473,7 +491,7 @@ const TELAS = {
           ${a.semMetadados ? `<span class="by">${esc(a.artistaNome)}</span>` : `<button class="artist-chip" data-a="artista" data-nome="${esc(a.artistaNome)}"><span class="av">${foto(a.artistaNome)}</span>${esc(a.artistaNome)}</button>`}
           <div class="meta">${a.ano ? a.ano + ' · ' : ''}${plural(ms.length, 'música', 'músicas')} · ${duracaoTotal(total)}</div>
         </div>
-        ${acoesTocar(k)}
+        ${acoesTocar(k, a.semMetadados ? null : id)}
         ${a.semMetadados ? `<p class="pad" style="font:var(--tipo-corpo-p);color:var(--cor-texto-2);margin:0 0 8px">Estes arquivos não têm informações de álbum e artista. O app mostra o nome do arquivo.</p>` : ''}
         ${ms.map((m, i) => linhaMusica(m, k, i, { numero: true })).join('')}
         <div class="crumbs" style="padding-top:16px">${icone('folder')} ${esc(a.pasta)}</div>`;
@@ -540,7 +558,7 @@ const TELAS = {
         params.q = input.value;
         $('[data-a="limpar-busca"]', el).style.visibility = q ? 'visible' : 'hidden';
         $('#resultados', el).innerHTML = resultadosBusca(q);
-        marcarAtivas();
+        marcarAtivas(); marcarFavoritos();
       };
       input.addEventListener('input', pintar);
       input.addEventListener('keydown', e => {
@@ -559,20 +577,33 @@ const TELAS = {
   'playlists': {
     render: () => {
       const fav = [...S.favoritas].filter(id => naBiblioteca(musica(id)));
+      const albFav = [...S.albunsFavoritos].filter(id => albunsVisiveis().some(a => a.id === id));
       const auto = [
-        ['favoritas', 'Favoritas', 'favorite', fav.length],
+        ['favoritas', 'Músicas favoritas', 'favorite', fav.length],
+        ['albuns-favoritos', 'Álbuns favoritos', 'album', albFav.length, 'álbum', 'álbuns'],
         ['tocadas', 'Mais tocadas', 'trending_up', Math.min(20, biblioteca().length)],
         ['recentes', 'Adicionadas recentemente', 'schedule', Math.min(20, biblioteca().length)],
       ];
       return `${topbar('Playlists', { voltar: false, acoes: `<button class="icon-btn" data-a="nova-playlist" aria-label="Nova playlist">${icone('add')}</button>` })}
         <div class="group-title">Automáticas</div>
-        <div class="group">${auto.map(([id, n, ic, c]) => `<div class="row-i" data-a="playlist" data-id="${id}" tabindex="0">
-          <div class="ic pri">${icone(ic, 'fill')}</div><div><div class="ti">${n}</div><div class="sb">${plural(c, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}</div>
+        <div class="group">${auto.map(([id, n, ic, c, um = 'música', varios = 'músicas']) => `<div class="row-i" data-a="${id === 'albuns-favoritos' ? 'albuns-favoritos' : 'playlist'}" data-id="${id}" tabindex="0">
+          <div class="ic pri">${icone(ic, 'fill')}</div><div><div class="ti">${n}</div><div class="sb">${plural(c, um, varios)}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}</div>
         <div class="group-title">Suas playlists</div>
         <div class="group">${S.playlists.map(p => `<div class="row-i" data-a="playlist" data-id="${p.id}" tabindex="0">
           <div class="ic">${mosaico(p.musicas)}</div><div style="min-width:0"><div class="ti">${esc(p.nome)}</div><div class="sb">${plural(p.musicas.length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}
           <div class="row-i" data-a="nova-playlist" tabindex="0"><div class="ic pri">${icone('add')}</div><div><div class="ti">Nova playlist</div></div><span></span></div>
         </div>`;
+    },
+  },
+
+  /* ---------- 9b. Álbuns favoritos ---------- */
+  'albuns-favoritos': {
+    chave: () => 'albuns-favoritos',
+    render: () => {
+      const as = [...S.albunsFavoritos].map(album).filter(a => albunsVisiveis().includes(a));
+      return `${topbar('Álbuns favoritos', { pequeno: true })}
+        ${as.length ? `<div class="list-head"><span class="count">${plural(as.length, 'álbum', 'álbuns')}</span></div><div class="albums">${as.map(cartaoAlbum).join('')}</div>`
+          : `<div class="empty"><span class="ms big">album</span><h3>Nenhum álbum favorito</h3><p>Toque no coração na página de um álbum, ou use o menu ⋮ dele, para ele aparecer aqui.</p></div>`}`;
     },
   },
 
@@ -685,7 +716,7 @@ function mosaico(ids, grande = false) {
   return `<div class="pl-mosaic" style="width:100%;height:100%">${as.map(capa).join('')}</div>`;
 }
 function dadosPlaylist(id) {
-  if (id === 'favoritas') return { nome: 'Favoritas', icone: 'favorite', ids: [...S.favoritas], desc: 'Automática' };
+  if (id === 'favoritas') return { nome: 'Músicas favoritas', icone: 'favorite', ids: [...S.favoritas], desc: 'Automática' };
   if (id === 'tocadas') return { nome: 'Mais tocadas', icone: 'trending_up', ids: biblioteca().slice().sort((a, b) => b.tocadas - a.tocadas).slice(0, 20).map(m => m.id), desc: 'Automática' };
   if (id === 'recentes') return { nome: 'Adicionadas recentemente', icone: 'schedule', ids: biblioteca().slice().reverse().slice(0, 20).map(m => m.id), desc: 'Automática' };
   const p = S.playlists.find(x => x.id === id);
@@ -903,7 +934,7 @@ function menuMusica(id) {
       <button class="menu-i" data-a="tocar-seguir" data-mid="${id}">${icone('playlist_play')}Tocar a seguir</button>
       <button class="menu-i" data-a="add-fila" data-mid="${id}">${icone('add_to_queue')}Adicionar ao fim da fila</button>
       <button class="menu-i" data-a="add-playlist" data-mid="${id}">${icone('playlist_add')}Adicionar à playlist</button>
-      <button class="menu-i" data-a="favoritar" data-mid="${id}">${icone('favorite', fav ? 'fill' : '')}${fav ? 'Remover das favoritas' : 'Adicionar às favoritas'}</button>
+      <button class="menu-i" data-a="favoritar" data-mid="${id}">${icone('favorite', fav ? 'fill' : '')}${fav ? 'Remover das músicas favoritas' : 'Adicionar às músicas favoritas'}</button>
       ${a.semMetadados ? '' : `<button class="menu-i" data-a="album" data-id="${a.id}">${icone('album')}Ir para o álbum</button>
       <button class="menu-i" data-a="artista" data-nome="${esc(m.artista)}">${icone('mic')}Ir para o artista</button>`}
       <button class="menu-i" data-a="info-arquivo" data-mid="${id}">${icone('info')}Detalhes do arquivo</button>
@@ -1057,10 +1088,18 @@ function simularSistema(tipo) {
   atualizarPainel(tipo === 'bloqueio' ? 'sim-bloqueio' : 'sim-notificacao');
 }
 
+function alternarAlbumFavorito(id) {
+  const tem = S.albunsFavoritos.has(id);
+  const mudar = () => { tem ? S.albunsFavoritos.delete(id) : S.albunsFavoritos.add(id); marcarFavoritos(); if (telaAtual === 'albuns-favoritos') render('none'); };
+  const desfazer = () => { tem ? S.albunsFavoritos.add(id) : S.albunsFavoritos.delete(id); marcarFavoritos(); if (telaAtual === 'albuns-favoritos') render('none'); };
+  mudar();
+  aviso(tem ? 'Álbum removido dos favoritos' : 'Álbum adicionado aos favoritos', 'Desfazer', desfazer);
+}
 function alternarFavorita(id) {
   const tem = S.favoritas.has(id);
   tem ? S.favoritas.delete(id) : S.favoritas.add(id);
-  aviso(tem ? 'Removida das favoritas' : 'Adicionada às favoritas', 'Desfazer', () => { tem ? S.favoritas.add(id) : S.favoritas.delete(id); atualizarPlayer(); });
+  marcarFavoritos();
+  aviso(tem ? 'Removida das músicas favoritas' : 'Adicionada às músicas favoritas', 'Desfazer', () => { tem ? S.favoritas.add(id) : S.favoritas.delete(id); marcarFavoritos(); atualizarPlayer(); });
   atualizarPlayer();
 }
 
@@ -1087,6 +1126,7 @@ const ACOES = {
   'menu': b => menuMusica(b.dataset.mid),
   'menu-album': b => { const a = album(b.dataset.id); const ids = biblioteca().filter(m => m.album === a.id).map(m => m.id);
     abrirFolha(`<div class="s-head"><div class="cover">${capa(a)}</div><div><div class="ti">${esc(a.titulo)}</div><div class="ar">${esc(a.artistaNome)}</div></div></div><div class="s-body">
+      ${a.semMetadados ? '' : `<button class="menu-i" data-a="favoritar-album" data-id="${a.id}">${icone('favorite', S.albunsFavoritos.has(a.id) ? 'fill' : '')}${S.albunsFavoritos.has(a.id) ? 'Remover dos álbuns favoritos' : 'Adicionar aos álbuns favoritos'}</button>`}
       <button class="menu-i" data-a="seguir-varias" data-ids="${ids.join(',')}">${icone('playlist_play')}Tocar a seguir</button>
       <button class="menu-i" data-a="fila-varias" data-ids="${ids.join(',')}">${icone('add_to_queue')}Adicionar ao fim da fila</button>
       ${a.semMetadados ? '' : `<button class="menu-i" data-a="artista" data-nome="${esc(a.artistaNome)}">${icone('mic')}Ir para o artista</button>`}</div>`); },
@@ -1117,6 +1157,8 @@ const ACOES = {
   'tocar-seguir': b => { const id = b.dataset.mid; fecharSobreposicao(); if (!atual()) return tocarLista([id], 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.splice(S.idx + 1, 0, id); S.filaOriginal.push(id); aviso('Vai tocar a seguir'); },
   'add-fila': b => { const id = b.dataset.mid; fecharSobreposicao(); if (!atual()) return tocarLista([id], 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.push(id); S.filaOriginal.push(id); aviso('Adicionada ao fim da fila'); },
   'favoritar': b => { fecharSobreposicao(); alternarFavorita(b.dataset.mid); },
+  'favoritar-album': b => { fecharSobreposicao(); alternarAlbumFavorito(b.dataset.id); },
+  'albuns-favoritos': () => ir('albuns-favoritos'),
   'info-arquivo': b => infoArquivo(b.dataset.mid),
   'abrir-np': (b, e) => { if (e.target.closest('[data-a="play"],[data-a="proxima"]')) return; abrirNP(); },
   'fechar-np': () => fecharNP(),
@@ -1190,11 +1232,12 @@ const NOTAS = {
   'biblioteca-albuns': 'Grade de álbuns com capas. Os MP3 sem capa ganham uma gerada a partir do nome do álbum.',
   'biblioteca-artistas': 'Artistas em grade, com a foto da pasta do artista (artista.jpg). Sem foto, aparece a capa do primeiro álbum dele.',
   'biblioteca-pastas': 'A biblioteca vista pelas pastas. Útil para quem organiza tudo em pastas, e mostra exatamente o que foi lido.',
-  'album': 'Detalhe do álbum: capa grande, faixas numeradas e a pasta de origem no rodapé.',
+  'album': 'O coração ao lado de Tocar/Aleatório favorita o álbum. Detalhe do álbum: capa grande, faixas numeradas e a pasta de origem no rodapé.',
   'artista': 'Foto grande do artista no topo, com o nome por cima. Sem foto (ex.: Titãs), a capa do álbum vira um fundo desfocado. Depois vêm os álbuns e as músicas.',
   'pasta': 'Navegação por pasta: pastas de artista mostram a foto e pastas de álbum mostram a capa. As imagens reconhecidas (artista.jpg, capa.jpg) aparecem destacadas.',
   'busca': 'Busca instantânea em músicas, álbuns e artistas, ignorando acentos ("aguas" acha "Águas"). As buscas recentes ficam salvas.',
-  'playlists': 'Playlists automáticas (favoritas, mais tocadas, recentes) e as suas.',
+  'playlists': 'Playlists automáticas (músicas favoritas, álbuns favoritos, mais tocadas, recentes) e as suas.',
+  'albuns-favoritos': 'Álbuns marcados com o coração, na página do álbum ou no menu ⋮ dele.',
   'playlist': 'Detalhe da playlist. Pelo ⋮ do topo dá para renomear ou excluir.',
   'ajustes': 'Pastas da biblioteca (adicionar e remover), subpastas, timer, retomar, fone, dica de bateria e tema.',
   'tocando': 'A capa do álbum vira o selo do disco. O braço desce ao tocar e sobe ao pausar, e o disco desacelera. O fundo ganha um toque da cor da capa. Toque no ícone de info para ver o arquivo.',
