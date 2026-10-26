@@ -22,7 +22,7 @@ Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mocku
 | 1 | **Boas-vindas** | As três promessas (só as pastas escolhidas, toca com a tela apagada, nada sai do celular) e o botão "Escolher pasta de músicas". |
 | 2 | **Seletor de pasta** | É a tela do **Android** (SAF), não do app, e tem estilo de sistema de propósito. A raiz e "Download" são bloqueadas, como no Android real. Depois vem o pedido "Permitir acesso". |
 | 3 | **Escaneamento** | Progresso arquivo por arquivo e resumo final ("50 músicas em 9 álbuns"). Escolhendo "WhatsApp", aparece o caso sem músicas. |
-| 4 | **Biblioteca** | Filtros Músicas / Álbuns / Artistas / Pastas. Tocar e Aleatório. Ordenação A–Z, recentes e mais tocadas. |
+| 4 | **Biblioteca** | Filtros **Artistas** / Músicas / Álbuns / Pastas. **Artistas** vem primeiro e já fica selecionado quando o app abre (grade de fotos). Em Músicas: Tocar, Aleatório e ordenação A–Z, recentes e mais tocadas. "Artista desconhecido" fica sempre no fim. |
 | 5 | **Álbum** | Capa grande, faixas numeradas, pasta de origem no rodapé. O álbum "Sem álbum" mostra como ficam arquivos sem metadados. |
 | 6 | **Artista** | Foto grande do artista no topo, com o nome por cima, e depois álbuns e músicas. Sem foto, a capa do álbum vira um fundo desfocado. |
 | 7 | **Pasta** | Navegação pela estrutura de pastas. Pastas de artista mostram a foto, pastas de álbum mostram a capa, e as imagens reconhecidas aparecem destacadas. |
@@ -127,7 +127,7 @@ Exemplo: buscar "águas" traz Elis Regina (artista), Elis & Tom (álbum) e Água
 ## Decisões tomadas no mockup
 
 - **Navegação:** 4 abas (Biblioteca, Playlists, Buscar, Ajustes), com o mini player fixo acima delas.
-- **Biblioteca:** uma aba só, com filtros em chips, no lugar de quatro abas separadas.
+- **Biblioteca:** uma aba só, com filtros em chips (Artistas, Músicas, Álbuns, Pastas), no lugar de quatro abas separadas. Abre em **Artistas**.
 - **Gestão de pastas fica em Ajustes:** a aba "Pastas" da biblioteca é só para navegar.
 - **Busca em camadas:** artistas, álbuns e músicas sempre em seções separadas, com os itens ligados entre si.
 - **Ações destrutivas** (remover pasta, excluir playlist, tirar da fila) pedem confirmação quando não dá para desfazer, ou mostram "Desfazer" no aviso.

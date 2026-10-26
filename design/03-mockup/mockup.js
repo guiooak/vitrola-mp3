@@ -48,7 +48,7 @@ const ESTADO_INICIAL = () => ({
   favoritas: new Set(D.favoritas),
   albunsFavoritos: new Set(D.albunsFavoritos),
   recentes: ['Milton', 'Águas de Março', 'Caetano'],
-  libTab: 'musicas',
+  libTab: 'artistas', // filtro padrão ao abrir o app
   ordem: 'az',
   // player
   fila: [], filaOriginal: [], idx: 0, tocando: false, pos: 0,
@@ -73,7 +73,9 @@ function artistas() {
     if (!map.has(m.artista)) map.set(m.artista, { nome: m.artista, musicas: [], albuns: new Set() });
     const a = map.get(m.artista); a.musicas.push(m.id); a.albuns.add(m.album);
   });
-  return [...map.values()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  // "Artista desconhecido" (arquivos sem metadados) sempre por último
+  const ultimo = a => a.nome === 'Artista desconhecido' ? 1 : 0;
+  return [...map.values()].sort((a, b) => ultimo(a) - ultimo(b) || a.nome.localeCompare(b.nome, 'pt-BR'));
 }
 const musicasDaPasta = (pasta, sub) => biblioteca().filter(m => sub ? (m.pasta === pasta || m.pasta.startsWith(pasta + '/')) : m.pasta === pasta);
 function subpastasDe(pasta) {
@@ -441,7 +443,7 @@ const TELAS = {
     chave: () => 'biblioteca-' + S.libTab,
     render: () => {
       const vazia = !S.pastas.length || !biblioteca().length;
-      const chips = [['musicas', 'Músicas'], ['albuns', 'Álbuns'], ['artistas', 'Artistas'], ['pastas', 'Pastas']]
+      const chips = [['artistas', 'Artistas'], ['musicas', 'Músicas'], ['albuns', 'Álbuns'], ['pastas', 'Pastas']]
         .map(([k, n]) => `<button class="chip-f" data-a="lib-tab" data-tab="${k}" aria-pressed="${S.libTab === k}">${icone('check')}${n}</button>`).join('');
       let corpo = '';
       if (!S.pastas.length) corpo = vazioDisco('Nenhum disco na vitrola', 'Escolha a pasta onde estão suas músicas. Só ela será lida, nada mais do celular.');
@@ -1110,7 +1112,7 @@ const ACOES = {
   'voltar': () => voltar(),
   'aba': b => aba(b.dataset.tab),
   'escolher-pasta': b => { fecharSobreposicao(true); abrirSeletor(b.dataset.origem || (S.configurado ? 'ajustes' : 'onboarding'), S.configurado ? '' : ''); },
-  'ir-biblioteca': () => { S.libTab = 'musicas'; raiz('biblioteca'); },
+  'ir-biblioteca': () => { S.libTab = 'artistas'; raiz('biblioteca'); },
   'lib-tab': b => { S.libTab = b.dataset.tab; pilha[0].params = {}; render('none'); },
   'ordem': () => abrirFolha(`<h3>Ordenar músicas</h3><div class="s-body">${Object.entries(ORDENS).map(([k, n]) =>
       `<button class="menu-i ${S.ordem === k ? 'sel' : ''}" data-a="set-ordem" data-k="${k}">${icone(S.ordem === k ? 'radio_button_checked' : 'radio_button_unchecked')}${n}</button>`).join('')}</div>`),
@@ -1254,9 +1256,9 @@ const ATALHOS = [
   ['boas-vindas', 'Boas-vindas', () => { zerar(); }],
   ['seletor', 'Seletor de pasta (Android)', () => { zerar(); abrirSeletor('onboarding', ''); }],
   ['escaneamento', 'Escaneamento', () => { garantirBiblioteca(); raiz('escaneamento'); }],
+  ['biblioteca-artistas', 'Biblioteca · Artistas', () => { garantirBiblioteca(); S.libTab = 'artistas'; raiz('biblioteca'); }],
   ['biblioteca-musicas', 'Biblioteca · Músicas', () => { garantirBiblioteca(); S.libTab = 'musicas'; raiz('biblioteca'); }],
   ['biblioteca-albuns', 'Biblioteca · Álbuns', () => { garantirBiblioteca(); S.libTab = 'albuns'; raiz('biblioteca'); }],
-  ['biblioteca-artistas', 'Biblioteca · Artistas', () => { garantirBiblioteca(); S.libTab = 'artistas'; raiz('biblioteca'); }],
   ['biblioteca-pastas', 'Biblioteca · Pastas', () => { garantirBiblioteca(); S.libTab = 'pastas'; raiz('biblioteca'); }],
   ['album', 'Álbum', () => { garantirBiblioteca(); S.libTab = 'albuns'; raiz('biblioteca'); ir('album', { id: 'clube' }); }],
   ['artista', 'Artista', () => { garantirBiblioteca(); S.libTab = 'artistas'; raiz('biblioteca'); ir('artista', { nome: 'Caetano Veloso' }); }],
@@ -1298,7 +1300,7 @@ const SIMULACOES = {
     const tinha = atual();
     if (S.tocando) { S.angulo = anguloAtual(); S.tocando = false; }
     if (!S.retomar) { S.fila = []; }
-    S.libTab = 'musicas'; raiz('biblioteca');
+    S.libTab = 'artistas'; raiz('biblioteca');
     if (tinha && S.retomar) aviso(`Continuando de onde parou: "${esc(tinha.titulo)}" em ${fmt(S.pos)}`, 'Tocar', () => play(true));
     else aviso('App reaberto do zero');
   },
@@ -1333,7 +1335,7 @@ function garantirBiblioteca() {
 }
 function garantirTocando() {
   garantirBiblioteca();
-  if (telaAtual === 'boas-vindas' || telaAtual === 'escaneamento') { S.libTab = 'musicas'; raiz('biblioteca'); }
+  if (telaAtual === 'boas-vindas' || telaAtual === 'escaneamento') { S.libTab = 'artistas'; raiz('biblioteca'); }
   if (!atual()) { const a = biblioteca().filter(m => m.album === 'elistom'); tocarLista(a.map(m => m.id), 0, { tipo: 'Tocando do álbum', nome: 'Elis & Tom' }, false); S.pos = 47; }
 }
 function zerar() {

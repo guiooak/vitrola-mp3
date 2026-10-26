@@ -71,7 +71,7 @@ Projeto pessoal: commits e push direto na `main`, sem branches nem pull requests
 
 Definida no mockup ([03-mockup.md](design/03-mockup.md)):
 - 4 abas (Biblioteca, Playlists, Buscar, Ajustes), com o mini player fixo acima delas;
-- a biblioteca é uma tela só, com filtros Músicas / Álbuns / Artistas / Pastas;
+- a biblioteca é uma tela só, com filtros Artistas / Músicas / Álbuns / Pastas, e abre em **Artistas** (pedido do usuário);
 - a gestão de pastas (adicionar e remover) fica em Ajustes;
 - ações destrutivas sempre têm confirmação ou "Desfazer".
 - a busca mostra sempre três seções (Artistas, Álbuns, Músicas), incluindo os itens ligados aos resultados diretos (pedido do usuário).
