@@ -45,7 +45,7 @@ Personal use first, **Play Store–ready** from day one:
 - Communicates in Brazilian Portuguese; expects the repository in English.
 - Likes the record-label animation and the heart (favorites) interaction.
 - Wants the library to open on **Artists**.
-- Organizes music as `Music/<Genre>/<Artist>/<Album>/`, with `artist.jpg` in artist folders and `cover.jpg` in album folders.
+- Organizes music as `Music/<Genre>/<Artist>/<Album>/`, with one image per artist and album folder; the naming rule is D19 (`folder.jpg`, else the only image).
 
 ## Repository layout today
 
@@ -61,7 +61,7 @@ design/
   03-mockup/         index.html, mockup.css, mockup.js, data.js
   index.html         landing page
 docs/
-  decisions.md       D1–D18
+  decisions.md       D1–D19
   design/            01-logo.md, 02-style-guide.md, 03-mockup.md
 ```
 

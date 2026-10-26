@@ -4,7 +4,6 @@ Ask the maintainer before deciding these. Record the answer in `docs/decisions.m
 
 | # | Question | Context / current assumption |
 |---|---|---|
-| Q3 | **Accepted image file names.** | Proposed by the design phase: artist `artist/photo/artista/foto`, cover `cover/folder/front/album/capa`. The maintainer uses `artist.jpg` and `cover.jpg`. Confirm or extend. |
 | Q4 | **Play-count rule** for "Most played". | Proposed: count after ≥ 50% or ≥ 30 s. |
 | Q5 | **Drag to reorder the queue** in v1? | Shown as a handle in the mockup but not implemented there. Proposed P1. |
 | Q6 | **Swipe down to close "Now playing"** and other gestures. | Not in the mockup; proposed as a natural Android behavior. |
@@ -19,6 +18,7 @@ Ask the maintainer before deciding these. Record the answer in `docs/decisions.m
 |---|---|---|
 | Q1 | Is the HTML mockup formally approved? | **Yes** (D17, 2026-10-25). |
 | Q2 | UI language(s) at launch | **US English, Brazilian Portuguese and Spanish** (D18). |
+| Q3 | Image file names | **`folder.(jpg|jpeg|png)` in any case, else the folder's only image** (D19). |
 
 ## Explicitly out of scope for now
 

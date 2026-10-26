@@ -81,11 +81,11 @@ Defined in the mockup ([03-mockup.md](design/03-mockup.md)):
 ### D12 · Artist photos and album covers from the folders
 **2026-10-25**
 
-Each artist folder has a photo (`artist.jpg`) and each album folder has a cover (`cover.jpg`). The app uses these images on every screen.
+Each artist folder has a photo and each album folder has a cover. The app uses these images on every screen. Which file counts as the photo/cover is defined in D19.
 - **Cover:** image in the folder → cover embedded in the MP3 → generated cover.
 - **Artist photo:** image in the folder → first album cover in a circle.
 - The previous look (generated cover, cover in a circle) becomes the fallback when there is no image, as the maintainer requested.
-- Details, accepted file names and where each image appears: [03-mockup.md](design/03-mockup.md#artist-photos-and-album-covers).
+- Details and where each image appears: [03-mockup.md](design/03-mockup.md#artist-photos-and-album-covers).
 
 ### D13 · Favorite songs and albums
 **2026-10-25**
@@ -122,3 +122,16 @@ The app ships in **three languages** from the first version: US English, Brazili
 - The app follows the device language. Per-app language selection (Android 13+ `locales_config`) is supported so users can pick one of the three in system settings.
 - The repository rule (D15) still applies: code, docs and the source strings stay in English; the translations live only in the Android string resources.
 - No text is hardcoded in the UI; every string, plural and content description goes through resources.
+
+### D19 · Folder image rule: `folder.*`, else the only image
+**2026-10-26**
+
+The same rule applies to artist folders (photo) and album folders (cover). In each folder the app uses:
+
+1. a file named `folder.jpg`, `folder.jpeg` or `folder.png` (any letter case) in the folder;
+2. otherwise, if the folder has **exactly one** image (`.jpg`, `.jpeg` or `.png`), that image;
+3. otherwise, no folder image (several images and none named `folder.*` is ambiguous).
+
+- An **album folder** is a folder that contains audio files; an **artist folder** is the folder right above album folders. So `folder.jpg` in an artist folder is the artist photo and in an album folder is the album cover.
+- After the folder image, the fallbacks from D12 still apply: cover embedded in the audio file (albums only), then the generated cover; for artists, the first album cover in a circle.
+- Replaces the earlier proposal of several accepted names (`artist`, `cover`, `capa`…). Existing `artist.jpg` / `cover.jpg` files keep working when they are the only image in their folder.

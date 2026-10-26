@@ -14,7 +14,7 @@
 - **Duplicate files** across folders → separate tracks (different document URIs); no dedupe in v1.
 - **Odd metadata:** empty strings, whitespace, "feat." artists, missing track numbers (sort by file name), multi-disc albums (sort by disc, then track).
 - **Unknown album / Unknown artist** always sort last and cannot be favorited (album).
-- **Images:** several accepted names in one folder → use the preference order; huge images → downsample; corrupt images → fall back silently.
+- **Images (D19):** `FOLDER.JPG`/`Folder.png` match regardless of case; `folder.jpg` wins over other images; one image with any name is used; several images and no `folder.*` → no folder image (embedded/generated); huge images → downsample; corrupt images → fall back silently.
 
 ### Playback
 - **Broken/unsupported file** → skip with a snackbar; if every file in the queue fails, stop and show the snackbar once.

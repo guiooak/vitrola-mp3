@@ -165,11 +165,17 @@ function folderThumb(c, icon = 'folder') {
   const al = albumOfFolder(c); if (al) return `<div class="ic">${cover(al)}</div>`;
   return `<div class="ic">${iconHtml(icon)}</div>`;
 }
+// Images picked for a folder (D19 rule is applied in data.js)
 function folderImages(c) {
   const ar = artistOfFolder(c), al = albumOfFolder(c), out = [];
-  if (ar && ar.photo) out.push({ file: ar.photo, use: 'artist photo' });
-  if (al && al.cover) out.push({ file: al.cover, use: 'album cover' });
+  if (ar && ar.photo) out.push({ file: ar.photo, use: 'artist photo', only: ar.photoReason === 'only' });
+  if (al && al.cover) out.push({ file: al.cover, use: 'album cover', only: al.coverReason === 'only' });
   return out;
+}
+// Every image file in a folder (for the system picker and the folder page)
+function allFolderImages(c) {
+  const ar = artistOfFolder(c), al = albumOfFolder(c);
+  return [...(ar ? ar.images : []), ...(al ? al.images : [])];
 }
 
 /* ============================================================
@@ -531,7 +537,8 @@ const SCREENS = {
       return `${topbar(esc(parts[parts.length - 1]))}
         <div class="crumbs">${iconHtml('smartphone')} Internal storage ${parts.map(p => `${iconHtml('chevron_right')} ${esc(p)}`).join(' ')}</div>
         ${all.length ? playActions(k) : ''}
-        ${folderImages(path).map(im => `<div class="img-file">${iconHtml('image')}<span><b>${esc(im.file)}</b> · used as the ${im.use}</span></div>`).join('')}
+        ${folderImages(path).map(im => `<div class="img-file">${iconHtml('image')}<span><b>${esc(im.file)}</b> · used as the ${im.use}${im.only ? ' (only image in the folder)' : ''}</span></div>`).join('')}
+        ${!folderImages(path).length && allFolderImages(path).length > 1 ? `<div class="img-file">${iconHtml('image')}<span>${allFolderImages(path).length} images and no <b>folder.jpg</b> · using the generated cover</span></div>` : ''}
         ${subs.length ? `<div class="group">${subs.map(sp => `<div class="row-i" data-action="folder" data-path="${esc(path + '/' + sp)}">${folderThumb(path + '/' + sp)}
           <div><div class="ti">${esc(sp)}</div><div class="sb">${plural(songsInFolder(path + '/' + sp, true).length, 'song', 'songs')}</div></div>${iconHtml('chevron_right', 'chev')}</div>`).join('')}</div>` : ''}
         ${direct.map((m, i) => `<div class="track" data-mid="${m.id}" data-action="play-from" data-ctx="${k2}" data-i="${i}" tabindex="0">
@@ -638,7 +645,7 @@ const SCREENS = {
             <button class="icon-btn" data-action="remove-folder" data-id="${p.id}" aria-label="Remove folder ${esc(p.name)}">${iconHtml('remove_circle_outline')}</button></div>`).join('')}
           <div class="row-i" data-action="choose-folder" data-origin="settings" tabindex="0"><div class="ic tinted">${iconHtml('create_new_folder')}</div><div><div class="ti">Add folder</div><div class="sb">Only chosen folders go into the library</div></div><span></span></div>
           <div class="row-i" data-action="toggle" data-k="subfolders"><div class="ic tinted">${iconHtml('subdirectory_arrow_right')}</div><div><div class="ti">Include subfolders</div><div class="sb">Look for songs inside the chosen folders</div></div><button class="switch" role="switch" aria-checked="${S.subfolders}" aria-label="Include subfolders"></button></div>
-          <div class="row-i" data-action="toggle" data-k="useFolderImages"><div class="ic tinted">${iconHtml('photo_library')}</div><div><div class="ti">Use folder photos and covers</div><div class="sb">artist.jpg in the artist folder and cover.jpg in the album folder</div></div><button class="switch" role="switch" aria-checked="${S.useFolderImages}" aria-label="Use folder photos and covers"></button></div>
+          <div class="row-i" data-action="toggle" data-k="useFolderImages"><div class="ic tinted">${iconHtml('photo_library')}</div><div><div class="ti">Use folder photos and covers</div><div class="sb">folder.jpg in each artist and album folder, or the folder's only image</div></div><button class="switch" role="switch" aria-checked="${S.useFolderImages}" aria-label="Use folder photos and covers"></button></div>
           <div class="row-i" data-action="rescan" tabindex="0"><div class="ic tinted">${iconHtml('refresh')}</div><div><div class="ti">Look for new songs</div><div class="sb">Also happens automatically when you open the app</div></div><span></span></div>
         </div>
         <div class="group-title">Playback</div>
@@ -992,7 +999,7 @@ function openPicker(origin = 'onboarding', path = '') {
   const names = path ? path.split('/') : [];
   const folders = D.systemFolders.filter(x => path ? x.startsWith(path + '/') && !x.slice(path.length + 1).includes('/') : !x.includes('/'))
     .map(x => x.split('/').pop()).sort((a, b) => a.localeCompare(b, LOCALE));
-  const files = [...folderImages(path).map(i => i.file), ...D.songs.filter(m => m.folder === path).map(m => m.file)];
+  const files = [...allFolderImages(path), ...D.songs.filter(m => m.folder === path).map(m => m.file)];
   const blocked = !path || path === 'Download' || path === 'Android';
   const div = document.createElement('div');
   div.className = 'sys';
@@ -1227,11 +1234,11 @@ const NOTES = {
   'scan': 'Reads only the chosen folder and shows real progress, file by file. At the end it summarizes what it found.',
   'library-songs': 'Filters at the top, "Play" and "Shuffle", and sorting (A–Z, recent, most played). Tap a song to play it; ⋮ opens the menu.',
   'library-albums': 'Album grid with covers. MP3s without a cover get one generated from the album name.',
-  'library-artists': 'Main screen when the app opens. Artists in a grid, with the photo from the artist folder (artist.jpg). Without a photo, the artist\'s first album cover is shown.',
+  'library-artists': 'Main screen when the app opens. Artists in a grid, with the photo from the artist folder (folder.jpg, or its only image). Without a photo, the artist\'s first album cover is shown.',
   'library-folders': 'The library seen through folders. Useful for people who organize everything in folders, and shows exactly what was read.',
   'album': 'The heart next to Play/Shuffle favorites the album. Album details: large cover, numbered tracks and the source folder at the bottom.',
   'artist': 'Large artist photo at the top with the name over it. Without a photo (e.g. Titãs), the album cover becomes a blurred background. Then come the albums and songs.',
-  'folder': 'Browsing by folder: artist folders show the photo and album folders show the cover. Recognized images (artist.jpg, cover.jpg) are highlighted.',
+  'folder': 'Browsing by folder: artist folders show the photo and album folders show the cover. The image in use is highlighted: folder.jpg, or the folder\'s only image (Tim Maia, Transa). Cabeça Dinossauro has two images and no folder.jpg, so it uses the generated cover.',
   'search': 'Instant search across songs, albums and artists, ignoring accents ("aguas" finds "Águas"). Results are always split into three sections. Recent searches are saved.',
   'playlists': 'Automatic playlists (favorite songs, favorite albums, most played, recently added) and your own.',
   'favorite-albums': 'Albums marked with the heart, on the album page or in its ⋮ menu.',

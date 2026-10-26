@@ -25,7 +25,7 @@ Open http://localhost:8765/03-mockup/. Opening `design/03-mockup/index.html` dir
 | 4 | **Library** | **Artists** / Songs / Albums / Folders filters. **Artists** comes first and is selected when the app opens (photo grid). In Songs: Play, Shuffle and sorting by A–Z, recently added and most played. "Unknown artist" always goes last. |
 | 5 | **Album** | Large cover, numbered tracks, source folder at the bottom. The "Unknown album" shows how files without metadata look. |
 | 6 | **Artist** | Large artist photo at the top with the name over it, then albums and songs. Without a photo, the album cover becomes a blurred background. |
-| 7 | **Folder** | Browsing the folder structure. Artist folders show the photo, album folders show the cover, and recognized images are highlighted. |
+| 7 | **Folder** | Browsing the folder structure. Artist folders show the photo, album folders show the cover, and the image in use is highlighted (or a note when several images make it ambiguous). |
 | 8 | **Search** | Results always in three separate sections: **Artists**, **Albums** and **Songs**. Each layer brings what matches the text and what is linked to it (see [search rules](#search-rules)). Ignores accents ("aguas" finds "Águas de Março"). Shows recent searches and artists to explore. |
 | 9 | **Playlists** | Automatic ones (Favorite songs, Favorite albums, Most played, Recently added) and the user's own, with a mosaic cover. |
 | 10 | **Playlist** | Play, Shuffle, rename and delete (with undo). |
@@ -44,20 +44,19 @@ The user organizes music like this, with one image per folder:
 Music/
   MPB/
     Gilberto Gil/
-      artist.jpg               ← artist photo
+      folder.jpg               ← artist photo
       Refavela (1977)/
-        cover.jpg              ← album cover
+        folder.jpg             ← album cover
         01 - Ilê Ayê.mp3
 ```
 
-**Recognized names** (case-insensitive; `.jpg`, `.jpeg`, `.png` or `.webp`):
+**Which image is used (D19)** — the same rule for artist and album folders:
 
-| Image | Accepted names, in order of preference |
-|---|---|
-| Artist photo (in the artist folder) | `artist`, `photo`, `artista`, `foto` |
-| Album cover (in the album folder) | `cover`, `folder`, `front`, `album`, `capa` |
+1. a file named `folder.jpg`, `folder.jpeg` or `folder.png` (any letter case) in the folder;
+2. otherwise, if the folder has **exactly one** image (`.jpg`, `.jpeg` or `.png`), that image;
+3. otherwise, no folder image (several images and none named `folder.*` is ambiguous).
 
-The Portuguese names (`artista`, `foto`, `capa`) are accepted too, since folders are named by the user.
+An album folder is one that contains audio files; an artist folder is the one right above the album folders. In the mockup, Tim Maia (artist) and Transa (album) use their only image, Elis & Tom uses `Folder.PNG` even though it also has `back.jpg`, and Cabeça Dinossauro has two images without `folder.*`, so it falls back to the generated cover.
 
 **When there is no image** (the earlier look becomes the fallback):
 

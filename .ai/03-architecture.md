@@ -63,7 +63,7 @@ The system picker blocks the storage root and `Download` on modern Android; the 
 - Walk the tree with `DocumentsContract.buildChildDocumentsUriUsingTree()` + `contentResolver.query()` (much faster than `DocumentFile.listFiles()`), selecting `COLUMN_DOCUMENT_ID`, `COLUMN_DISPLAY_NAME`, `COLUMN_MIME_TYPE`, `COLUMN_LAST_MODIFIED`, `COLUMN_SIZE`.
 - Recurse into subfolders only if "Include subfolders" is ON.
 - Audio files: `MIME_TYPE` starts with `audio/` or the extension is in the supported list.
-- Image files: names from the accepted lists in 02-product-requirements §3; remember them per folder.
+- Image files (`.jpg`, `.jpeg`, `.png`): remember every image per folder, then pick with the D19 rule (`folder.*` any case → the only image → none).
 - **Incremental:** a file is re-read only when `lastModified` or `size` changed; files that disappeared are removed. Store `dateAdded` = first time the file was seen (drives "Recently added").
 - Metadata via `MediaMetadataRetriever` (`setDataSource(context, uri)`): title, artist, album artist, album, track number, disc number, year, duration, and whether an embedded picture exists (do not store the bitmap in the DB).
 - Missing title → file name without extension. Missing artist → "Unknown artist". Missing album → "Unknown album".
@@ -89,8 +89,8 @@ recent_searches(query PK, searchedAt)   -- keep newest 6
 Grouping rules:
 - `albumKey` = normalized(albumArtist ?: artist) + "|" + normalized(album). Files with no album/artist share the key of "Unknown album" / "Unknown artist".
 - `artistKey` = normalized(albumArtist ?: artist). Album lists use album artist; song rows show the track artist.
-- **Album folder** = the directory that contains the album's tracks (if tracks are spread over several, use the most common one). **Cover** = accepted image in that directory.
-- **Artist folder** = the parent directory of the album folder when its name matches the artist name (normalized), otherwise the album folder's parent if it contains an accepted artist image. **Photo** = accepted image there.
+- **Album folder** = the directory that contains the album's tracks (if tracks are spread over several, use the most common one). **Cover** = the D19 pick in that directory.
+- **Artist folder** = the parent directory of the album folder when its name matches the artist name (normalized), otherwise the album folder's parent if it contains no audio files of its own. **Photo** = the D19 pick there.
 - Normalization for keys and search: Unicode NFD, strip diacritics, lowercase, trim, collapse spaces.
 
 Settings (DataStore): `subfolders`, `useFolderImages`, `resume`, `pauseOnUnplug`, `theme` (auto/light/dark), `librarySort` (az/recent/plays), `libraryTab` (default `artists` on every launch — do not persist a different start tab unless the maintainer asks).

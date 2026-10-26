@@ -26,7 +26,7 @@ Each requirement references the decision (D#) in `docs/decisions.md` when there 
 - **Folders:** the chosen folders and their subfolders, as browsable rows. Artist folders show the artist photo (round), album folders show the cover.
 - **Album page:** large cover, title, artist chip (small photo + name → artist page), year · song count · total duration, Play / Shuffle / heart (favorite album), numbered track list, source folder path at the bottom.
 - **Artist page:** large photo banner at the top with the name over it; without a photo, the first album cover becomes a blurred background. Then Play / Shuffle, albums (horizontal scroller), songs.
-- **Folder page:** breadcrumb path, Play / Shuffle (all songs below, recursive), recognized image files highlighted ("artist.jpg · used as the artist photo"), subfolders, then the files directly inside (shown by **file name**, with title · artist below).
+- **Folder page:** breadcrumb path, Play / Shuffle (all songs below, recursive), the image in use highlighted ("folder.jpg · used as the album cover", or "… (only image in the folder)"), or a note when several images and no `folder.*` make it ambiguous, subfolders, then the files directly inside (shown by **file name**, with title · artist below).
 - **Files without metadata** are grouped under album "Unknown album" and artist "Unknown artist", and listed by file name.
 
 ## 3. Artist photos and album covers (D12) — P0
@@ -34,14 +34,16 @@ Each requirement references the decision (D#) in `docs/decisions.md` when there 
 Folder convention used by the maintainer:
 
 ```
-Music/<Genre>/<Artist>/artist.jpg
-Music/<Genre>/<Artist>/<Album (Year)>/cover.jpg
+Music/<Genre>/<Artist>/folder.jpg
+Music/<Genre>/<Artist>/<Album (Year)>/folder.jpg
 Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 ```
 
-- **Accepted names** (case-insensitive, `.jpg`, `.jpeg`, `.png`, `.webp`), in order of preference:
-  - artist photo: `artist`, `photo`, `artista`, `foto`
-  - album cover: `cover`, `folder`, `front`, `album`, `capa`
+- **Folder image rule (D19)**, the same for artist and album folders:
+  1. a file named `folder.jpg`, `folder.jpeg` or `folder.png` (any letter case) in the folder;
+  2. otherwise, if the folder has **exactly one** image (`.jpg`, `.jpeg` or `.png`), that image;
+  3. otherwise, no folder image (several images and none named `folder.*` is ambiguous).
+- An **album folder** contains audio files; an **artist folder** is the folder right above album folders.
 - **Cover fallback chain:** image in the album folder → picture embedded in the audio file → **generated cover** (see 04-design-system).
 - **Artist photo fallback chain:** image in the artist folder → the artist's first album cover, shown in a circle → generated cover.
 - Settings toggle **"Use folder photos and covers"** (default ON). When OFF, skip folder images (embedded → generated).
