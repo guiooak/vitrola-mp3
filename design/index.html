@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrola Mp3</title>
+<meta name="description" content="Player de música para Android que toca os MP3 do seu celular. Offline, sem conta e só das pastas que você escolher.">
+<link rel="icon" href="01-logo/export/vitrola-icone-app.svg" type="image/svg+xml">
+<meta property="og:title" content="Vitrola Mp3">
+<meta property="og:description" content="Suas músicas, do seu jeito. Sem conta, sem internet, sem anúncios.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="02-style-guide/tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cor-fundo); color: var(--cor-texto); font: var(--tipo-corpo); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .ms { font-family: "Material Symbols Rounded"; font-size: 24px; line-height: 1; font-variation-settings: "FILL" 0, "wght" 400, "opsz" 24; display: inline-block; font-feature-settings: "liga"; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* Topo */
+  header.top { padding: 20px 0; }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  header.top img { height: 40px; }
+  .gh { display: inline-flex; align-items: center; gap: 8px; font: var(--tipo-rotulo); text-decoration: none; padding: 8px 14px; border-radius: var(--raio-total); border: 1.5px solid var(--cor-borda-forte); }
+  .gh:hover { background: var(--cor-superficie-2); }
+  .gh svg { width: 18px; height: 18px; fill: currentColor; }
+
+  .logo-n { display: none; }
+  @media (prefers-color-scheme: dark) { .logo-p { display: none; } .logo-n { display: block; } }
+
+  /* Herói */
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding-top: 48px; padding-bottom: 72px; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; font: var(--tipo-sobrelinha); letter-spacing: .08em; text-transform: uppercase; color: var(--cor-sobre-destaque-container); background: var(--cor-destaque-container); padding: 6px 12px; border-radius: var(--raio-total); }
+  .tag .ms { font-size: 16px; }
+  h1 { font-family: var(--fonte-marca); font-weight: 800; font-size: clamp(44px, 7vw, 76px); line-height: 1.02; letter-spacing: -.01em; margin: 18px 0 16px; font-variation-settings: "opsz" 144; }
+  h1 span { font-weight: 500; }
+  .lead { font-size: 20px; line-height: 30px; color: var(--cor-texto-2); margin: 0 0 28px; max-width: 520px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { font: var(--tipo-rotulo); font-size: 15px; height: 52px; padding: 0 24px; border-radius: var(--raio-total); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: transform var(--duracao-rapida) var(--curva-padrao), box-shadow var(--duracao-rapida); }
+  .btn:active { transform: scale(.97); }
+  .btn-pri { background: var(--cor-primaria); color: var(--cor-sobre-primaria); }
+  .btn-pri:hover { box-shadow: var(--elevacao-2); }
+  .btn-ton { background: var(--cor-primaria-container); color: var(--cor-sobre-primaria-container); }
+  .btn .ms { font-size: 20px; }
+
+  /* Vitrola animada */
+  .vitrola { justify-self: center; width: min(100%, 420px); aspect-ratio: 1; border-radius: 22%; background: var(--cor-superficie-2); box-shadow: var(--elevacao-3); display: grid; place-items: center; }
+  .vitrola svg { width: 88%; }
+  .vitrola .gira { transform-box: view-box; transform-origin: 150px 160px; animation: spin var(--duracao-volta-disco) linear infinite; }
+  .vitrola .braco { transform-box: view-box; transform-origin: 296px 24px; animation: braco 1.4s var(--curva-braco) both; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes braco { from { transform: rotate(-14deg); } }
+  @media (prefers-reduced-motion: reduce) { .vitrola .gira, .vitrola .braco { animation: none; } }
+
+  /* Promessas */
+  .promessas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-bottom: 72px; }
+  .promessa { background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: var(--raio-g); padding: 24px; }
+  .promessa .ms { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--cor-primaria-container); color: var(--cor-sobre-primaria-container); margin-bottom: 14px; }
+  .promessa h3 { font: var(--tipo-titulo-m); margin: 0 0 6px; }
+  .promessa p { margin: 0; color: var(--cor-texto-2); font: var(--tipo-corpo-p); }
+
+  /* Design */
+  .design { background: var(--cor-superficie-2); padding: 64px 0 72px; }
+  .design h2 { font: var(--tipo-titulo); font-size: 36px; line-height: 42px; margin: 0 0 8px; }
+  .design .sub { color: var(--cor-texto-2); margin: 0 0 32px; max-width: 620px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { display: flex; flex-direction: column; background: var(--cor-superficie); border-radius: var(--raio-g); overflow: hidden; text-decoration: none; border: 1px solid var(--cor-borda); transition: transform var(--duracao-media) var(--curva-padrao), box-shadow var(--duracao-media); }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--elevacao-2); }
+  .card .preview { height: 150px; display: grid; place-items: center; }
+  .card .preview img { height: 88px; }
+  .card .body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .card .num { font: var(--tipo-sobrelinha); letter-spacing: .08em; text-transform: uppercase; color: var(--cor-primaria); }
+  .card h3 { font: var(--tipo-titulo-m); margin: 0; }
+  .card p { margin: 0; color: var(--cor-texto-2); font: var(--tipo-corpo-p); flex: 1; }
+  .card .go { margin-top: 10px; font: var(--tipo-rotulo); color: var(--cor-primaria); display: inline-flex; align-items: center; gap: 4px; }
+  .card .go .ms { font-size: 18px; transition: transform var(--duracao-rapida); }
+  .card:hover .go .ms { transform: translateX(3px); }
+  .p-logo { background: var(--cor-disco); }
+  .p-guia { background: var(--cor-primaria); }
+  .p-mock { background: var(--cor-destaque); }
+  .chips { display: flex; gap: 6px; }
+  .chips i { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,.5); }
+  .phone { width: 64px; height: 112px; border-radius: 14px; background: #1B1714; border: 3px solid #0D0B0A; display: grid; place-items: center; box-shadow: var(--elevacao-2); }
+  .phone i { width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle, #7A1F2B 0 28%, #1B1714 30% 100%); box-shadow: 0 0 0 2px #6A5B50; }
+
+  /* Rodapé */
+  footer { padding: 32px 0 48px; color: var(--cor-texto-3); font: var(--tipo-corpo-p); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; padding-top: 24px; gap: 32px; }
+    .vitrola { width: min(100%, 320px); }
+    .promessas, .cards { grid-template-columns: 1fr; }
+    .gh span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img class="logo-p" src="01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3">
+    <img class="logo-n" src="01-logo/export/vitrola-mp3-horizontal-negativo.svg" alt="Vitrola Mp3">
+    <a class="gh" href="https://github.com/guiooak/vitrola-mp3" aria-label="Código no GitHub">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span>GitHub</span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero">
+    <div>
+      <span class="tag"><span class="ms">construction</span>Em desenvolvimento · Android</span>
+      <h1>Vitrola <span>Mp3</span></h1>
+      <p class="lead">O player de música para Android que toca os MP3 do seu celular. Sem conta, sem internet e sem anúncios. Só as pastas que você escolher.</p>
+      <div class="ctas">
+        <a class="btn btn-pri" href="03-mockup/"><span class="ms">smartphone</span>Experimentar o mockup</a>
+        <a class="btn btn-ton" href="#design"><span class="ms">palette</span>Ver o design</a>
+      </div>
+    </div>
+    <div class="vitrola" aria-hidden="true">
+      <svg viewBox="0 0 320 300">
+        <g class="gira">
+          <circle cx="150" cy="160" r="130" fill="#1B1714"/>
+          <circle cx="150" cy="160" r="128.5" fill="none" stroke="#6A5B50" stroke-width="3"/>
+          <g fill="none" stroke="#3A322C" stroke-width="1.3">
+            <circle cx="150" cy="160" r="120"/><circle cx="150" cy="160" r="111" stroke-opacity=".55"/><circle cx="150" cy="160" r="102"/>
+            <circle cx="150" cy="160" r="93" stroke-opacity=".55"/><circle cx="150" cy="160" r="84"/><circle cx="150" cy="160" r="75" stroke-opacity=".55"/><circle cx="150" cy="160" r="66"/>
+          </g>
+          <path d="M48.6 115.8 A110.5 110.5 0 0 1 105.8 58.6" fill="none" stroke="#fff" stroke-opacity=".17" stroke-width="10" stroke-linecap="round"/>
+          <path d="M251.4 204.2 A110.5 110.5 0 0 1 194.2 261.4" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="10" stroke-linecap="round"/>
+          <circle cx="150" cy="160" r="50" fill="#7A1F2B"/>
+          <circle cx="150" cy="160" r="38" fill="none" stroke="#E0A526" stroke-width="2" stroke-opacity=".85"/>
+          <circle cx="150" cy="160" r="5" fill="#F3E9D2"/>
+        </g>
+        <g class="braco">
+          <rect x="288" y="0" width="16" height="15" rx="4" fill="#8E8676"/>
+          <path d="M296 24 L282 150 L240 190" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" transform="translate(3 4)"/>
+          <path d="M296 24 L282 150 L240 190" fill="none" stroke="#CFC8B8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="228" y="183" width="24" height="14" rx="3.5" transform="rotate(-45 240 190)" fill="#E0A526"/>
+          <circle cx="296" cy="24" r="17" fill="#8E8676"/><circle cx="296" cy="24" r="12.5" fill="#E0A526"/><circle cx="296" cy="24" r="5" fill="#1B1714"/>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="wrap promessas" aria-label="O que o app faz">
+    <div class="promessa"><span class="ms">folder_special</span><h3>Só as suas pastas</h3><p>Você escolhe as pastas de música. Áudios do WhatsApp e gravações ficam de fora.</p></div>
+    <div class="promessa"><span class="ms">headphones</span><h3>Toca com a tela apagada</h3><p>Controles na notificação, na tela de bloqueio e no fone. Retoma de onde parou.</p></div>
+    <div class="promessa"><span class="ms">album</span><h3>Cara de vitrola</h3><p>A capa do álbum vira o selo de um disco que gira enquanto a música toca.</p></div>
+  </section>
+
+  <section class="design" id="design">
+    <div class="wrap">
+      <h2>Design</h2>
+      <p class="sub">O app está sendo desenhado antes de ser programado. Estes são os materiais de cada etapa.</p>
+      <div class="cards">
+        <a class="card" href="01-logo/logo-vinil.html">
+          <div class="preview p-logo"><img src="01-logo/export/vitrola-mp3-vertical-negativo.svg" alt=""></div>
+          <div class="body"><span class="num">Etapa 1</span><h3>Manual da logo</h3>
+            <p>Símbolo, variações por tamanho, ícone do Android, assinaturas, área de respiro e paleta.</p>
+            <span class="go">Abrir<span class="ms">arrow_forward</span></span></div>
+        </a>
+        <a class="card" href="02-style-guide/style-guide.html">
+          <div class="preview p-guia"><div class="chips"><i style="background:#F3E9D2"></i><i style="background:#E0A526"></i><i style="background:#1B1714"></i><i style="background:#D67887"></i></div></div>
+          <div class="body"><span class="num">Etapa 2</span><h3>Style guide</h3>
+            <p>Cores, tipografia, espaços, ícones, componentes interativos, movimento e voz.</p>
+            <span class="go">Abrir<span class="ms">arrow_forward</span></span></div>
+        </a>
+        <a class="card" href="03-mockup/">
+          <div class="preview p-mock"><div class="phone"><i></i></div></div>
+          <div class="body"><span class="num">Etapa 3</span><h3>Mockup navegável</h3>
+            <p>O app inteiro no navegador: biblioteca, player com disco girando, fila, busca, playlists e ajustes.</p>
+            <span class="go">Abrir<span class="ms">arrow_forward</span></span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Vitrola Mp3 · projeto pessoal em desenvolvimento</span>
+    <a href="https://github.com/guiooak/vitrola-mp3">github.com/guiooak/vitrola-mp3</a>
+  </div>
+</footer>
+
+</body>
+</html>

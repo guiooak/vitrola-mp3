@@ -8,6 +8,8 @@ Player de música para Android que toca os MP3 guardados no próprio celular. Fu
 
 > **Status:** em design. Logo ✅ · Style guide ✅ · Mockup HTML 🔍 em validação · App Android ⏳
 
+🌐 **Site:** https://guiooak.github.io/vitrola-mp3/ (landing page, manual da logo, style guide e mockup)
+
 ## Ideia
 
 - **Só as suas pastas:** você escolhe as pastas de música e nada fora delas entra na biblioteca (áudios do WhatsApp, por exemplo).
@@ -30,18 +32,29 @@ design/
   01-logo/          páginas da logo, SVGs exportados e scripts de exportação
   02-style-guide/   style guide, tokens de design e gerador
   03-mockup/        app navegável para validar telas e interações
+  index.html        landing page do site
 docs/
   decisoes.md       registro das decisões de produto e técnica
   design/           documentação de cada etapa de design
 ```
 
-## Ver o design no navegador
+## Site
+
+O conteúdo da pasta `design/` é publicado no GitHub Pages pelo workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml), a cada push na `main` que altere o design:
+
+- Landing page: https://guiooak.github.io/vitrola-mp3/
+- Manual da logo: https://guiooak.github.io/vitrola-mp3/01-logo/logo-vinil.html
+- Style guide: https://guiooak.github.io/vitrola-mp3/02-style-guide/style-guide.html
+- Mockup: https://guiooak.github.io/vitrola-mp3/03-mockup/
+
+## Ver o design no navegador (local)
 
 ```bash
 python3 -m http.server 8765 --directory design
 ```
 
 Depois abra:
+- Landing page: http://localhost:8765/
 - Logo: http://localhost:8765/01-logo/logo-vinil.html
 - Style guide: http://localhost:8765/02-style-guide/style-guide.html
 - Mockup: http://localhost:8765/03-mockup/

@@ -91,3 +91,8 @@ Cada pasta de artista tem uma foto (`artista.jpg`) e cada pasta de álbum tem a 
 **25/10/2026**
 
 Músicas e álbuns podem ser favoritados com o coração, em duas listas independentes (Playlists › Músicas favoritas e Álbuns favoritos). Favoritar um álbum não favorita as músicas dele. Detalhes em [03-mockup.md](design/03-mockup.md#favoritos).
+
+### D14 · Site no GitHub Pages
+**25/10/2026**
+
+A pasta `design/` vira um site no GitHub Pages (https://guiooak.github.io/vitrola-mp3/), com uma landing page em `design/index.html` que leva ao manual da logo, ao style guide e ao mockup. O deploy é automático pelo GitHub Actions (`.github/workflows/pages.yml`) a cada push na `main` que mexa em `design/`. Os scripts de geração (`scripts/`, `*.py`) não vão para o site.
