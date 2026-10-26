@@ -11,7 +11,9 @@ Everything committed to this repository must be written in **US English**:
 
 This applies even when the conversation with the maintainer happens in Brazilian Portuguese. Translate the request, write the result in English.
 
-The only exception is proper names and real titles that are not translated (artist names, album and song titles such as "Águas de Março").
+Exceptions:
+- proper names and real titles that are not translated (artist names, album and song titles such as "Águas de Março");
+- the app's translations (Brazilian Portuguese and Spanish), which live only in `i18n/translations.csv` and the generated Android string resources. They must be reviewed and approved by the maintainer before shipping (D20).
 
 ## Implementing the app
 

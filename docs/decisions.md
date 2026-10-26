@@ -135,3 +135,14 @@ The same rule applies to artist folders (photo) and album folders (cover). In ea
 - An **album folder** is a folder that contains audio files; an **artist folder** is the folder right above album folders. So `folder.jpg` in an artist folder is the artist photo and in an album folder is the album cover.
 - After the folder image, the fallbacks from D12 still apply: cover embedded in the audio file (albums only), then the generated cover; for artists, the first album cover in a circle.
 - Replaces the earlier proposal of several accepted names (`artist`, `cover`, `capa`…). Existing `artist.jpg` / `cover.jpg` files keep working when they are the only image in their folder.
+
+### D20 · Every translation is reviewed by the maintainer
+**2026-10-26**
+
+No automatic or unreviewed translation ships. The maintainer reviews and approves **every** Brazilian Portuguese and Spanish string before it goes into the app.
+- **Single review file:** `i18n/translations.csv` with the columns `key, en, pt-BR, es, status_pt, status_es, notes`. Status values: `draft` (proposed, not reviewed), `approved`, `changes` (maintainer asked for changes, see notes).
+- The implementing agent may **propose** drafts there, always as `draft`. Only the maintainer sets `approved`.
+- `res/values-pt-rBR/strings.xml` and `res/values-es/strings.xml` are generated from the approved rows only (a small script or Gradle task). A string without approval is simply left out, so Android falls back to English for it.
+- A language is listed in `locales_config` (and offered to users) only when **all** of its strings are approved.
+- Any new or changed English string resets its translations to `draft` and is listed for review in the commit message.
+- Runtime machine translation (e.g. a translation API) is never used.

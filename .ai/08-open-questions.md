@@ -18,6 +18,7 @@ Ask the maintainer before deciding these. Record the answer in `docs/decisions.m
 |---|---|---|
 | Q1 | Is the HTML mockup formally approved? | **Yes** (D17, 2026-10-25). |
 | Q2 | UI language(s) at launch | **US English, Brazilian Portuguese and Spanish** (D18). |
+| — | Translation process | **Maintainer reviews and approves every pt-BR/es string via `i18n/translations.csv`; no automatic translation** (D20). |
 | Q3 | Image file names | **`folder.(jpg|jpeg|png)` in any case, else the folder's only image** (D19). |
 
 ## Explicitly out of scope for now

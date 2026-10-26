@@ -112,6 +112,7 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - Formatting follows the locale: numbers ("1,032" / "1.032"), dates on the lock screen, plurals.
 - Generated-cover initials and proper names (artists, albums, songs, folder and file names) are never translated.
 - "Unknown artist" / "Unknown album" are translated labels, but grouping must not depend on the label text (use a flag/key).
+- **No automatic translation (D20).** All pt-BR and es strings are reviewed and approved by the maintainer through `i18n/translations.csv`. Only approved strings are generated into the resource files, and a language is enabled in `locales_config` only when all of its strings are approved. Until then the app runs in English.
 
 ## 11. Later (do not build without asking)
 
