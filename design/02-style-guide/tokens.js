@@ -1,0 +1,208 @@
+// Gerado por gerar_tokens.py a partir de tokens.json. Não edite à mão.
+window.TOKENS = {
+  "$descricao": "Tokens de design do Vitrola Mp3. Fonte da verdade: edite aqui e rode gerar_tokens.py para atualizar tokens.css.",
+  "primitivas": {
+    "vinho": {
+      "50": "#FBEDEF",
+      "100": "#F5D5DA",
+      "200": "#E9A9B3",
+      "300": "#D67887",
+      "400": "#BC4A5D",
+      "500": "#9E2F42",
+      "600": "#7A1F2B",
+      "700": "#631824",
+      "800": "#4B121B",
+      "900": "#330B12"
+    },
+    "mostarda": {
+      "50": "#FDF6E3",
+      "100": "#FAE9B8",
+      "200": "#F4D27A",
+      "300": "#ECBD48",
+      "400": "#E0A526",
+      "500": "#C08A17",
+      "600": "#9A6D10",
+      "700": "#74510C",
+      "800": "#4F3708",
+      "900": "#2E2005"
+    },
+    "neutro": {
+      "0": "#FFFDF8",
+      "50": "#FAF6EE",
+      "100": "#F3E9D2",
+      "200": "#E6DAC0",
+      "300": "#CFC8B8",
+      "400": "#A89F90",
+      "500": "#7D7468",
+      "600": "#5A5148",
+      "700": "#3A322C",
+      "800": "#26201C",
+      "900": "#1B1714",
+      "950": "#120F0D"
+    },
+    "vermelho": {
+      "claro": "#B3261E",
+      "escuro": "#F2B8B5"
+    },
+    "verde": {
+      "claro": "#2E7D4F",
+      "escuro": "#7FD1A0"
+    }
+  },
+  "cores": {
+    "claro": {
+      "fundo": "#FAF6EE",
+      "superficie": "#FFFDF8",
+      "superficie-2": "#F3E9D2",
+      "superficie-3": "#E6DAC0",
+      "texto": "#1B1714",
+      "texto-2": "#5A5148",
+      "texto-3": "#6E655A",
+      "borda": "#E6DAC0",
+      "borda-forte": "#A89F90",
+      "primaria": "#7A1F2B",
+      "sobre-primaria": "#FFFDF8",
+      "primaria-container": "#F5D5DA",
+      "sobre-primaria-container": "#4B121B",
+      "destaque": "#E0A526",
+      "sobre-destaque": "#1B1714",
+      "destaque-container": "#FAE9B8",
+      "sobre-destaque-container": "#4F3708",
+      "erro": "#B3261E",
+      "sucesso": "#2E7D4F",
+      "acao-aviso": "#E0A526",
+      "disco": "#1B1714",
+      "sulco": "#3A322C",
+      "metal": "#CFC8B8",
+      "veu": "rgba(27, 23, 20, 0.45)"
+    },
+    "escuro": {
+      "fundo": "#120F0D",
+      "superficie": "#1B1714",
+      "superficie-2": "#26201C",
+      "superficie-3": "#3A322C",
+      "texto": "#F3E9D2",
+      "texto-2": "#CFC8B8",
+      "texto-3": "#A89F90",
+      "borda": "#3A322C",
+      "borda-forte": "#5A5148",
+      "primaria": "#D67887",
+      "sobre-primaria": "#330B12",
+      "primaria-container": "#631824",
+      "sobre-primaria-container": "#F5D5DA",
+      "destaque": "#ECBD48",
+      "sobre-destaque": "#2E2005",
+      "destaque-container": "#4F3708",
+      "sobre-destaque-container": "#FAE9B8",
+      "erro": "#F2B8B5",
+      "sucesso": "#7FD1A0",
+      "acao-aviso": "#7A1F2B",
+      "disco": "#0B0908",
+      "sulco": "#2C2521",
+      "metal": "#CFC8B8",
+      "veu": "rgba(0, 0, 0, 0.6)"
+    }
+  },
+  "tipografia": {
+    "familias": {
+      "marca": "Fraunces",
+      "interface": "Outfit"
+    },
+    "escala": {
+      "display": {
+        "familia": "marca",
+        "peso": 800,
+        "tamanho": 40,
+        "altura": 44
+      },
+      "titulo": {
+        "familia": "marca",
+        "peso": 700,
+        "tamanho": 28,
+        "altura": 34
+      },
+      "titulo-m": {
+        "familia": "marca",
+        "peso": 600,
+        "tamanho": 22,
+        "altura": 28
+      },
+      "subtitulo": {
+        "familia": "interface",
+        "peso": 600,
+        "tamanho": 18,
+        "altura": 24
+      },
+      "corpo": {
+        "familia": "interface",
+        "peso": 400,
+        "tamanho": 16,
+        "altura": 24
+      },
+      "corpo-p": {
+        "familia": "interface",
+        "peso": 400,
+        "tamanho": 14,
+        "altura": 20
+      },
+      "rotulo": {
+        "familia": "interface",
+        "peso": 500,
+        "tamanho": 14,
+        "altura": 20
+      },
+      "legenda": {
+        "familia": "interface",
+        "peso": 400,
+        "tamanho": 12,
+        "altura": 16
+      },
+      "sobrelinha": {
+        "familia": "interface",
+        "peso": 600,
+        "tamanho": 11,
+        "altura": 16
+      }
+    }
+  },
+  "espaco": {
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "8": 32,
+    "10": 40,
+    "12": 48,
+    "16": 64
+  },
+  "raio": {
+    "xs": 6,
+    "p": 10,
+    "m": 14,
+    "g": 20,
+    "gg": 28,
+    "total": 999
+  },
+  "elevacao": {
+    "1": "0 1px 2px rgba(27,23,20,.08), 0 1px 3px rgba(27,23,20,.06)",
+    "2": "0 4px 12px rgba(27,23,20,.10), 0 2px 4px rgba(27,23,20,.06)",
+    "3": "0 12px 32px rgba(27,23,20,.18), 0 4px 8px rgba(27,23,20,.08)"
+  },
+  "movimento": {
+    "duracao": {
+      "rapida": 150,
+      "media": 300,
+      "longa": 500,
+      "braco": 700,
+      "volta-disco": 1800
+    },
+    "curva": {
+      "padrao": "cubic-bezier(0.2, 0, 0, 1)",
+      "entrada": "cubic-bezier(0.05, 0.7, 0.1, 1)",
+      "saida": "cubic-bezier(0.3, 0, 0.8, 0.15)",
+      "braco": "cubic-bezier(0.4, 0.1, 0.2, 1)"
+    }
+  }
+};
