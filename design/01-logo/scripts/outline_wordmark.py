@@ -1,4 +1,5 @@
-# Converte "Vitrola" (Fraunces 800) e "Mp3" (Fraunces 500) em contornos SVG
+# Converts "Vitrola" (Fraunces 800) and "Mp3" (Fraunces 500) into SVG outlines
+# Usage: python outline_wordmark.py Fraunces.ttf wordmark.json
 import sys, json, uharfbuzz as hb
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
@@ -18,7 +19,7 @@ def outline(text, wght, opsz=144):
     x = 0; d = []
     for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
         pen = SVGPathPen(None)
-        # inverte o eixo Y (fonte cresce para cima, SVG para baixo)
+        # flip the Y axis (font units grow upward, SVG grows downward)
         tp = TransformPen(pen, (1, 0, 0, -1, x + pos.x_offset, -pos.y_offset))
         font.draw_glyph_with_pen(info.codepoint, tp)
         d.append(pen.getCommands())

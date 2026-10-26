@@ -1,177 +1,177 @@
-# Etapa 2 · Style guide
+# Step 2 · Style guide
 
-**Status:** aprovado em 25/10/2026 · guia visual interativo em [`design/02-style-guide/style-guide.html`](../../design/02-style-guide/style-guide.html)
+**Status:** approved on 2026-10-25 · interactive visual guide at [`design/02-style-guide/style-guide.html`](../../design/02-style-guide/style-guide.html)
 
-Este documento resume as regras. O HTML mostra tudo funcionando: componentes clicáveis, contraste calculado na hora, e temas claro e escuro.
+This document summarizes the rules. The HTML shows everything working: clickable components, live contrast checks, and light and dark themes.
 
-## Fonte da verdade: tokens
+## Source of truth: tokens
 
-Cores, tipografia, espaços, raios, sombras e movimento ficam em [`tokens.json`](../../design/02-style-guide/tokens.json). Os arquivos `tokens.css` (para o mockup) e `tokens.js` (para a página do guia) são gerados a partir dele:
+Colors, typography, spacing, radii, shadows and motion live in [`tokens.json`](../../design/02-style-guide/tokens.json). The `tokens.css` (for the mockup) and `tokens.js` (for the guide page) files are generated from it:
 
 ```bash
-python3 design/02-style-guide/gerar_tokens.py
+python3 design/02-style-guide/generate_tokens.py
 ```
 
-Nunca edite `tokens.css` ou `tokens.js` à mão. No app, o mesmo `tokens.json` vai virar o tema do Compose (ver [Mapeamento para o app](#mapeamento-para-o-app)).
+Never edit `tokens.css` or `tokens.js` by hand. In the app, the same `tokens.json` becomes the Compose theme (see [Mapping to the app](#mapping-to-the-app)).
 
-## Princípios
+## Principles
 
-1. **Calor analógico:** creme, vinho e mostarda no lugar do cinza frio.
-2. **A música em primeiro lugar:** a capa e o disco são as estrelas, e a interface recua.
-3. **Simples como pôr um disco:** tarefas comuns em no máximo dois toques.
-4. **Para todo mundo:** contraste AA, toque de 48dp, respeito ao "reduzir movimento".
+1. **Analog warmth:** cream, wine and mustard instead of cold gray.
+2. **Music comes first:** the cover and the record are the stars, and the interface steps back.
+3. **As simple as putting on a record:** common tasks take two taps at most.
+4. **For everyone:** AA contrast, 48dp touch targets, respect for "reduce motion".
 
-## Cores
+## Colors
 
-### Escalas primitivas
+### Primitive scales
 
-| Passo | Vinho | Mostarda | Neutro quente |
+| Step | Wine | Mustard | Warm neutral |
 |---|---|---|---|
 | 0 | | | `#FFFDF8` |
 | 50 | `#FBEDEF` | `#FDF6E3` | `#FAF6EE` |
-| 100 | `#F5D5DA` | `#FAE9B8` | `#F3E9D2` (creme) |
+| 100 | `#F5D5DA` | `#FAE9B8` | `#F3E9D2` (cream) |
 | 200 | `#E9A9B3` | `#F4D27A` | `#E6DAC0` |
 | 300 | `#D67887` | `#ECBD48` | `#CFC8B8` (metal) |
-| 400 | `#BC4A5D` | `#E0A526` (marca) | `#A89F90` |
+| 400 | `#BC4A5D` | `#E0A526` (brand) | `#A89F90` |
 | 500 | `#9E2F42` | `#C08A17` | `#7D7468` |
-| 600 | `#7A1F2B` (marca) | `#9A6D10` | `#5A5148` |
-| 700 | `#631824` | `#74510C` | `#3A322C` (sulco) |
+| 600 | `#7A1F2B` (brand) | `#9A6D10` | `#5A5148` |
+| 700 | `#631824` | `#74510C` | `#3A322C` (groove) |
 | 800 | `#4B121B` | `#4F3708` | `#26201C` |
-| 900 | `#330B12` | `#2E2005` | `#1B1714` (vinil) |
+| 900 | `#330B12` | `#2E2005` | `#1B1714` (vinyl) |
 | 950 | | | `#120F0D` |
 
-### Cores com função
+### Role colors
 
-Os componentes usam **só estas**, nunca as primitivas direto.
+Components use **only these**, never the primitives directly. In CSS they are `--color-<token>`.
 
-| Token | Claro | Escuro | Uso |
+| Token | Light | Dark | Use |
 |---|---|---|---|
-| `fundo` | `#FAF6EE` | `#120F0D` | Fundo das telas |
-| `superficie` | `#FFFDF8` | `#1B1714` | Cards, listas, folhas |
-| `superficie-2` | `#F3E9D2` | `#26201C` | Mini player, campos, áreas agrupadas |
-| `superficie-3` | `#E6DAC0` | `#3A322C` | Trilhas, divisões fortes |
-| `texto` | `#1B1714` | `#F3E9D2` | Texto principal |
-| `texto-2` | `#5A5148` | `#CFC8B8` | Texto secundário (artista) |
-| `texto-3` | `#6E655A` | `#A89F90` | Legendas, placeholders |
-| `borda` | `#E6DAC0` | `#3A322C` | Divisores |
-| `borda-forte` | `#A89F90` | `#5A5148` | Contornos de controles |
-| `primaria` | `#7A1F2B` | `#D67887` | Ação principal, item ativo |
-| `sobre-primaria` | `#FFFDF8` | `#330B12` | Texto sobre a primária |
-| `primaria-container` | `#F5D5DA` | `#631824` | Botão tonal, aba ativa |
-| `sobre-primaria-container` | `#4B121B` | `#F5D5DA` | Texto sobre o container |
-| `destaque` | `#E0A526` | `#ECBD48` | Tocar, controle da barra, equalizador |
-| `sobre-destaque` | `#1B1714` | `#2E2005` | Texto sobre o destaque |
-| `destaque-container` | `#FAE9B8` | `#4F3708` | Ícones de pasta, avisos leves |
-| `sobre-destaque-container` | `#4F3708` | `#FAE9B8` | Texto sobre o container de destaque |
-| `erro` | `#B3261E` | `#F2B8B5` | Erros, ações destrutivas |
-| `sucesso` | `#2E7D4F` | `#7FD1A0` | Confirmações |
-| `acao-aviso` | `#E0A526` | `#7A1F2B` | Ação dentro do snackbar |
-| `disco` / `sulco` / `metal` | — | — | Desenho do vinil e do braço |
-| `veu` | 45% vinil | 60% preto | Fundo atrás de diálogos |
+| `background` | `#FAF6EE` | `#120F0D` | Screen background |
+| `surface` | `#FFFDF8` | `#1B1714` | Cards, lists, sheets |
+| `surface-2` | `#F3E9D2` | `#26201C` | Mini player, fields, grouped areas |
+| `surface-3` | `#E6DAC0` | `#3A322C` | Tracks, strong dividers |
+| `text` | `#1B1714` | `#F3E9D2` | Primary text |
+| `text-2` | `#5A5148` | `#CFC8B8` | Secondary text (artist) |
+| `text-3` | `#6E655A` | `#A89F90` | Captions, placeholders |
+| `border` | `#E6DAC0` | `#3A322C` | Dividers |
+| `border-strong` | `#A89F90` | `#5A5148` | Control outlines |
+| `primary` | `#7A1F2B` | `#D67887` | Main action, active item |
+| `on-primary` | `#FFFDF8` | `#330B12` | Text on primary |
+| `primary-container` | `#F5D5DA` | `#631824` | Tonal button, active tab |
+| `on-primary-container` | `#4B121B` | `#F5D5DA` | Text on the container |
+| `accent` | `#E0A526` | `#ECBD48` | Play, seek thumb, equalizer |
+| `on-accent` | `#1B1714` | `#2E2005` | Text on accent |
+| `accent-container` | `#FAE9B8` | `#4F3708` | Folder icons, light notices |
+| `on-accent-container` | `#4F3708` | `#FAE9B8` | Text on the accent container |
+| `error` | `#B3261E` | `#F2B8B5` | Errors, destructive actions |
+| `success` | `#2E7D4F` | `#7FD1A0` | Confirmations |
+| `snackbar-action` | `#E0A526` | `#7A1F2B` | Action inside a snackbar |
+| `record` / `groove` / `metal` | — | — | Drawing of the vinyl and tonearm |
+| `scrim` | 45% vinyl | 60% black | Backdrop behind dialogs |
 
-### Regras
+### Rules
 
-- Todo texto passa em **AA (4,5:1)** e todo ícone em **3:1**, nos dois temas. A página do guia mostra a conta.
-- **Mostarda nunca é cor de texto** sobre fundo claro. Ela é só preenchimento, com texto escuro em cima.
-- O app **não usa cor dinâmica** (Material You). A identidade é fixa, mas o ícone temático do Android 13+ continua acompanhando o papel de parede.
+- All text passes **AA (4.5:1)** and all icons pass **3:1**, in both themes. The guide page shows the math.
+- **Mustard is never a text color** on light backgrounds. It is only a fill, with dark text on top.
+- The app **does not use dynamic color** (Material You). The identity is fixed, but the Android 13+ themed icon still follows the wallpaper.
 
-## Tipografia
+## Typography
 
-| Família | Papel | Pesos |
+| Family | Role | Weights |
 |---|---|---|
-| **Fraunces** | Marca: títulos, nome de álbum, "tocando agora". Só a partir de 22sp. | 600–800 |
-| **Outfit** | Interface: listas, botões, tempos | 400–600 |
+| **Fraunces** | Brand: titles, album names, "now playing". Only at 22sp and up. | 600–800 |
+| **Outfit** | Interface: lists, buttons, times | 400–600 |
 
-| Estilo | Fonte | Tamanho/altura | Uso |
+| Style | Font | Size/line height | Use |
 |---|---|---|---|
-| `display` | Fraunces 800 | 40/44 | Boas-vindas |
-| `titulo` | Fraunces 700 | 28/34 | Nome do álbum, títulos de tela |
-| `titulo-m` | Fraunces 600 | 22/28 | Música no player, diálogos |
-| `subtitulo` | Outfit 600 | 18/24 | Seções |
-| `corpo` | Outfit 400 | 16/24 | Textos |
-| `corpo-p` | Outfit 400 | 14/20 | Artista, detalhes |
-| `rotulo` | Outfit 500 | 14/20 | Botões, títulos na lista |
-| `legenda` | Outfit 400 | 12/16 | Tempos, contagens |
-| `sobrelinha` | Outfit 600 | 11/16, maiúsculas | Rótulos de seção |
+| `display` | Fraunces 800 | 40/44 | Welcome |
+| `title` | Fraunces 700 | 28/34 | Album name, screen titles |
+| `title-m` | Fraunces 600 | 22/28 | Song in the player, dialogs |
+| `subtitle` | Outfit 600 | 18/24 | Sections |
+| `body` | Outfit 400 | 16/24 | Body text |
+| `body-s` | Outfit 400 | 14/20 | Artist, details |
+| `label` | Outfit 500 | 14/20 | Buttons, list titles |
+| `caption` | Outfit 400 | 12/16 | Times, counts |
+| `overline` | Outfit 600 | 11/16, uppercase | Section labels |
 
-Tempos e contagens usam números de largura fixa (`tabular-nums`), para não "pularem" enquanto a música toca.
+Times and counts use tabular figures (`tabular-nums`) so they don't "jump" while the music plays.
 
-## Espaço e forma
+## Space and shape
 
-- **Espaçamento** (grade de 4dp): 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64
-- **Raios:** `xs` 6 · `p` 10 · `m` 14 · `g` 20 · `gg` 28 · `total` (pílula)
-- **Elevação:** 3 níveis de sombra quente (marrom, não preto). No tema escuro, a elevação aparece mais pela cor da superfície.
+- **Spacing** (4dp grid): 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64
+- **Radii:** `xs` 6 · `s` 10 · `m` 14 · `l` 20 · `xl` 28 · `full` (pill)
+- **Elevation:** 3 levels of warm shadow (brown, not black). In the dark theme, elevation shows more through the surface color.
 
-## Ícones
+## Icons
 
-**Material Symbols Rounded**, peso 400, 24dp. Contorno no estado normal e preenchido no item ativo (aba atual, favorito marcado). Os controles de reprodução usam a versão preenchida.
+**Material Symbols Rounded**, weight 400, 24dp. Outlined by default and filled for the active item (current tab, favorited item). Playback controls use the filled version.
 
-## Componentes
+## Components
 
-Todos estão interativos no guia.
+All of them are interactive in the guide.
 
-| Componente | Regras principais |
+| Component | Key rules |
 |---|---|
-| **Botões** | Primário (vinho): no máximo um por tela. Tonal: secundário. Destaque (mostarda): "tocar", com moderação. Contorno e texto: baixo peso. Altura 48dp, forma de pílula. |
-| **Controles do player** | Play de 72dp que vira quadrado arredondado ao tocar. Aleatório e repetir ativos ficam em vinho com um ponto. Repetir alterna desligado → todas → uma. |
-| **Barra de progresso** | Trilha de 6dp, preenchimento vinho e controle mostarda (como a cápsula do braço). Tempos com números de largura fixa. |
-| **Disco "tocando agora"** | A capa do álbum vira o selo do disco, que gira a 33⅓ rpm (1,8s por volta) e desacelera ao pausar. |
-| **Filtros** | Chips Músicas / Álbuns / Artistas / Pastas. O selecionado fica vinho e ganha ✓. |
-| **Item de música** | Capa 48dp, título, artista, duração e menu. A música atual tem título vinho e equalizador animado sobre a capa. |
-| **Capa padrão** | Para MP3 sem capa: gerada a partir do nome do álbum, com cor da paleta, sulcos e iniciais em Fraunces. Determinística: o mesmo álbum sempre recebe a mesma capa. |
-| **Foto do artista** | Imagem da pasta do artista, em círculo (listas, busca) ou em faixa larga (página do artista). Sem foto, usa a capa do primeiro álbum. Detalhes em [03-mockup.md](03-mockup.md#fotos-de-artista-e-capas-de-álbum). |
-| **Mini player** | Fixo acima da navegação, com disco girando, título, play e próxima, e progresso em linha fina no topo. |
-| **Navegação inferior** | 4 abas com indicador em pílula. As abas são provisórias e serão definidas no mockup. |
-| **Busca, pastas, ajustes** | Campo em pílula. Linhas de 64dp com ícone em quadrado. Switch para opções. |
-| **Escaneamento** | Barra com listras animadas e contagem "412 / 664". |
-| **Aviso e diálogo** | O snackbar usa a cor `acao-aviso`. Diálogos destrutivos explicam a consequência ("os arquivos continuam no seu celular"). |
-| **Estado vazio** | Disco vazio ilustrado, título amigável e a ação principal. |
+| **Buttons** | Primary (wine): at most one per screen. Tonal: secondary. Accent (mustard): "play", sparingly. Outline and text: low emphasis. 48dp tall, pill shape. |
+| **Player controls** | A 72dp play button that morphs into a rounded square while playing. Active shuffle and repeat turn wine with a dot. Repeat cycles off → all → one. |
+| **Seek bar** | 6dp track, wine fill and mustard thumb (like the tonearm headshell). Tabular figures for times. |
+| **"Now playing" record** | The album cover becomes the record label, which spins at 33⅓ rpm (1.8s per turn) and slows down when paused. |
+| **Filters** | Artists / Songs / Albums / Folders chips. The selected one turns wine and gets a ✓. |
+| **Song row** | 48dp cover, title, artist, duration and menu. The current song has a wine title and an animated equalizer over the cover. |
+| **Fallback cover** | For MP3s without a cover: generated from the album name, with a palette color, grooves and initials in Fraunces. Deterministic: the same album always gets the same cover. |
+| **Artist photo** | Image from the artist folder, as a circle (lists, search) or a wide banner (artist page). Without a photo, the first album cover is used. Details in [03-mockup.md](03-mockup.md#artist-photos-and-album-covers). |
+| **Mini player** | Pinned above the navigation, with a spinning record, title, play and next, and a thin progress line at the top. |
+| **Bottom navigation** | 4 tabs with a pill indicator. |
+| **Search, folders, settings** | Pill-shaped field. 64dp rows with a square icon. Switch for options. |
+| **Scan** | Bar with animated stripes and a "412 / 664" count. |
+| **Snackbar and dialog** | The snackbar uses the `snackbar-action` color. Destructive dialogs explain the consequence ("the files stay on your phone"). |
+| **Empty state** | Illustrated empty record, a friendly title and the main action. |
 
-## Movimento
+## Motion
 
-| Token | Valor | Uso |
+| Token | Value | Use |
 |---|---|---|
-| `rapida` | 150ms | Toques, hover, troca de estado |
-| `media` | 300ms | Switches, abas, morph do play |
-| `longa` | 500ms | Mini player → tela cheia |
-| `braco` | 700ms | Braço da vitrola descendo e subindo |
-| `volta-disco` | 1800ms | Uma volta do disco (33⅓ rpm) |
+| `fast` | 150ms | Taps, hover, state changes |
+| `medium` | 300ms | Switches, tabs, play morph |
+| `long` | 500ms | Mini player → full screen |
+| `tonearm` | 700ms | Tonearm lowering and lifting |
+| `record-spin` | 1800ms | One record turn (33⅓ rpm) |
 
-Curvas: `padrao` (0.2, 0, 0, 1) · `entrada` (0.05, 0.7, 0.1, 1) · `saida` (0.3, 0, 0.8, 0.15) · `braco` (0.4, 0.1, 0.2, 1).
+Easing: `standard` (0.2, 0, 0, 1) · `decelerate` (0.05, 0.7, 0.1, 1) · `accelerate` (0.3, 0, 0.8, 0.15) · `tonearm` (0.4, 0.1, 0.2, 1).
 
-O movimento imita o físico: o disco tem peso e o braço desce devagar. Nada pisca nem quica. Com **"reduzir movimento"** ligado no celular, o disco fica parado e as transições viram um esmaecimento rápido.
+Motion mimics the physical: the record has weight and the arm lowers slowly. Nothing blinks or bounces. With **"reduce motion"** turned on, the record stays still and transitions become a quick fade.
 
-## Voz e tom
+## Voice and tone
 
-Português do Brasil, frases curtas, tom de amigo que entende de música. A metáfora da vitrola aparece em momentos especiais (estado vazio, boas-vindas), nunca em botões.
+Short sentences in the tone of a friend who knows music. The turntable metaphor shows up in special moments (empty state, welcome), never on buttons.
 
-| Situação | ✓ Assim | ✕ Não assim |
+| Situation | ✓ Like this | ✕ Not like this |
 |---|---|---|
-| Botão de pasta | Escolher pasta | Selecionar diretório de mídia |
-| Biblioteca vazia | Nenhum disco na vitrola | Erro: nenhum arquivo encontrado |
-| Escaneando | Procurando músicas… 412 de 664 | Indexando arquivos (62%) |
-| Arquivo com problema | Não deu para tocar "faixa 07.mp3". Pulamos para a próxima. | Exceção de decodificação de mídia |
-| Permissão perdida | Perdemos o acesso à pasta "Music". Escolha de novo para continuar. | URI permission revoked |
+| Folder button | Choose folder | Select media directory |
+| Empty library | No record on the turntable | Error: no files found |
+| Scanning | Looking for songs… 412 of 664 | Indexing files (62%) |
+| Broken file | Couldn't play "track 07.mp3". Skipped to the next one. | Media decoding exception |
+| Lost permission | We lost access to the "Music" folder. Choose it again to keep listening. | URI permission revoked |
 
-## Acessibilidade
+## Accessibility
 
-- Contraste AA em texto (4,5:1) e ícones (3:1), nos dois temas.
-- Alvo de toque de no mínimo 48dp.
-- Descrição para leitor de tela em todo botão só com ícone ("Próxima música").
-- Respeitar "reduzir movimento".
-- Tamanhos em sp. O layout aguenta fonte em 200%, usando reticências quando preciso.
-- O estado nunca depende só de cor (ponto em aleatório e repetir, ✓ no chip).
+- AA contrast for text (4.5:1) and icons (3:1), in both themes.
+- Touch targets of at least 48dp.
+- Screen reader labels on every icon-only button ("Next song").
+- Respect "reduce motion".
+- Sizes in sp. The layout handles 200% font size, using ellipsis when needed.
+- State never relies on color alone (dot on shuffle and repeat, ✓ on the chip).
 
-## Mapeamento para o app
+## Mapping to the app
 
 | Token | Jetpack Compose (Material 3) |
 |---|---|
-| `primaria` / `sobre-primaria` | `colorScheme.primary` / `onPrimary` |
-| `primaria-container` | `colorScheme.primaryContainer` |
-| `destaque` / `destaque-container` | `colorScheme.secondary` / `secondaryContainer` |
-| `fundo`, `superficie`, `superficie-2`, `superficie-3` | `background`, `surface`, `surfaceContainer`, `surfaceContainerHigh` |
-| `texto` / `texto-2` | `onSurface` / `onSurfaceVariant` |
-| `borda` / `borda-forte` | `outlineVariant` / `outline` |
-| `tipo-*` | `Typography(...)` com `FontFamily` Fraunces e Outfit |
-| `raio-*` | `Shapes(...)` |
-| `disco`, `sulco`, `metal`, `duracao-*`, `curva-*` | Objeto próprio `VitrolaTokens` via `CompositionLocal` |
+| `primary` / `on-primary` | `colorScheme.primary` / `onPrimary` |
+| `primary-container` | `colorScheme.primaryContainer` |
+| `accent` / `accent-container` | `colorScheme.secondary` / `secondaryContainer` |
+| `background`, `surface`, `surface-2`, `surface-3` | `background`, `surface`, `surfaceContainer`, `surfaceContainerHigh` |
+| `text` / `text-2` | `onSurface` / `onSurfaceVariant` |
+| `border` / `border-strong` | `outlineVariant` / `outline` |
+| `type-*` | `Typography(...)` with Fraunces and Outfit `FontFamily` |
+| `radius-*` | `Shapes(...)` |
+| `record`, `groove`, `metal`, `duration-*`, `easing-*` | Custom `VitrolaTokens` object via `CompositionLocal` |

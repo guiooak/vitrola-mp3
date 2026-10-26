@@ -1,13 +1,13 @@
 # Mockup — Vitrola Mp3
 
-App navegável para validar telas e interações no navegador.
+A clickable app for validating screens and interactions in the browser.
 
 ```bash
 python3 -m http.server 8765 --directory design
 ```
 
-Abra http://localhost:8765/03-mockup/ (ou abra `index.html` direto).
+Open http://localhost:8765/03-mockup/ (or open `index.html` directly).
 
-No computador, use o painel ao lado do celular para pular entre telas e simular situações (notificação, tela de bloqueio, reabrir o app…). No celular, o painel abre pela aba na borda esquerda.
+On a computer, use the panel next to the phone to jump between screens and simulate situations (notification, lock screen, reopening the app…). On a phone, the panel opens from the tab on the left edge.
 
-Documentação completa: [docs/design/03-mockup.md](../../docs/design/03-mockup.md).
+Full documentation: [docs/design/03-mockup.md](../../docs/design/03-mockup.md).

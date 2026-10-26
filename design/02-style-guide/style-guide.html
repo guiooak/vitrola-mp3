@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,38 +11,38 @@
 <link rel="stylesheet" href="tokens.css">
 <script src="tokens.js"></script>
 <style>
-  /* ---------- Base da página ---------- */
+  /* ---------- Page base ---------- */
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; scroll-padding-top: 72px; }
-  body { margin: 0; background: var(--cor-fundo); color: var(--cor-texto); font: var(--tipo-corpo); -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--color-background); color: var(--color-text); font: var(--type-body); -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 96px; }
   h1, h2, h3 { margin: 0; }
   section { padding-top: 64px; }
   .sec-head { margin-bottom: 24px; max-width: 720px; }
-  .sec-head .num { font: var(--tipo-sobrelinha); letter-spacing: .08em; text-transform: uppercase; color: var(--cor-primaria); }
-  .sec-head h2 { font: var(--tipo-titulo); margin: 4px 0 8px; }
-  .sec-head p { color: var(--cor-texto-2); margin: 0; }
-  h3.sub { font: var(--tipo-subtitulo); margin: 32px 0 12px; }
-  .note { font: var(--tipo-corpo-p); color: var(--cor-texto-2); margin: 12px 0 0; }
-  .card { background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: var(--raio-g); padding: var(--espaco-6); }
+  .sec-head .num { font: var(--type-overline); letter-spacing: .08em; text-transform: uppercase; color: var(--color-primary); }
+  .sec-head h2 { font: var(--type-title); margin: 4px 0 8px; }
+  .sec-head p { color: var(--color-text-2); margin: 0; }
+  h3.sub { font: var(--type-subtitle); margin: 32px 0 12px; }
+  .note { font: var(--type-body-s); color: var(--color-text-2); margin: 12px 0 0; }
+  .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-l); padding: var(--space-6); }
   code, .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; }
   .ms { font-family: "Material Symbols Rounded"; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-feature-settings: "liga"; font-feature-settings: "liga"; font-variation-settings: "FILL" 0, "wght" 400, "opsz" 24; user-select: none; }
   .ms.fill { font-variation-settings: "FILL" 1, "wght" 400, "opsz" 24; }
 
-  /* Topo e navegação */
-  .top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--cor-fundo) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--cor-borda); }
+  /* Top bar and navigation */
+  .top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--color-background) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--color-border); }
   .top .in { max-width: 1080px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 12px; align-items: center; }
   .top nav { display: flex; gap: 4px; overflow-x: auto; flex: 1; scrollbar-width: none; }
-  .top nav a { font: var(--tipo-rotulo); color: var(--cor-texto-2); text-decoration: none; padding: 6px 10px; border-radius: var(--raio-total); white-space: nowrap; }
-  .top nav a:hover { background: var(--cor-superficie-2); color: var(--cor-texto); }
-  .theme { display: flex; gap: 2px; background: var(--cor-superficie-2); padding: 3px; border-radius: var(--raio-total); flex: none; }
-  .theme button { border: 0; background: none; color: var(--cor-texto-2); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; }
-  .theme button[aria-pressed="true"] { background: var(--cor-superficie); color: var(--cor-texto); box-shadow: var(--elevacao-1); }
+  .top nav a { font: var(--type-label); color: var(--color-text-2); text-decoration: none; padding: 6px 10px; border-radius: var(--radius-full); white-space: nowrap; }
+  .top nav a:hover { background: var(--color-surface-2); color: var(--color-text); }
+  .theme { display: flex; gap: 2px; background: var(--color-surface-2); padding: 3px; border-radius: var(--radius-full); flex: none; }
+  .theme button { border: 0; background: none; color: var(--color-text-2); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; }
+  .theme button[aria-pressed="true"] { background: var(--color-surface); color: var(--color-text); box-shadow: var(--elevation-1); }
   .theme .ms { font-size: 18px; }
 
   .hero { padding: 56px 0 8px; display: grid; gap: 20px; }
   .hero img { height: 72px; width: auto; max-width: 100%; }
-  .hero p { color: var(--cor-texto-2); max-width: 640px; margin: 0; font-size: 18px; line-height: 28px; }
+  .hero p { color: var(--color-text-2); max-width: 640px; margin: 0; font-size: 18px; line-height: 28px; }
   .logo-n { display: none; }
   :root[data-theme="dark"] .logo-p { display: none; }
   :root[data-theme="dark"] .logo-n { display: block; }
@@ -56,221 +56,221 @@
   .g3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
   .g4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
 
-  /* Princípios */
-  .prin .ms { font-size: 28px; color: var(--cor-primaria); }
-  .prin h3 { font: var(--tipo-titulo-m); margin: 12px 0 6px; }
-  .prin p { margin: 0; color: var(--cor-texto-2); font: var(--tipo-corpo-p); }
+  /* Principles */
+  .principle .ms { font-size: 28px; color: var(--color-primary); }
+  .principle h3 { font: var(--type-title-m); margin: 12px 0 6px; }
+  .principle p { margin: 0; color: var(--color-text-2); font: var(--type-body-s); }
 
-  /* Cores */
-  .scale { display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); border-radius: var(--raio-m); overflow: hidden; border: 1px solid var(--cor-borda); }
-  .scale div { height: 76px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: flex-end; font: 500 11px/14px var(--fonte-interface); }
+  /* Colors */
+  .scale { display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); border-radius: var(--radius-m); overflow: hidden; border: 1px solid var(--color-border); }
+  .scale div { height: 76px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: flex-end; font: 500 11px/14px var(--font-ui); }
   .scale div b { font-weight: 600; }
-  .scale-name { font: var(--tipo-rotulo); margin: 20px 0 8px; display: flex; justify-content: space-between; }
-  .scale-name span { color: var(--cor-texto-3); font-weight: 400; }
-  .sem { width: 100%; border-collapse: collapse; font: var(--tipo-corpo-p); }
-  .sem th { text-align: left; font: var(--tipo-sobrelinha); letter-spacing: .06em; text-transform: uppercase; color: var(--cor-texto-3); padding: 8px; border-bottom: 1px solid var(--cor-borda); }
-  .sem td { padding: 8px; border-bottom: 1px solid var(--cor-borda); vertical-align: middle; }
+  .scale-name { font: var(--type-label); margin: 20px 0 8px; display: flex; justify-content: space-between; }
+  .scale-name span { color: var(--color-text-3); font-weight: 400; }
+  .sem { width: 100%; border-collapse: collapse; font: var(--type-body-s); }
+  .sem th { text-align: left; font: var(--type-overline); letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-3); padding: 8px; border-bottom: 1px solid var(--color-border); }
+  .sem td { padding: 8px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
   .sem .sw { display: inline-flex; align-items: center; gap: 8px; }
   .sem .chip { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgba(128,128,128,.25); flex: none; }
-  .sem .uso { color: var(--cor-texto-2); }
+  .sem .use { color: var(--color-text-2); }
   .tbl { overflow-x: auto; }
   .pairs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
-  .pair { border-radius: var(--raio-m); padding: 16px; min-height: 96px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(128,128,128,.18); }
-  .pair .t { font: var(--tipo-subtitulo); }
-  .pair .m { display: flex; justify-content: space-between; align-items: center; font: var(--tipo-legenda); }
-  .badge { white-space: nowrap; flex: none; font: 600 11px/16px var(--fonte-interface); padding: 2px 8px; border-radius: var(--raio-total); background: rgba(255,255,255,.85); color: #1B1714; }
+  .pair { border-radius: var(--radius-m); padding: 16px; min-height: 96px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(128,128,128,.18); }
+  .pair .t { font: var(--type-subtitle); }
+  .pair .m { display: flex; justify-content: space-between; align-items: center; font: var(--type-caption); }
+  .badge { white-space: nowrap; flex: none; font: 600 11px/16px var(--font-ui); padding: 2px 8px; border-radius: var(--radius-full); background: rgba(255,255,255,.85); color: #1B1714; }
   .badge.fail { background: #B3261E; color: #fff; }
 
-  /* Tipografia */
-  .type-row { display: grid; grid-template-columns: 170px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--cor-borda); align-items: baseline; }
+  /* Typography */
+  .type-row { display: grid; grid-template-columns: 170px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--color-border); align-items: baseline; }
   .type-row:last-child { border-bottom: 0; }
-  .type-row .meta { font: var(--tipo-legenda); color: var(--cor-texto-3); }
-  .type-row .meta b { display: block; font: var(--tipo-rotulo); color: var(--cor-texto); }
+  .type-row .meta { font: var(--type-caption); color: var(--color-text-3); }
+  .type-row .meta b { display: block; font: var(--type-label); color: var(--color-text); }
   .fonts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
   .font-card .big { font-size: 64px; line-height: 1; margin: 8px 0 12px; }
-  .font-card p { margin: 0; color: var(--cor-texto-2); font: var(--tipo-corpo-p); }
+  .font-card p { margin: 0; color: var(--color-text-2); font: var(--type-body-s); }
 
-  /* Espaço, raio, elevação */
-  .space-row { display: flex; align-items: center; gap: 12px; margin: 6px 0; font: var(--tipo-corpo-p); }
-  .space-row .bar { height: 16px; background: var(--cor-primaria-container); border: 1px solid var(--cor-primaria); border-radius: 3px; }
-  .space-row .k { width: 76px; color: var(--cor-texto-2); }
+  /* Space, radius, elevation */
+  .space-row { display: flex; align-items: center; gap: 12px; margin: 6px 0; font: var(--type-body-s); }
+  .space-row .bar { height: 16px; background: var(--color-primary-container); border: 1px solid var(--color-primary); border-radius: 3px; }
+  .space-row .k { width: 76px; color: var(--color-text-2); }
   .radii { display: flex; gap: 16px; flex-wrap: wrap; }
-  .radii figure, .elev figure { margin: 0; text-align: center; font: var(--tipo-legenda); color: var(--cor-texto-2); }
-  .radii .box { width: 84px; height: 84px; background: var(--cor-superficie-2); border: 2px solid var(--cor-borda-forte); margin-bottom: 6px; }
+  .radii figure, .elev figure { margin: 0; text-align: center; font: var(--type-caption); color: var(--color-text-2); }
+  .radii .box { width: 84px; height: 84px; background: var(--color-surface-2); border: 2px solid var(--color-border-strong); margin-bottom: 6px; }
   .elev { display: flex; gap: 24px; flex-wrap: wrap; }
-  .elev .box { width: 120px; height: 84px; background: var(--cor-superficie); border-radius: var(--raio-m); margin-bottom: 8px; }
+  .elev .box { width: 120px; height: 84px; background: var(--color-surface); border-radius: var(--radius-m); margin-bottom: 8px; }
 
-  /* Ícones */
+  /* Icons */
   .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
-  .icons div { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; border-radius: var(--raio-m); background: var(--cor-superficie-2); font: var(--tipo-legenda); color: var(--cor-texto-2); text-align: center; }
-  .icons .ms { color: var(--cor-texto); }
+  .icons div { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px; border-radius: var(--radius-m); background: var(--color-surface-2); font: var(--type-caption); color: var(--color-text-2); text-align: center; }
+  .icons .ms { color: var(--color-text); }
 
-  /* ---------- Componentes do app ---------- */
-  .demo { background: var(--cor-fundo); border: 1px dashed var(--cor-borda-forte); border-radius: var(--raio-g); padding: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  /* ---------- App components ---------- */
+  .demo { background: var(--color-background); border: 1px dashed var(--color-border-strong); border-radius: var(--radius-l); padding: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .demo.col { flex-direction: column; align-items: stretch; }
-  .demo-label { font: var(--tipo-legenda); color: var(--cor-texto-3); width: 100%; }
+  .demo-label { font: var(--type-caption); color: var(--color-text-3); width: 100%; }
 
-  /* Botões */
-  .btn { font: var(--tipo-rotulo); height: 48px; padding: 0 24px; border-radius: var(--raio-total); border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform var(--duracao-rapida) var(--curva-padrao), box-shadow var(--duracao-rapida), background var(--duracao-rapida); }
+  /* Buttons */
+  .btn { font: var(--type-label); height: 48px; padding: 0 24px; border-radius: var(--radius-full); border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast), background var(--duration-fast); }
   .btn .ms { font-size: 20px; margin-left: -6px; }
   .btn:active { transform: scale(.97); }
-  .btn:focus-visible, .icon-btn:focus-visible, .chip-f:focus-visible, .play:focus-visible { outline: 3px solid var(--cor-destaque); outline-offset: 2px; }
-  .btn-pri { background: var(--cor-primaria); color: var(--cor-sobre-primaria); }
-  .btn-pri:hover { box-shadow: var(--elevacao-2); }
-  .btn-ton { background: var(--cor-primaria-container); color: var(--cor-sobre-primaria-container); }
-  .btn-dest { background: var(--cor-destaque); color: var(--cor-sobre-destaque); }
-  .btn-cont { background: transparent; color: var(--cor-primaria); box-shadow: inset 0 0 0 1.5px var(--cor-borda-forte); }
-  .btn-txt { background: transparent; color: var(--cor-primaria); padding: 0 12px; }
-  .btn:disabled { background: var(--cor-superficie-3); color: var(--cor-texto-3); box-shadow: none; cursor: not-allowed; transform: none; opacity: .7; }
-  .icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; color: var(--cor-texto); display: inline-grid; place-items: center; cursor: pointer; transition: background var(--duracao-rapida); }
-  .icon-btn:hover { background: var(--cor-superficie-2); }
-  .icon-btn.on { color: var(--cor-primaria); position: relative; }
+  .btn:focus-visible, .icon-btn:focus-visible, .chip-f:focus-visible, .play:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+  .btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+  .btn-primary:hover { box-shadow: var(--elevation-2); }
+  .btn-tonal { background: var(--color-primary-container); color: var(--color-on-primary-container); }
+  .btn-accent { background: var(--color-accent); color: var(--color-on-accent); }
+  .btn-outline { background: transparent; color: var(--color-primary); box-shadow: inset 0 0 0 1.5px var(--color-border-strong); }
+  .btn-text { background: transparent; color: var(--color-primary); padding: 0 12px; }
+  .btn:disabled { background: var(--color-surface-3); color: var(--color-text-3); box-shadow: none; cursor: not-allowed; transform: none; opacity: .7; }
+  .icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; color: var(--color-text); display: inline-grid; place-items: center; cursor: pointer; transition: background var(--duration-fast); }
+  .icon-btn:hover { background: var(--color-surface-2); }
+  .icon-btn.on { color: var(--color-primary); position: relative; }
   .icon-btn.on::after { content: ""; position: absolute; bottom: 7px; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
 
-  /* Botão play */
-  .play { width: 72px; height: 72px; border-radius: 50%; border: 0; background: var(--cor-primaria); color: var(--cor-sobre-primaria); display: grid; place-items: center; cursor: pointer; box-shadow: var(--elevacao-2); transition: transform var(--duracao-rapida) var(--curva-padrao), border-radius var(--duracao-media) var(--curva-padrao); }
+  /* Play button */
+  .play { width: 72px; height: 72px; border-radius: 50%; border: 0; background: var(--color-primary); color: var(--color-on-primary); display: grid; place-items: center; cursor: pointer; box-shadow: var(--elevation-2); transition: transform var(--duration-fast) var(--easing-standard), border-radius var(--duration-medium) var(--easing-standard); }
   .play .ms { font-size: 40px; }
   .play:active { transform: scale(.94); }
-  .play.tocando { border-radius: 24px; }
+  .play.playing { border-radius: 24px; }
 
   /* Chips */
-  .chip-f { font: var(--tipo-rotulo); height: 36px; padding: 0 16px; border-radius: var(--raio-total); border: 1.5px solid var(--cor-borda-forte); background: transparent; color: var(--cor-texto-2); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all var(--duracao-rapida) var(--curva-padrao); }
+  .chip-f { font: var(--type-label); height: 36px; padding: 0 16px; border-radius: var(--radius-full); border: 1.5px solid var(--color-border-strong); background: transparent; color: var(--color-text-2); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all var(--duration-fast) var(--easing-standard); }
   .chip-f .ms { font-size: 18px; margin-left: -4px; display: none; }
-  .chip-f[aria-pressed="true"] { background: var(--cor-primaria); border-color: var(--cor-primaria); color: var(--cor-sobre-primaria); }
+  .chip-f[aria-pressed="true"] { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
   .chip-f[aria-pressed="true"] .ms { display: inline-block; }
 
-  /* Lista de músicas */
-  .list { background: var(--cor-superficie); border-radius: var(--raio-g); overflow: hidden; width: 100%; max-width: 420px; border: 1px solid var(--cor-borda); }
-  .track { display: grid; grid-template-columns: 48px 1fr auto auto; gap: 12px; align-items: center; padding: 8px 4px 8px 16px; min-height: 64px; cursor: pointer; transition: background var(--duracao-rapida); }
-  .track:hover { background: var(--cor-superficie-2); }
-  .track .cover { width: 48px; height: 48px; border-radius: var(--raio-p); overflow: hidden; position: relative; }
+  /* Song list */
+  .list { background: var(--color-surface); border-radius: var(--radius-l); overflow: hidden; width: 100%; max-width: 420px; border: 1px solid var(--color-border); }
+  .track { display: grid; grid-template-columns: 48px 1fr auto auto; gap: 12px; align-items: center; padding: 8px 4px 8px 16px; min-height: 64px; cursor: pointer; transition: background var(--duration-fast); }
+  .track:hover { background: var(--color-surface-2); }
+  .track .cover { width: 48px; height: 48px; border-radius: var(--radius-s); overflow: hidden; position: relative; }
   .track .cover svg { width: 100%; height: 100%; display: block; }
-  .track .ti { font: var(--tipo-rotulo); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .track .ar { font: var(--tipo-corpo-p); color: var(--cor-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .track .du { font: var(--tipo-legenda); color: var(--cor-texto-3); font-variant-numeric: tabular-nums; }
-  .track.ativa .ti { color: var(--cor-primaria); }
+  .track .ti { font: var(--type-label); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track .ar { font: var(--type-body-s); color: var(--color-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track .du { font: var(--type-caption); color: var(--color-text-3); font-variant-numeric: tabular-nums; }
+  .track.active .ti { color: var(--color-primary); }
   .track .eq { position: absolute; inset: 0; background: rgba(27,23,20,.55); display: none; align-items: flex-end; justify-content: center; gap: 3px; padding-bottom: 14px; }
-  .track.ativa .eq { display: flex; }
-  .eq i { width: 4px; height: 18px; background: var(--cor-destaque); border-radius: 2px; transform-origin: bottom; animation: eq 900ms var(--curva-padrao) infinite alternate; }
+  .track.active .eq { display: flex; }
+  .eq i { width: 4px; height: 18px; background: var(--color-accent); border-radius: 2px; transform-origin: bottom; animation: eq 900ms var(--easing-standard) infinite alternate; }
   .eq i:nth-child(2) { animation-delay: -300ms; animation-duration: 700ms; }
   .eq i:nth-child(3) { animation-delay: -600ms; animation-duration: 1100ms; }
   @keyframes eq { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
 
-  /* Álbuns e capas */
+  /* Albums and covers */
   .albums { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; width: 100%; }
-  .album .art { aspect-ratio: 1; border-radius: var(--raio-m); overflow: hidden; box-shadow: var(--elevacao-1); }
+  .album .art { aspect-ratio: 1; border-radius: var(--radius-m); overflow: hidden; box-shadow: var(--elevation-1); }
   .album .art svg { width: 100%; height: 100%; display: block; }
-  .album .ti { font: var(--tipo-rotulo); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .album .ar { font: var(--tipo-legenda); color: var(--cor-texto-2); }
+  .album .ti { font: var(--type-label); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .album .ar { font: var(--type-caption); color: var(--color-text-2); }
 
-  /* Disco com capa como selo */
-  .disco-wrap { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-  .disco { width: 220px; height: 220px; flex: none; }
-  .disco .gira { transform-box: view-box; transform-origin: 100px 100px; }
-  .disco.tocando .gira { animation: spin var(--duracao-volta-disco) linear infinite; }
+  /* Record with the cover as its label */
+  .record-wrap { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+  .record { width: 220px; height: 220px; flex: none; }
+  .record .rotor { transform-box: view-box; transform-origin: 100px 100px; }
+  .record.playing .rotor { animation: spin var(--duration-record-spin) linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Mini player */
-  .mini { width: 100%; max-width: 420px; background: var(--cor-superficie-2); border-radius: var(--raio-g); overflow: hidden; box-shadow: var(--elevacao-2); }
-  .mini .prog { height: 3px; background: var(--cor-superficie-3); }
-  .mini .prog i { display: block; height: 100%; width: 38%; background: var(--cor-primaria); }
+  .mini { width: 100%; max-width: 420px; background: var(--color-surface-2); border-radius: var(--radius-l); overflow: hidden; box-shadow: var(--elevation-2); }
+  .mini .prog { height: 3px; background: var(--color-surface-3); }
+  .mini .prog i { display: block; height: 100%; width: 38%; background: var(--color-primary); }
   .mini .row { display: grid; grid-template-columns: 44px 1fr auto auto; gap: 12px; align-items: center; padding: 8px 8px 8px 12px; }
-  .mini .ti { font: var(--tipo-rotulo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .mini .ar { font: var(--tipo-legenda); color: var(--cor-texto-2); }
+  .mini .ti { font: var(--type-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini .ar { font: var(--type-caption); color: var(--color-text-2); }
   .mini svg.mdisc { width: 44px; height: 44px; }
-  .mini.tocando .gira { animation: spin var(--duracao-volta-disco) linear infinite; }
-  .mini .gira { transform-box: view-box; transform-origin: 100px 100px; }
+  .mini.playing .rotor { animation: spin var(--duration-record-spin) linear infinite; }
+  .mini .rotor { transform-box: view-box; transform-origin: 100px 100px; }
 
-  /* Barra de progresso */
+  /* Seek bar */
   .seek { width: 100%; max-width: 420px; }
   .seek input { width: 100%; appearance: none; -webkit-appearance: none; height: 24px; background: transparent; cursor: pointer; margin: 0; }
-  .seek input::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--cor-primaria) var(--p, 38%), var(--cor-superficie-3) var(--p, 38%)); }
-  .seek input::-moz-range-track { height: 6px; border-radius: 3px; background: var(--cor-superficie-3); }
-  .seek input::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--cor-primaria); }
-  .seek input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--cor-destaque); margin-top: -6px; border: 3px solid var(--cor-superficie); box-shadow: var(--elevacao-1); transition: transform var(--duracao-rapida); }
+  .seek input::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--color-primary) var(--p, 38%), var(--color-surface-3) var(--p, 38%)); }
+  .seek input::-moz-range-track { height: 6px; border-radius: 3px; background: var(--color-surface-3); }
+  .seek input::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--color-primary); }
+  .seek input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--color-accent); margin-top: -6px; border: 3px solid var(--color-surface); box-shadow: var(--elevation-1); transition: transform var(--duration-fast); }
   .seek input:active::-webkit-slider-thumb { transform: scale(1.3); }
-  .seek input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--cor-destaque); border: 3px solid var(--cor-superficie); }
-  .seek .times { display: flex; justify-content: space-between; font: var(--tipo-legenda); color: var(--cor-texto-2); font-variant-numeric: tabular-nums; }
+  .seek input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); border: 3px solid var(--color-surface); }
+  .seek .times { display: flex; justify-content: space-between; font: var(--type-caption); color: var(--color-text-2); font-variant-numeric: tabular-nums; }
 
-  /* Controles */
+  /* Controls */
   .controls { display: flex; align-items: center; gap: 8px; }
 
-  /* Navegação inferior */
-  .bnav { width: 100%; max-width: 420px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--cor-superficie); border-top: 1px solid var(--cor-borda); border-radius: var(--raio-g); padding: 8px 4px 10px; }
-  .bnav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--cor-texto-2); font: var(--tipo-legenda); font-weight: 500; cursor: pointer; }
-  .bnav .pill { width: 56px; height: 30px; border-radius: var(--raio-total); display: grid; place-items: center; transition: background var(--duracao-media) var(--curva-padrao); }
-  .bnav button[aria-current="page"] { color: var(--cor-texto); }
-  .bnav button[aria-current="page"] .pill { background: var(--cor-primaria-container); color: var(--cor-sobre-primaria-container); }
+  /* Bottom navigation */
+  .bnav { width: 100%; max-width: 420px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--color-surface); border-top: 1px solid var(--color-border); border-radius: var(--radius-l); padding: 8px 4px 10px; }
+  .bnav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--color-text-2); font: var(--type-caption); font-weight: 500; cursor: pointer; }
+  .bnav .pill { width: 56px; height: 30px; border-radius: var(--radius-full); display: grid; place-items: center; transition: background var(--duration-medium) var(--easing-standard); }
+  .bnav button[aria-current="page"] { color: var(--color-text); }
+  .bnav button[aria-current="page"] .pill { background: var(--color-primary-container); color: var(--color-on-primary-container); }
   .bnav button[aria-current="page"] .ms { font-variation-settings: "FILL" 1, "wght" 400, "opsz" 24; }
 
-  /* Busca */
-  .search { width: 100%; max-width: 420px; height: 52px; border-radius: var(--raio-total); background: var(--cor-superficie-2); display: flex; align-items: center; gap: 10px; padding: 0 8px 0 16px; border: 2px solid transparent; transition: border-color var(--duracao-rapida); }
-  .search:focus-within { border-color: var(--cor-primaria); background: var(--cor-superficie); }
-  .search input { flex: 1; border: 0; background: none; font: var(--tipo-corpo); color: var(--cor-texto); outline: none; min-width: 0; }
-  .search input::placeholder { color: var(--cor-texto-3); }
-  .search .ms { color: var(--cor-texto-2); }
+  /* Search */
+  .search { width: 100%; max-width: 420px; height: 52px; border-radius: var(--radius-full); background: var(--color-surface-2); display: flex; align-items: center; gap: 10px; padding: 0 8px 0 16px; border: 2px solid transparent; transition: border-color var(--duration-fast); }
+  .search:focus-within { border-color: var(--color-primary); background: var(--color-surface); }
+  .search input { flex: 1; border: 0; background: none; font: var(--type-body); color: var(--color-text); outline: none; min-width: 0; }
+  .search input::placeholder { color: var(--color-text-3); }
+  .search .ms { color: var(--color-text-2); }
 
-  /* Pastas e ajustes */
-  .rows { width: 100%; max-width: 420px; background: var(--cor-superficie); border-radius: var(--raio-g); border: 1px solid var(--cor-borda); overflow: hidden; }
+  /* Folders and settings */
+  .rows { width: 100%; max-width: 420px; background: var(--color-surface); border-radius: var(--radius-l); border: 1px solid var(--color-border); overflow: hidden; }
   .row-i { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 12px 8px 12px 16px; min-height: 64px; }
-  .row-i + .row-i { border-top: 1px solid var(--cor-borda); }
-  .row-i .ic { width: 40px; height: 40px; border-radius: var(--raio-p); background: var(--cor-destaque-container); color: var(--cor-sobre-destaque-container); display: grid; place-items: center; }
-  .row-i .ti { font: var(--tipo-rotulo); }
-  .row-i .sb { font: var(--tipo-legenda); color: var(--cor-texto-2); }
-  .switch { width: 52px; height: 32px; border-radius: var(--raio-total); background: var(--cor-superficie-3); border: 2px solid var(--cor-borda-forte); position: relative; cursor: pointer; transition: background var(--duracao-media) var(--curva-padrao); margin-right: 8px; }
-  .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--cor-borda-forte); transition: all var(--duracao-media) var(--curva-padrao); }
-  .switch[aria-checked="true"] { background: var(--cor-primaria); border-color: var(--cor-primaria); }
-  .switch[aria-checked="true"]::after { left: 24px; background: var(--cor-sobre-primaria); }
+  .row-i + .row-i { border-top: 1px solid var(--color-border); }
+  .row-i .ic { width: 40px; height: 40px; border-radius: var(--radius-s); background: var(--color-accent-container); color: var(--color-on-accent-container); display: grid; place-items: center; }
+  .row-i .ti { font: var(--type-label); }
+  .row-i .sb { font: var(--type-caption); color: var(--color-text-2); }
+  .switch { width: 52px; height: 32px; border-radius: var(--radius-full); background: var(--color-surface-3); border: 2px solid var(--color-border-strong); position: relative; cursor: pointer; transition: background var(--duration-medium) var(--easing-standard); margin-right: 8px; }
+  .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--color-border-strong); transition: all var(--duration-medium) var(--easing-standard); }
+  .switch[aria-checked="true"] { background: var(--color-primary); border-color: var(--color-primary); }
+  .switch[aria-checked="true"]::after { left: 24px; background: var(--color-on-primary); }
 
-  /* Progresso de escaneamento */
+  /* Scan progress */
   .scan { width: 100%; max-width: 420px; }
-  .scan .lbl { display: flex; justify-content: space-between; font: var(--tipo-corpo-p); margin-bottom: 8px; }
-  .scan .lbl span { color: var(--cor-texto-2); font-variant-numeric: tabular-nums; }
-  .scan .bar { height: 6px; border-radius: 3px; background: var(--cor-superficie-3); overflow: hidden; }
-  .scan .bar i { display: block; height: 100%; width: 62%; background: repeating-linear-gradient(-45deg, var(--cor-destaque) 0 8px, var(--cor-destaque-container) 8px 16px); background-size: 22.6px 22.6px; animation: listras 1s linear infinite; border-radius: 3px; }
-  @keyframes listras { to { background-position: 22.6px 0; } }
+  .scan .lbl { display: flex; justify-content: space-between; font: var(--type-body-s); margin-bottom: 8px; }
+  .scan .lbl span { color: var(--color-text-2); font-variant-numeric: tabular-nums; }
+  .scan .bar { height: 6px; border-radius: 3px; background: var(--color-surface-3); overflow: hidden; }
+  .scan .bar i { display: block; height: 100%; width: 62%; background: repeating-linear-gradient(-45deg, var(--color-accent) 0 8px, var(--color-accent-container) 8px 16px); background-size: 22.6px 22.6px; animation: stripes 1s linear infinite; border-radius: 3px; }
+  @keyframes stripes { to { background-position: 22.6px 0; } }
 
-  /* Snackbar e diálogo */
-  .snack { background: var(--cor-texto); color: var(--cor-fundo); border-radius: var(--raio-m); padding: 6px 6px 6px 16px; display: flex; align-items: center; gap: 12px; font: var(--tipo-corpo-p); max-width: 420px; width: 100%; box-shadow: var(--elevacao-3); }
+  /* Snackbar and dialog */
+  .snack { background: var(--color-text); color: var(--color-background); border-radius: var(--radius-m); padding: 6px 6px 6px 16px; display: flex; align-items: center; gap: 12px; font: var(--type-body-s); max-width: 420px; width: 100%; box-shadow: var(--elevation-3); }
   .snack span { flex: 1; }
-  .snack button { background: none; border: 0; color: var(--cor-acao-aviso); font: var(--tipo-rotulo); padding: 10px 12px; border-radius: var(--raio-p); cursor: pointer; }
-  .dialog { background: var(--cor-superficie); border-radius: var(--raio-gg); padding: 24px; max-width: 340px; box-shadow: var(--elevacao-3); border: 1px solid var(--cor-borda); }
-  .dialog .ms { color: var(--cor-erro); font-size: 28px; }
-  .dialog h4 { font: var(--tipo-titulo-m); margin: 12px 0 8px; }
-  .dialog p { margin: 0 0 20px; color: var(--cor-texto-2); font: var(--tipo-corpo-p); }
+  .snack button { background: none; border: 0; color: var(--color-snackbar-action); font: var(--type-label); padding: 10px 12px; border-radius: var(--radius-s); cursor: pointer; }
+  .dialog { background: var(--color-surface); border-radius: var(--radius-xl); padding: 24px; max-width: 340px; box-shadow: var(--elevation-3); border: 1px solid var(--color-border); }
+  .dialog .ms { color: var(--color-error); font-size: 28px; }
+  .dialog h4 { font: var(--type-title-m); margin: 12px 0 8px; }
+  .dialog p { margin: 0 0 20px; color: var(--color-text-2); font: var(--type-body-s); }
   .dialog .acts { display: flex; justify-content: flex-end; gap: 4px; }
-  .btn-perigo { background: var(--cor-erro); color: var(--cor-superficie); }
+  .btn-danger { background: var(--color-error); color: var(--color-surface); }
 
-  /* Estado vazio */
-  .empty { width: 100%; max-width: 420px; text-align: center; padding: 32px 24px; background: var(--cor-superficie); border-radius: var(--raio-g); border: 1px solid var(--cor-borda); }
+  /* Empty state */
+  .empty { width: 100%; max-width: 420px; text-align: center; padding: 32px 24px; background: var(--color-surface); border-radius: var(--radius-l); border: 1px solid var(--color-border); }
   .empty svg { width: 140px; height: 140px; }
-  .empty h4 { font: var(--tipo-titulo-m); margin: 16px 0 6px; }
-  .empty p { color: var(--cor-texto-2); margin: 0 0 20px; font: var(--tipo-corpo-p); }
+  .empty h4 { font: var(--type-title-m); margin: 16px 0 6px; }
+  .empty p { color: var(--color-text-2); margin: 0 0 20px; font: var(--type-body-s); }
 
-  /* Movimento */
+  /* Motion */
   .motion { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
   .motion .card { display: flex; flex-direction: column; gap: 12px; }
-  .motion h4 { font: var(--tipo-subtitulo); margin: 0; }
-  .motion p { margin: 0; font: var(--tipo-corpo-p); color: var(--cor-texto-2); }
-  .motion .stage { height: 120px; background: var(--cor-superficie-2); border-radius: var(--raio-m); position: relative; overflow: hidden; display: grid; place-items: center; }
-  .curve-dot { position: absolute; left: 16px; top: 50%; width: 24px; height: 24px; margin-top: -12px; border-radius: 50%; background: var(--cor-primaria); }
+  .motion h4 { font: var(--type-subtitle); margin: 0; }
+  .motion p { margin: 0; font: var(--type-body-s); color: var(--color-text-2); }
+  .motion .stage { height: 120px; background: var(--color-surface-2); border-radius: var(--radius-m); position: relative; overflow: hidden; display: grid; place-items: center; }
+  .curve-dot { position: absolute; left: 16px; top: 50%; width: 24px; height: 24px; margin-top: -12px; border-radius: 50%; background: var(--color-primary); }
   .curve-dot.go { left: calc(100% - 40px); }
-  .expand-box { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 36px; border-radius: var(--raio-m); background: var(--cor-primaria); transition: all var(--duracao-longa) var(--curva-entrada); }
+  .expand-box { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 36px; border-radius: var(--radius-m); background: var(--color-primary); transition: all var(--duration-long) var(--easing-decelerate); }
   .expand-box.open { left: 0; right: 0; bottom: 0; height: 100%; border-radius: 0; }
-  .tok { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font: var(--tipo-corpo-p); }
+  .tok { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font: var(--type-body-s); }
   .tok dt { font-weight: 600; }
-  .tok dd { margin: 0; color: var(--cor-texto-2); }
+  .tok dd { margin: 0; color: var(--color-text-2); }
 
-  /* Voz */
-  .voz { width: 100%; border-collapse: collapse; font: var(--tipo-corpo-p); }
-  .voz th { text-align: left; padding: 10px 12px; font: var(--tipo-sobrelinha); letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--cor-borda); }
-  .voz td { padding: 10px 12px; border-bottom: 1px solid var(--cor-borda); vertical-align: top; }
-  .voz .sim { color: var(--cor-sucesso); } .voz .nao { color: var(--cor-erro); }
-  .voz td:first-child { color: var(--cor-texto-2); width: 22%; }
+  /* Voice */
+  .voice { width: 100%; border-collapse: collapse; font: var(--type-body-s); }
+  .voice th { text-align: left; padding: 10px 12px; font: var(--type-overline); letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--color-border); }
+  .voice td { padding: 10px 12px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+  .voice .yes { color: var(--color-success); } .voice .no { color: var(--color-error); }
+  .voice td:first-child { color: var(--color-text-2); width: 22%; }
 
   .checklist { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
-  .checklist li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; font: var(--tipo-corpo-p); }
-  .checklist .ms { color: var(--cor-sucesso); font-size: 22px; }
+  .checklist li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; font: var(--type-body-s); }
+  .checklist .ms { color: var(--color-success); font-size: 22px; }
   .checklist b { font-weight: 600; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -279,7 +279,7 @@
   @media (max-width: 640px) {
     .g4 { grid-template-columns: 1fr; }
     .type-row { grid-template-columns: 1fr; gap: 4px; }
-    .voz td:first-child { width: auto; }
+    .voice td:first-child { width: auto; }
   }
 </style>
 </head>
@@ -287,167 +287,167 @@
 
 <header class="top">
   <div class="in">
-    <nav aria-label="Seções">
-      <a href="#principios">Princípios</a>
-      <a href="#cores">Cores</a>
-      <a href="#tipografia">Tipografia</a>
-      <a href="#espaco">Espaço e forma</a>
-      <a href="#icones">Ícones</a>
-      <a href="#componentes">Componentes</a>
-      <a href="#movimento">Movimento</a>
-      <a href="#voz">Voz</a>
-      <a href="#acessibilidade">Acessibilidade</a>
+    <nav aria-label="Sections">
+      <a href="#principles">Principles</a>
+      <a href="#colors">Colors</a>
+      <a href="#typography">Typography</a>
+      <a href="#space">Space and shape</a>
+      <a href="#icons">Icons</a>
+      <a href="#components">Components</a>
+      <a href="#motion">Motion</a>
+      <a href="#voice">Voice</a>
+      <a href="#accessibility">Accessibility</a>
       <a href="#compose">Compose</a>
     </nav>
-    <div class="theme" role="group" aria-label="Tema">
-      <button data-t="auto" aria-label="Automático"><span class="ms">brightness_auto</span></button>
-      <button data-t="light" aria-label="Claro"><span class="ms">light_mode</span></button>
-      <button data-t="dark" aria-label="Escuro"><span class="ms">dark_mode</span></button>
+    <div class="theme" role="group" aria-label="Theme">
+      <button data-t="auto" aria-label="Automatic"><span class="ms">brightness_auto</span></button>
+      <button data-t="light" aria-label="Light"><span class="ms">light_mode</span></button>
+      <button data-t="dark" aria-label="Dark"><span class="ms">dark_mode</span></button>
     </div>
   </div>
 </header>
 
 <main class="wrap">
   <div class="hero">
-    <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3">
-    <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negativo.svg" alt="Vitrola Mp3">
-    <p>Style guide do app: cores, tipografia, espaços, componentes e movimento. Tudo aqui sai de <code>tokens.json</code>, que vai alimentar o mockup e, depois, o tema do app em Jetpack Compose.</p>
+    <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positive.svg" alt="Vitrola Mp3">
+    <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negative.svg" alt="Vitrola Mp3">
+    <p>The app's style guide: colors, typography, spacing, components and motion. Everything here comes from <code>tokens.json</code>, which feeds the mockup and, later, the app theme in Jetpack Compose.</p>
   </div>
 
-  <!-- 1. Princípios -->
-  <section id="principios">
+  <!-- 1. Principles -->
+  <section id="principles">
     <div class="sec-head">
       <div class="num">01</div>
-      <h2>Princípios</h2>
-      <p>Quatro ideias que desempatam qualquer decisão de design.</p>
+      <h2>Principles</h2>
+      <p>Four ideas that settle any design decision.</p>
     </div>
     <div class="grid g4">
-      <div class="card prin"><span class="ms">local_fire_department</span><h3>Calor analógico</h3><p>Creme, vinho e mostarda no lugar do cinza frio. A sensação é de sala de estar com toca-discos, não de painel de controle.</p></div>
-      <div class="card prin"><span class="ms">album</span><h3>A música em primeiro lugar</h3><p>A capa e o disco são as estrelas. A interface recua: poucos botões e sem enfeites competindo com a arte.</p></div>
-      <div class="card prin"><span class="ms">touch_app</span><h3>Simples como pôr um disco</h3><p>Cada tarefa comum (tocar, pular, achar uma música) leva no máximo dois toques.</p></div>
-      <div class="card prin"><span class="ms">accessibility_new</span><h3>Para todo mundo</h3><p>Contraste AA, alvos de toque de 48dp, respeito ao "reduzir movimento" e leitores de tela.</p></div>
+      <div class="card principle"><span class="ms">local_fire_department</span><h3>Analog warmth</h3><p>Cream, wine and mustard instead of cold gray. It should feel like a living room with a turntable, not a control panel.</p></div>
+      <div class="card principle"><span class="ms">album</span><h3>Music comes first</h3><p>The cover and the record are the stars. The interface steps back: few buttons and no decoration competing with the artwork.</p></div>
+      <div class="card principle"><span class="ms">touch_app</span><h3>As simple as putting on a record</h3><p>Every common task (play, skip, find a song) takes two taps at most.</p></div>
+      <div class="card principle"><span class="ms">accessibility_new</span><h3>For everyone</h3><p>AA contrast, 48dp touch targets, respect for "reduce motion" and screen readers.</p></div>
     </div>
   </section>
 
-  <!-- 2. Cores -->
-  <section id="cores">
+  <!-- 2. Colors -->
+  <section id="colors">
     <div class="sec-head">
       <div class="num">02</div>
-      <h2>Cores</h2>
-      <p>Três escalas primitivas (vinho, mostarda e neutros quentes) viram cores com função, que mudam entre o tema claro e o escuro. Os componentes usam <b>só as cores com função</b>, nunca as primitivas direto.</p>
+      <h2>Colors</h2>
+      <p>Three primitive scales (wine, mustard and warm neutrals) become role-based colors that switch between the light and dark themes. Components use <b>only the role colors</b>, never the primitives directly.</p>
     </div>
 
-    <h3 class="sub">Escalas primitivas</h3>
-    <div id="primitivas"></div>
+    <h3 class="sub">Primitive scales</h3>
+    <div id="primitives"></div>
 
-    <h3 class="sub">Cores com função</h3>
-    <div class="card tbl"><table class="sem" id="semanticas"></table></div>
+    <h3 class="sub">Role colors</h3>
+    <div class="card tbl"><table class="sem" id="role-colors"></table></div>
 
-    <h3 class="sub">Combinações e contraste</h3>
-    <div class="pairs" id="pares"></div>
-    <p class="note">O contraste é calculado na hora para o tema atual. A meta é AA: 4,5:1 para texto normal e 3:1 para texto grande e ícones. Mostarda nunca é usada como cor de texto sobre fundo claro, só como preenchimento com texto escuro em cima.</p>
+    <h3 class="sub">Pairings and contrast</h3>
+    <div class="pairs" id="pairs"></div>
+    <p class="note">Contrast is computed live for the current theme. The target is AA: 4.5:1 for body text and 3:1 for large text and icons. Mustard is never used as a text color on light backgrounds, only as a fill with dark text on top.</p>
   </section>
 
-  <!-- 3. Tipografia -->
-  <section id="tipografia">
+  <!-- 3. Typography -->
+  <section id="typography">
     <div class="sec-head">
       <div class="num">03</div>
-      <h2>Tipografia</h2>
-      <p>Duas famílias. <b>Fraunces</b> é a voz da marca e aparece em títulos, nomes de álbum e na tela "tocando agora". <b>Outfit</b> cuida de toda a interface: listas, botões e tempos.</p>
+      <h2>Typography</h2>
+      <p>Two families. <b>Fraunces</b> is the brand voice, used for titles, album names and the "now playing" screen. <b>Outfit</b> handles the whole interface: lists, buttons and times.</p>
     </div>
     <div class="fonts">
-      <div class="card font-card"><div class="mono" style="color:var(--cor-texto-3)">Marca · títulos</div><div class="big" style="font-family:var(--fonte-marca);font-weight:800">Aa</div><p>Fraunces, serifa "macia" com eixo óptico. Pesos 600–800. Usar só a partir de 22sp.</p></div>
-      <div class="card font-card"><div class="mono" style="color:var(--cor-texto-3)">Interface · texto</div><div class="big" style="font-family:var(--fonte-interface);font-weight:500">Aa</div><p>Outfit, geométrica e muito legível em tamanhos pequenos. Pesos 400–600. Números com largura fixa nos tempos (<span style="font-variant-numeric:tabular-nums">03:41</span>).</p></div>
+      <div class="card font-card"><div class="mono" style="color:var(--color-text-3)">Brand · titles</div><div class="big" style="font-family:var(--font-brand);font-weight:800">Aa</div><p>Fraunces, a "soft" serif with an optical size axis. Weights 600–800. Use only at 22sp and up.</p></div>
+      <div class="card font-card"><div class="mono" style="color:var(--color-text-3)">Interface · text</div><div class="big" style="font-family:var(--font-ui);font-weight:500">Aa</div><p>Outfit, geometric and very legible at small sizes. Weights 400–600. Tabular figures for times (<span style="font-variant-numeric:tabular-nums">03:41</span>).</p></div>
     </div>
-    <h3 class="sub">Escala</h3>
-    <div class="card" id="escala-tipo"></div>
+    <h3 class="sub">Scale</h3>
+    <div class="card" id="type-scale"></div>
   </section>
 
-  <!-- 4. Espaço e forma -->
-  <section id="espaco">
+  <!-- 4. Space and shape -->
+  <section id="space">
     <div class="sec-head">
       <div class="num">04</div>
-      <h2>Espaço e forma</h2>
-      <p>Grade de 4dp. Cantos bem arredondados lembram o vinil e os botões de aparelhos antigos. As sombras são quentes (marrom, não preto) e discretas.</p>
+      <h2>Space and shape</h2>
+      <p>A 4dp grid. Generously rounded corners echo vinyl and the knobs of old stereos. Shadows are warm (brown, not black) and subtle.</p>
     </div>
     <div class="grid g3">
-      <div class="card"><h3 class="sub" style="margin-top:0">Espaçamento</h3><div id="espacos"></div></div>
-      <div class="card"><h3 class="sub" style="margin-top:0">Raios</h3><div class="radii" id="raios"></div></div>
-      <div class="card"><h3 class="sub" style="margin-top:0">Elevação</h3><div class="elev" id="elevs"></div><p class="note">No tema escuro, a elevação aparece mais pela cor da superfície (mais clara) do que pela sombra.</p></div>
+      <div class="card"><h3 class="sub" style="margin-top:0">Spacing</h3><div id="spacing"></div></div>
+      <div class="card"><h3 class="sub" style="margin-top:0">Radii</h3><div class="radii" id="radii"></div></div>
+      <div class="card"><h3 class="sub" style="margin-top:0">Elevation</h3><div class="elev" id="elevations"></div><p class="note">In the dark theme, elevation shows through a lighter surface color more than through shadow.</p></div>
     </div>
   </section>
 
-  <!-- 5. Ícones -->
-  <section id="icones">
+  <!-- 5. Icons -->
+  <section id="icons">
     <div class="sec-head">
       <div class="num">05</div>
-      <h2>Ícones</h2>
-      <p><b>Material Symbols Rounded</b>, peso 400, 24dp. As pontas arredondadas conversam com a Fraunces e com o disco. Contorno no estado normal; preenchido no item ativo (ex.: aba atual, favorito marcado).</p>
+      <h2>Icons</h2>
+      <p><b>Material Symbols Rounded</b>, weight 400, 24dp. The rounded ends match Fraunces and the record. Outlined by default; filled for the active item (e.g. current tab, favorited item).</p>
     </div>
-    <div class="icons" id="lista-icones"></div>
+    <div class="icons" id="icon-list"></div>
   </section>
 
-  <!-- 6. Componentes -->
-  <section id="componentes">
+  <!-- 6. Components -->
+  <section id="components">
     <div class="sec-head">
       <div class="num">06</div>
-      <h2>Componentes</h2>
-      <p>As peças que vão montar as telas. Os componentes são interativos: clique para ver os estados.</p>
+      <h2>Components</h2>
+      <p>The building blocks of the screens. They are interactive: click to see their states.</p>
     </div>
 
-    <h3 class="sub">Botões</h3>
+    <h3 class="sub">Buttons</h3>
     <div class="demo">
-      <button class="btn btn-pri"><span class="ms">folder_open</span>Escolher pasta</button>
-      <button class="btn btn-ton"><span class="ms">shuffle</span>Aleatório</button>
-      <button class="btn btn-dest"><span class="ms">play_arrow</span>Tocar tudo</button>
-      <button class="btn btn-cont">Reescanear</button>
-      <button class="btn btn-txt">Cancelar</button>
-      <button class="btn btn-pri" disabled>Desativado</button>
-      <div class="demo-label">Primário (vinho): ação principal da tela, no máximo um por tela · Tonal: ações secundárias · Destaque (mostarda): "tocar", usar com moderação · Contorno e texto: ações de baixo peso.</div>
+      <button class="btn btn-primary"><span class="ms">folder_open</span>Choose folder</button>
+      <button class="btn btn-tonal"><span class="ms">shuffle</span>Shuffle</button>
+      <button class="btn btn-accent"><span class="ms">play_arrow</span>Play all</button>
+      <button class="btn btn-outline">Rescan</button>
+      <button class="btn btn-text">Cancel</button>
+      <button class="btn btn-primary" disabled>Disabled</button>
+      <div class="demo-label">Primary (wine): the main action, at most one per screen · Tonal: secondary actions · Accent (mustard): "play", use sparingly · Outline and text: low-emphasis actions.</div>
     </div>
 
-    <h3 class="sub">Controles do player</h3>
+    <h3 class="sub">Player controls</h3>
     <div class="demo">
       <div class="controls">
-        <button class="icon-btn" data-toggle="shuffle" aria-label="Aleatório"><span class="ms">shuffle</span></button>
-        <button class="icon-btn" aria-label="Anterior"><span class="ms fill" style="font-size:32px">skip_previous</span></button>
-        <button class="play" id="play-main" aria-label="Tocar"><span class="ms fill">play_arrow</span></button>
-        <button class="icon-btn" aria-label="Próxima"><span class="ms fill" style="font-size:32px">skip_next</span></button>
-        <button class="icon-btn" id="repeat" aria-label="Repetir"><span class="ms">repeat</span></button>
+        <button class="icon-btn" data-toggle="shuffle" aria-label="Shuffle"><span class="ms">shuffle</span></button>
+        <button class="icon-btn" aria-label="Previous"><span class="ms fill" style="font-size:32px">skip_previous</span></button>
+        <button class="play" id="play-main" aria-label="Play"><span class="ms fill">play_arrow</span></button>
+        <button class="icon-btn" aria-label="Next"><span class="ms fill" style="font-size:32px">skip_next</span></button>
+        <button class="icon-btn" id="repeat" aria-label="Repeat"><span class="ms">repeat</span></button>
       </div>
       <div class="seek">
-        <input type="range" id="seek" min="0" max="221" value="84" aria-label="Posição da música">
+        <input type="range" id="seek" min="0" max="221" value="84" aria-label="Song position">
         <div class="times"><span id="t-now">1:24</span><span>3:41</span></div>
       </div>
-      <div class="demo-label">Ao tocar, o botão play passa de círculo a quadrado arredondado. Aleatório e repetir ficam em vinho com um ponto quando ativos, e repetir alterna entre desligado, todas e uma (ícone <span class="ms" style="font-size:14px;vertical-align:-2px">repeat_one</span>). O controle da barra é mostarda, como a cápsula do braço.</div>
+      <div class="demo-label">While playing, the play button morphs from a circle into a rounded square. Shuffle and repeat turn wine with a dot when active, and repeat cycles through off, all and one (icon <span class="ms" style="font-size:14px;vertical-align:-2px">repeat_one</span>). The seek thumb is mustard, like the tonearm headshell.</div>
     </div>
 
-    <h3 class="sub">Disco "tocando agora"</h3>
-    <div class="demo disco-wrap">
-      <svg class="disco" id="disco-grande" viewBox="0 0 200 200" aria-label="Disco com a capa do álbum"></svg>
+    <h3 class="sub">"Now playing" record</h3>
+    <div class="demo record-wrap">
+      <svg class="record" id="big-record" viewBox="0 0 200 200" aria-label="Record with the album cover"></svg>
       <div style="flex:1;min-width:220px">
-        <p style="margin:0 0 12px;color:var(--cor-texto-2);font:var(--tipo-corpo-p)">A capa do álbum vira o <b>selo do disco</b>. O disco gira a 33⅓ rotações por minuto (uma volta a cada 1,8s), como um LP. Ao pausar, ele desacelera até parar, em vez de travar.</p>
-        <button class="btn btn-ton" id="disco-btn"><span class="ms">play_arrow</span>Girar</button>
+        <p style="margin:0 0 12px;color:var(--color-text-2);font:var(--type-body-s)">The album cover becomes the <b>record label</b>. The record spins at 33⅓ rpm (one turn every 1.8s), like an LP. When paused it slows down to a stop instead of freezing.</p>
+        <button class="btn btn-tonal" id="record-btn"><span class="ms">play_arrow</span>Spin</button>
       </div>
     </div>
 
-    <h3 class="sub">Filtros da biblioteca</h3>
+    <h3 class="sub">Library filters</h3>
     <div class="demo" id="chips">
-      <button class="chip-f" aria-pressed="true"><span class="ms">check</span>Músicas</button>
-      <button class="chip-f" aria-pressed="false"><span class="ms">check</span>Álbuns</button>
-      <button class="chip-f" aria-pressed="false"><span class="ms">check</span>Artistas</button>
-      <button class="chip-f" aria-pressed="false"><span class="ms">check</span>Pastas</button>
+      <button class="chip-f" aria-pressed="true"><span class="ms">check</span>Songs</button>
+      <button class="chip-f" aria-pressed="false"><span class="ms">check</span>Albums</button>
+      <button class="chip-f" aria-pressed="false"><span class="ms">check</span>Artists</button>
+      <button class="chip-f" aria-pressed="false"><span class="ms">check</span>Folders</button>
     </div>
 
-    <h3 class="sub">Lista de músicas</h3>
-    <div class="demo"><div class="list" id="lista"></div>
-      <div class="demo-label">A música atual fica com o título em vinho e barrinhas de equalizador animadas sobre a capa. Clique em outra música para trocar.</div>
+    <h3 class="sub">Song list</h3>
+    <div class="demo"><div class="list" id="song-list"></div>
+      <div class="demo-label">The current song shows its title in wine and animated equalizer bars over the cover. Click another song to switch.</div>
     </div>
 
-    <h3 class="sub">Álbuns e capas padrão</h3>
+    <h3 class="sub">Albums and fallback covers</h3>
     <div class="demo col">
-      <div class="albums" id="albuns"></div>
-      <div class="demo-label">Quando o MP3 não tem capa, o app gera uma a partir do nome do álbum: cor da paleta, sulcos e iniciais em Fraunces. O mesmo álbum sempre recebe a mesma capa.</div>
+      <div class="albums" id="albums"></div>
+      <div class="demo-label">When an MP3 has no cover, the app generates one from the album name: a palette color, grooves and initials in Fraunces. The same album always gets the same cover.</div>
     </div>
 
     <h3 class="sub">Mini player</h3>
@@ -455,135 +455,135 @@
       <div class="mini" id="mini">
         <div class="prog"><i></i></div>
         <div class="row">
-          <svg class="mdisc" id="mini-disco" viewBox="0 0 200 200"></svg>
+          <svg class="mdisc" id="mini-record" viewBox="0 0 200 200"></svg>
           <div style="min-width:0"><div class="ti">Águas de Março</div><div class="ar">Elis & Tom</div></div>
-          <button class="icon-btn" id="mini-play" aria-label="Tocar"><span class="ms fill">play_arrow</span></button>
-          <button class="icon-btn" aria-label="Próxima"><span class="ms fill">skip_next</span></button>
+          <button class="icon-btn" id="mini-play" aria-label="Play"><span class="ms fill">play_arrow</span></button>
+          <button class="icon-btn" aria-label="Next"><span class="ms fill">skip_next</span></button>
         </div>
       </div>
-      <div class="demo-label">Fica fixo acima da navegação em todas as telas. Tocar nele abre o "tocando agora". A linha fina no topo mostra o progresso.</div>
+      <div class="demo-label">Pinned above the navigation on every screen. Tapping it opens "now playing". The thin line at the top shows progress.</div>
     </div>
 
-    <h3 class="sub">Navegação inferior</h3>
+    <h3 class="sub">Bottom navigation</h3>
     <div class="demo">
       <nav class="bnav" id="bnav">
-        <button aria-current="page"><span class="pill"><span class="ms">library_music</span></span>Biblioteca</button>
+        <button aria-current="page"><span class="pill"><span class="ms">library_music</span></span>Library</button>
         <button><span class="pill"><span class="ms">queue_music</span></span>Playlists</button>
-        <button><span class="pill"><span class="ms">search</span></span>Buscar</button>
-        <button><span class="pill"><span class="ms">settings</span></span>Ajustes</button>
+        <button><span class="pill"><span class="ms">search</span></span>Search</button>
+        <button><span class="pill"><span class="ms">settings</span></span>Settings</button>
       </nav>
-      <div class="demo-label">Abas provisórias. A estrutura final das telas será validada no mockup.</div>
+      <div class="demo-label">Provisional tabs. The final screen structure is validated in the mockup.</div>
     </div>
 
-    <h3 class="sub">Busca</h3>
+    <h3 class="sub">Search</h3>
     <div class="demo">
-      <label class="search"><span class="ms">search</span><input placeholder="Música, artista ou álbum"><button class="icon-btn" aria-label="Limpar" style="width:40px;height:40px"><span class="ms">close</span></button></label>
+      <label class="search"><span class="ms">search</span><input placeholder="Song, artist or album"><button class="icon-btn" aria-label="Clear" style="width:40px;height:40px"><span class="ms">close</span></button></label>
     </div>
 
-    <h3 class="sub">Pastas e ajustes</h3>
+    <h3 class="sub">Folders and settings</h3>
     <div class="demo">
       <div class="rows">
-        <div class="row-i"><div class="ic"><span class="ms">folder</span></div><div><div class="ti">Music</div><div class="sb">Memória interna · 248 músicas</div></div><button class="icon-btn" aria-label="Remover pasta"><span class="ms">remove_circle_outline</span></button></div>
-        <div class="row-i"><div class="ic"><span class="ms">sd_card</span></div><div><div class="ti">Discos/MPB</div><div class="sb">Cartão SD · 1.032 músicas</div></div><button class="icon-btn" aria-label="Remover pasta"><span class="ms">remove_circle_outline</span></button></div>
-        <div class="row-i"><div class="ic" style="background:var(--cor-primaria-container);color:var(--cor-sobre-primaria-container)"><span class="ms">subdirectory_arrow_right</span></div><div><div class="ti">Incluir subpastas</div><div class="sb">Procurar músicas dentro das pastas escolhidas</div></div><button class="switch" role="switch" aria-checked="true" aria-label="Incluir subpastas"></button></div>
-        <div class="row-i"><div class="ic" style="background:var(--cor-primaria-container);color:var(--cor-sobre-primaria-container)"><span class="ms">bedtime</span></div><div><div class="ti">Timer para dormir</div><div class="sb">Desligado</div></div><button class="switch" role="switch" aria-checked="false" aria-label="Timer para dormir"></button></div>
+        <div class="row-i"><div class="ic"><span class="ms">folder</span></div><div><div class="ti">Music</div><div class="sb">Internal storage · 248 songs</div></div><button class="icon-btn" aria-label="Remove folder"><span class="ms">remove_circle_outline</span></button></div>
+        <div class="row-i"><div class="ic"><span class="ms">sd_card</span></div><div><div class="ti">Records/MPB</div><div class="sb">SD card · 1,032 songs</div></div><button class="icon-btn" aria-label="Remove folder"><span class="ms">remove_circle_outline</span></button></div>
+        <div class="row-i"><div class="ic" style="background:var(--color-primary-container);color:var(--color-on-primary-container)"><span class="ms">subdirectory_arrow_right</span></div><div><div class="ti">Include subfolders</div><div class="sb">Look for songs inside the chosen folders</div></div><button class="switch" role="switch" aria-checked="true" aria-label="Include subfolders"></button></div>
+        <div class="row-i"><div class="ic" style="background:var(--color-primary-container);color:var(--color-on-primary-container)"><span class="ms">bedtime</span></div><div><div class="ti">Sleep timer</div><div class="sb">Off</div></div><button class="switch" role="switch" aria-checked="false" aria-label="Sleep timer"></button></div>
       </div>
       <div class="scan">
-        <div class="lbl">Procurando músicas… <span>412 / 664</span></div>
+        <div class="lbl">Looking for songs… <span>412 / 664</span></div>
         <div class="bar"><i></i></div>
-        <p class="note">O escaneamento mostra o progresso real quando dá para contar os arquivos. As listras se movem para mostrar que o app está trabalhando.</p>
+        <p class="note">The scan shows real progress when files can be counted. The moving stripes show the app is working.</p>
       </div>
     </div>
 
-    <h3 class="sub">Avisos e diálogos</h3>
+    <h3 class="sub">Snackbars and dialogs</h3>
     <div class="demo">
-      <div class="snack"><span>Pasta adicionada · 248 músicas</span><button>Desfazer</button></div>
+      <div class="snack"><span>Folder added · 248 songs</span><button>Undo</button></div>
       <div class="dialog">
         <span class="ms">folder_off</span>
-        <h4>Remover "Discos/MPB"?</h4>
-        <p>As 1.032 músicas dessa pasta saem da biblioteca. Os arquivos continuam no seu celular.</p>
-        <div class="acts"><button class="btn btn-txt">Cancelar</button><button class="btn btn-perigo">Remover</button></div>
+        <h4>Remove "Records/MPB"?</h4>
+        <p>The 1,032 songs in this folder leave the library. The files stay on your phone.</p>
+        <div class="acts"><button class="btn btn-text">Cancel</button><button class="btn btn-danger">Remove</button></div>
       </div>
     </div>
 
-    <h3 class="sub">Estado vazio</h3>
+    <h3 class="sub">Empty state</h3>
     <div class="demo">
       <div class="empty">
         <svg viewBox="0 0 200 200" aria-hidden="true">
-          <circle cx="100" cy="100" r="84" fill="none" stroke="var(--cor-borda-forte)" stroke-width="2" stroke-dasharray="6 6"/>
-          <circle cx="100" cy="100" r="58" fill="var(--cor-superficie-2)"/>
-          <circle cx="100" cy="100" r="40" fill="none" stroke="var(--cor-borda)" stroke-width="2"/>
-          <circle cx="100" cy="100" r="18" fill="var(--cor-primaria-container)"/>
-          <circle cx="100" cy="100" r="4" fill="var(--cor-primaria)"/>
+          <circle cx="100" cy="100" r="84" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="6 6"/>
+          <circle cx="100" cy="100" r="58" fill="var(--color-surface-2)"/>
+          <circle cx="100" cy="100" r="40" fill="none" stroke="var(--color-border)" stroke-width="2"/>
+          <circle cx="100" cy="100" r="18" fill="var(--color-primary-container)"/>
+          <circle cx="100" cy="100" r="4" fill="var(--color-primary)"/>
         </svg>
-        <h4>Nenhum disco na vitrola</h4>
-        <p>Escolha a pasta onde estão suas músicas. Só ela será lida, nada mais do celular.</p>
-        <button class="btn btn-pri"><span class="ms">folder_open</span>Escolher pasta</button>
+        <h4>No record on the turntable</h4>
+        <p>Choose the folder where your music lives. Only that folder is read, nothing else on your phone.</p>
+        <button class="btn btn-primary"><span class="ms">folder_open</span>Choose folder</button>
       </div>
     </div>
   </section>
 
-  <!-- 7. Movimento -->
-  <section id="movimento">
+  <!-- 7. Motion -->
+  <section id="motion">
     <div class="sec-head">
       <div class="num">07</div>
-      <h2>Movimento</h2>
-      <p>O movimento imita o físico: o disco tem peso, o braço desce devagar, os painéis "assentam". Nada pisca nem quica.</p>
+      <h2>Motion</h2>
+      <p>Motion mimics the physical: the record has weight, the arm lowers slowly, panels "settle". Nothing blinks or bounces.</p>
     </div>
     <div class="motion">
       <div class="card">
-        <h4>Durações</h4>
-        <dl class="tok" id="duracoes"></dl>
+        <h4>Durations</h4>
+        <dl class="tok" id="durations"></dl>
       </div>
       <div class="card">
-        <h4>Curva padrão</h4>
-        <div class="stage"><div class="curve-dot" id="dot" style="transition: left var(--duracao-longa) var(--curva-padrao)"></div></div>
-        <p>Usada na maioria das transições: sai rápido e assenta suave.</p>
-        <button class="btn btn-ton" data-anim="dot">Testar</button>
+        <h4>Standard easing</h4>
+        <div class="stage"><div class="curve-dot" id="dot" style="transition: left var(--duration-long) var(--easing-standard)"></div></div>
+        <p>Used for most transitions: starts fast and settles gently.</p>
+        <button class="btn btn-tonal" data-anim="dot">Try it</button>
       </div>
       <div class="card">
-        <h4>Mini player → tela cheia</h4>
+        <h4>Mini player → full screen</h4>
         <div class="stage"><div class="expand-box" id="exp"></div></div>
-        <p>O mini player cresce até virar a tela "tocando agora" (curva de entrada, 500ms).</p>
-        <button class="btn btn-ton" data-anim="exp">Testar</button>
+        <p>The mini player grows into the "now playing" screen (decelerate easing, 500ms).</p>
+        <button class="btn btn-tonal" data-anim="exp">Try it</button>
       </div>
     </div>
-    <p class="note">Com "reduzir movimento" ativado no celular, o disco não gira e as transições viram um esmaecimento rápido.</p>
+    <p class="note">With "reduce motion" turned on, the record does not spin and transitions become a quick fade.</p>
   </section>
 
-  <!-- 8. Voz -->
-  <section id="voz">
+  <!-- 8. Voice -->
+  <section id="voice">
     <div class="sec-head">
       <div class="num">08</div>
-      <h2>Voz e tom</h2>
-      <p>Português do Brasil, frases curtas, tom de amigo que entende de música. A metáfora da vitrola aparece em momentos especiais (estado vazio, boas-vindas), nunca em botões e ações.</p>
+      <h2>Voice and tone</h2>
+      <p>Short sentences in the tone of a friend who knows music. The turntable metaphor shows up in special moments (empty state, welcome), never on buttons or actions.</p>
     </div>
     <div class="card tbl">
-      <table class="voz">
-        <tr><th>Situação</th><th><span class="sim">✓</span> Assim</th><th><span class="nao">✕</span> Não assim</th></tr>
-        <tr><td>Botão de pasta</td><td>Escolher pasta</td><td>Selecionar diretório de mídia</td></tr>
-        <tr><td>Biblioteca vazia</td><td>Nenhum disco na vitrola</td><td>Erro: nenhum arquivo encontrado</td></tr>
-        <tr><td>Escaneando</td><td>Procurando músicas… 412 de 664</td><td>Indexando arquivos (62%)</td></tr>
-        <tr><td>Arquivo com problema</td><td>Não deu para tocar "faixa 07.mp3". Pulamos para a próxima.</td><td>Exceção de decodificação de mídia</td></tr>
-        <tr><td>Permissão perdida</td><td>Perdemos o acesso à pasta "Music". Escolha de novo para continuar.</td><td>URI permission revoked</td></tr>
+      <table class="voice">
+        <tr><th>Situation</th><th><span class="yes">✓</span> Like this</th><th><span class="no">✕</span> Not like this</th></tr>
+        <tr><td>Folder button</td><td>Choose folder</td><td>Select media directory</td></tr>
+        <tr><td>Empty library</td><td>No record on the turntable</td><td>Error: no files found</td></tr>
+        <tr><td>Scanning</td><td>Looking for songs… 412 of 664</td><td>Indexing files (62%)</td></tr>
+        <tr><td>Broken file</td><td>Couldn't play "track 07.mp3". Skipped to the next one.</td><td>Media decoding exception</td></tr>
+        <tr><td>Lost permission</td><td>We lost access to the "Music" folder. Choose it again to keep listening.</td><td>URI permission revoked</td></tr>
       </table>
     </div>
   </section>
 
-  <!-- 9. Acessibilidade -->
-  <section id="acessibilidade">
+  <!-- 9. Accessibility -->
+  <section id="accessibility">
     <div class="sec-head">
       <div class="num">09</div>
-      <h2>Acessibilidade</h2>
+      <h2>Accessibility</h2>
     </div>
     <div class="card">
       <ul class="checklist">
-        <li><span class="ms">check_circle</span><div><b>Contraste AA</b> em todo texto (4,5:1) e ícone (3:1), nos dois temas. Ver a tabela de cores.</div></li>
-        <li><span class="ms">check_circle</span><div><b>Alvo de toque de 48dp</b> no mínimo, mesmo quando o ícone é menor.</div></li>
-        <li><span class="ms">check_circle</span><div><b>Descrição para leitor de tela</b> em todo botão só com ícone ("Próxima música", não "skip_next").</div></li>
-        <li><span class="ms">check_circle</span><div><b>Respeitar "reduzir movimento"</b>: o disco fica parado e as transições ficam curtas.</div></li>
-        <li><span class="ms">check_circle</span><div><b>Texto escalável</b>: tudo em sp, e o layout aguenta fonte em 200% sem cortar títulos (reticências quando preciso).</div></li>
-        <li><span class="ms">check_circle</span><div><b>Estado não depende só de cor</b>: aleatório e repetir ativos ganham um ponto, e o chip selecionado ganha um ✓.</div></li>
+        <li><span class="ms">check_circle</span><div><b>AA contrast</b> for all text (4.5:1) and icons (3:1), in both themes. See the color table.</div></li>
+        <li><span class="ms">check_circle</span><div><b>48dp touch targets</b> at minimum, even when the icon is smaller.</div></li>
+        <li><span class="ms">check_circle</span><div><b>Screen reader labels</b> on every icon-only button ("Next song", not "skip_next").</div></li>
+        <li><span class="ms">check_circle</span><div><b>Respect "reduce motion"</b>: the record stays still and transitions get short.</div></li>
+        <li><span class="ms">check_circle</span><div><b>Scalable text</b>: everything in sp, and the layout handles 200% font size without clipping titles (ellipsis when needed).</div></li>
+        <li><span class="ms">check_circle</span><div><b>State never relies on color alone</b>: active shuffle and repeat get a dot, and the selected chip gets a ✓.</div></li>
       </ul>
     </div>
   </section>
@@ -592,24 +592,24 @@
   <section id="compose">
     <div class="sec-head">
       <div class="num">10</div>
-      <h2>Mapeamento para o app</h2>
-      <p>Como os tokens viram o tema do Jetpack Compose (Material 3) na hora de construir o app.</p>
+      <h2>Mapping to the app</h2>
+      <p>How the tokens become the Jetpack Compose (Material 3) theme when the app is built.</p>
     </div>
     <div class="card tbl">
       <table class="sem">
         <tr><th>Token</th><th>Compose</th></tr>
-        <tr><td><code>primaria / sobre-primaria</code></td><td><code>colorScheme.primary / onPrimary</code></td></tr>
-        <tr><td><code>primaria-container</code></td><td><code>colorScheme.primaryContainer</code></td></tr>
-        <tr><td><code>destaque / destaque-container</code></td><td><code>colorScheme.secondary / secondaryContainer</code></td></tr>
-        <tr><td><code>fundo, superficie, superficie-2, superficie-3</code></td><td><code>background, surface, surfaceContainer, surfaceContainerHigh</code></td></tr>
-        <tr><td><code>texto / texto-2</code></td><td><code>onSurface / onSurfaceVariant</code></td></tr>
-        <tr><td><code>borda / borda-forte</code></td><td><code>outlineVariant / outline</code></td></tr>
-        <tr><td><code>tipo-display … tipo-legenda</code></td><td><code>Typography(displaySmall … labelSmall)</code> com <code>FontFamily</code> Fraunces e Outfit</td></tr>
-        <tr><td><code>raio-*</code></td><td><code>Shapes(small, medium, large, extraLarge)</code></td></tr>
-        <tr><td><code>disco, sulco, metal, duracao-*, curva-*</code></td><td>Objeto próprio <code>VitrolaTokens</code> via <code>CompositionLocal</code></td></tr>
+        <tr><td><code>primary / on-primary</code></td><td><code>colorScheme.primary / onPrimary</code></td></tr>
+        <tr><td><code>primary-container</code></td><td><code>colorScheme.primaryContainer</code></td></tr>
+        <tr><td><code>accent / accent-container</code></td><td><code>colorScheme.secondary / secondaryContainer</code></td></tr>
+        <tr><td><code>background, surface, surface-2, surface-3</code></td><td><code>background, surface, surfaceContainer, surfaceContainerHigh</code></td></tr>
+        <tr><td><code>text / text-2</code></td><td><code>onSurface / onSurfaceVariant</code></td></tr>
+        <tr><td><code>border / border-strong</code></td><td><code>outlineVariant / outline</code></td></tr>
+        <tr><td><code>type-display … type-caption</code></td><td><code>Typography(displaySmall … labelSmall)</code> with Fraunces and Outfit <code>FontFamily</code></td></tr>
+        <tr><td><code>radius-*</code></td><td><code>Shapes(small, medium, large, extraLarge)</code></td></tr>
+        <tr><td><code>record, groove, metal, duration-*, easing-*</code></td><td>Custom <code>VitrolaTokens</code> object via <code>CompositionLocal</code></td></tr>
       </table>
     </div>
-    <p class="note">O app não vai usar cor dinâmica (Material You). A identidade de cor da marca é fixa, mas o ícone temático do Android 13+ continua acompanhando o papel de parede.</p>
+    <p class="note">The app does not use dynamic color (Material You). The brand colors are fixed, but the Android 13+ themed icon still follows the wallpaper.</p>
   </section>
 </main>
 
@@ -618,18 +618,18 @@ const T = window.TOKENS;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-/* ---------- Tema ---------- */
+/* ---------- Theme ---------- */
 const root = document.documentElement;
 function setTheme(t) {
   if (t === 'auto') delete root.dataset.theme; else root.dataset.theme = t;
   $$('.theme button').forEach(b => b.setAttribute('aria-pressed', b.dataset.t === t));
-  try { localStorage.setItem('vitrola-tema', t); } catch (e) {}
+  try { localStorage.setItem('vitrola-theme', t); } catch (e) {}
   requestAnimationFrame(renderContrast);
 }
 $$('.theme button').forEach(b => b.addEventListener('click', () => setTheme(b.dataset.t)));
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => renderContrast());
 
-/* ---------- Contraste ---------- */
+/* ---------- Contrast ---------- */
 function lum(hex) {
   const n = hex.replace('#', '');
   return [0, 2, 4].map(i => parseInt(n.substr(i, 2), 16) / 255)
@@ -637,158 +637,158 @@ function lum(hex) {
     .reduce((a, c, i) => a + c * [0.2126, 0.7152, 0.0722][i], 0);
 }
 function ratio(a, b) { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); }
-const temaAtual = () => root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+const currentTheme = () => root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
-/* ---------- Primitivas ---------- */
-const nomes = { vinho: 'Vinho · primária da marca', mostarda: 'Mostarda · destaque', neutro: 'Neutros quentes · creme → vinil' };
-$('#primitivas').innerHTML = Object.entries(nomes).map(([k, n]) => {
-  const esc = T.primitivas[k];
+/* ---------- Primitives ---------- */
+const scaleNames = { wine: 'Wine · brand primary', mustard: 'Mustard · accent', neutral: 'Warm neutrals · cream → vinyl' };
+$('#primitives').innerHTML = Object.entries(scaleNames).map(([k, n]) => {
+  const steps = T.primitives[k];
   return `<div class="scale-name">${n}<span>${k}</span></div><div class="scale">` +
-    Object.entries(esc).map(([p, hex]) => {
+    Object.entries(steps).map(([p, hex]) => {
       const fg = lum(hex) > 0.35 ? '#1B1714' : '#FFFDF8';
       return `<div style="background:${hex};color:${fg}"><b>${p}</b>${hex}</div>`;
     }).join('') + '</div>';
 }).join('');
 
-/* ---------- Semânticas ---------- */
-const usos = {
-  'fundo': 'Fundo das telas', 'superficie': 'Cards, listas, folhas', 'superficie-2': 'Mini player, campos, áreas agrupadas',
-  'superficie-3': 'Trilhas, divisões fortes', 'texto': 'Texto principal', 'texto-2': 'Texto secundário (artista)',
-  'texto-3': 'Legendas, placeholders', 'borda': 'Divisores', 'borda-forte': 'Contornos de controles',
-  'primaria': 'Ação principal, item ativo', 'sobre-primaria': 'Texto/ícone sobre primária', 'primaria-container': 'Botão tonal, aba ativa',
-  'sobre-primaria-container': 'Texto sobre container', 'destaque': 'Tocar, controle da barra, equalizador', 'sobre-destaque': 'Texto sobre destaque',
-  'destaque-container': 'Ícones de pasta, avisos leves', 'sobre-destaque-container': 'Texto sobre container de destaque',
-  'erro': 'Erros e ações destrutivas', 'sucesso': 'Confirmações', 'acao-aviso': 'Ação dentro do aviso (snackbar)', 'disco': 'Corpo do vinil', 'sulco': 'Sulcos do vinil', 'metal': 'Braço da vitrola', 'veu': 'Fundo atrás de diálogos'
+/* ---------- Role colors ---------- */
+const roleUses = {
+  'background': 'Screen background', 'surface': 'Cards, lists, sheets', 'surface-2': 'Mini player, fields, grouped areas',
+  'surface-3': 'Tracks, strong dividers', 'text': 'Primary text', 'text-2': 'Secondary text (artist)',
+  'text-3': 'Captions, placeholders', 'border': 'Dividers', 'border-strong': 'Control outlines',
+  'primary': 'Main action, active item', 'on-primary': 'Text/icon on primary', 'primary-container': 'Tonal button, active tab',
+  'on-primary-container': 'Text on container', 'accent': 'Play, seek thumb, equalizer', 'on-accent': 'Text on accent',
+  'accent-container': 'Folder icons, light notices', 'on-accent-container': 'Text on accent container',
+  'error': 'Errors and destructive actions', 'success': 'Confirmations', 'snackbar-action': 'Action inside a snackbar', 'record': 'Vinyl body', 'groove': 'Vinyl grooves', 'metal': 'Tonearm', 'scrim': 'Backdrop behind dialogs'
 };
 const sw = v => `<span class="sw"><span class="chip" style="background:${v}"></span><code>${v}</code></span>`;
-$('#semanticas').innerHTML = '<tr><th>Token</th><th>Claro</th><th>Escuro</th><th>Uso</th></tr>' +
-  Object.keys(T.cores.claro).map(k =>
-    `<tr><td><code>--cor-${k}</code></td><td>${sw(T.cores.claro[k])}</td><td>${sw(T.cores.escuro[k])}</td><td class="uso">${usos[k] || ''}</td></tr>`).join('');
+$('#role-colors').innerHTML = '<tr><th>Token</th><th>Light</th><th>Dark</th><th>Use</th></tr>' +
+  Object.keys(T.colors.light).map(k =>
+    `<tr><td><code>--color-${k}</code></td><td>${sw(T.colors.light[k])}</td><td>${sw(T.colors.dark[k])}</td><td class="use">${roleUses[k] || ''}</td></tr>`).join('');
 
-/* ---------- Pares de contraste ---------- */
-const pares = [
-  ['texto', 'fundo', 'Texto principal'], ['texto-2', 'superficie', 'Texto secundário'], ['texto-3', 'fundo', 'Legenda'],
-  ['sobre-primaria', 'primaria', 'Botão primário'], ['sobre-primaria-container', 'primaria-container', 'Botão tonal'],
-  ['sobre-destaque', 'destaque', 'Botão destaque'], ['primaria', 'fundo', 'Título ativo'], ['sobre-destaque-container', 'destaque-container', 'Ícone de pasta']
+/* ---------- Contrast pairs ---------- */
+const pairs = [
+  ['text', 'background', 'Primary text'], ['text-2', 'surface', 'Secondary text'], ['text-3', 'background', 'Caption'],
+  ['on-primary', 'primary', 'Primary button'], ['on-primary-container', 'primary-container', 'Tonal button'],
+  ['on-accent', 'accent', 'Accent button'], ['primary', 'background', 'Active title'], ['on-accent-container', 'accent-container', 'Folder icon']
 ];
 function renderContrast() {
-  const c = T.cores[temaAtual() === 'dark' ? 'escuro' : 'claro'];
-  $('#pares').innerHTML = pares.map(([fg, bg, n]) => {
+  const c = T.colors[currentTheme() === 'dark' ? 'dark' : 'light'];
+  $('#pairs').innerHTML = pairs.map(([fg, bg, n]) => {
     const r = ratio(c[fg], c[bg]); const ok = r >= 4.5;
     return `<div class="pair" style="background:${c[bg]};color:${c[fg]}"><div class="t">${n}</div>
       <div class="m"><span>${fg} / ${bg}</span><span class="badge ${ok ? '' : 'fail'}">${r.toFixed(1)}:1 ${ok ? 'AA' : '✕'}</span></div></div>`;
   }).join('');
 }
 
-/* ---------- Tipografia ---------- */
-const exemplos = {
-  'display': 'Vitrola Mp3', 'titulo': 'Clube da Esquina', 'titulo-m': 'Tocando agora', 'subtitulo': 'Biblioteca',
-  'corpo': 'Escolha a pasta onde estão suas músicas.', 'corpo-p': 'Milton Nascimento · 1972',
-  'rotulo': 'Tocar tudo', 'legenda': '248 músicas · 16h 32min', 'sobrelinha': 'A seguir na fila'
+/* ---------- Typography ---------- */
+const samples = {
+  'display': 'Vitrola Mp3', 'title': 'Clube da Esquina', 'title-m': 'Now playing', 'subtitle': 'Library',
+  'body': 'Choose the folder where your music lives.', 'body-s': 'Milton Nascimento · 1972',
+  'label': 'Play all', 'caption': '248 songs · 16h 32min', 'overline': 'Up next'
 };
-const usosTipo = { 'display': 'Boas-vindas', 'titulo': 'Nome do álbum, títulos de tela', 'titulo-m': 'Música no player, diálogos', 'subtitulo': 'Seções', 'corpo': 'Textos', 'corpo-p': 'Artista, detalhes', 'rotulo': 'Botões, títulos na lista', 'legenda': 'Tempos, contagens', 'sobrelinha': 'Rótulos de seção' };
-$('#escala-tipo').innerHTML = Object.entries(T.tipografia.escala).map(([k, e]) =>
-  `<div class="type-row"><div class="meta"><b>${k}</b>${T.tipografia.familias[e.familia]} ${e.peso} · ${e.tamanho}/${e.altura}sp<br>${usosTipo[k]}</div>
-   <div style="font:var(--tipo-${k});${k === 'sobrelinha' ? 'text-transform:uppercase;letter-spacing:.08em;' : ''}">${exemplos[k]}</div></div>`).join('');
+const typeUses = { 'display': 'Welcome', 'title': 'Album name, screen titles', 'title-m': 'Song in the player, dialogs', 'subtitle': 'Sections', 'body': 'Body text', 'body-s': 'Artist, details', 'label': 'Buttons, list titles', 'caption': 'Times, counts', 'overline': 'Section labels' };
+$('#type-scale').innerHTML = Object.entries(T.typography.scale).map(([k, e]) =>
+  `<div class="type-row"><div class="meta"><b>${k}</b>${T.typography.families[e.family]} ${e.weight} · ${e.size}/${e.lineHeight}sp<br>${typeUses[k]}</div>
+   <div style="font:var(--type-${k});${k === 'overline' ? 'text-transform:uppercase;letter-spacing:.08em;' : ''}">${samples[k]}</div></div>`).join('');
 
-/* ---------- Espaço, raio, elevação ---------- */
-$('#espacos').innerHTML = Object.entries(T.espaco).map(([k, v]) =>
-  `<div class="space-row"><span class="k mono">espaco-${k}</span><span class="bar" style="width:${v * 2.4}px"></span><span>${v}dp</span></div>`).join('');
-$('#raios').innerHTML = Object.entries(T.raio).map(([k, v]) =>
-  `<figure><div class="box" style="border-radius:${Math.min(v, 42)}px"></div>${k} · ${v === 999 ? 'pílula' : v + 'dp'}</figure>`).join('');
-$('#elevs').innerHTML = Object.keys(T.elevacao).map(k =>
-  `<figure><div class="box" style="box-shadow:var(--elevacao-${k})"></div>elevacao-${k}</figure>`).join('');
+/* ---------- Space, radius, elevation ---------- */
+$('#spacing').innerHTML = Object.entries(T.space).map(([k, v]) =>
+  `<div class="space-row"><span class="k mono">space-${k}</span><span class="bar" style="width:${v * 2.4}px"></span><span>${v}dp</span></div>`).join('');
+$('#radii').innerHTML = Object.entries(T.radius).map(([k, v]) =>
+  `<figure><div class="box" style="border-radius:${Math.min(v, 42)}px"></div>${k} · ${v === 999 ? 'pill' : v + 'dp'}</figure>`).join('');
+$('#elevations').innerHTML = Object.keys(T.elevation).map(k =>
+  `<figure><div class="box" style="box-shadow:var(--elevation-${k})"></div>elevation-${k}</figure>`).join('');
 
-/* ---------- Ícones ---------- */
-const icones = [['play_arrow', 'Tocar'], ['pause', 'Pausar'], ['skip_previous', 'Anterior'], ['skip_next', 'Próxima'], ['shuffle', 'Aleatório'],
-  ['repeat', 'Repetir'], ['repeat_one', 'Repetir uma'], ['queue_music', 'Fila'], ['library_music', 'Biblioteca'], ['album', 'Álbum'],
-  ['mic', 'Artista'], ['folder', 'Pasta'], ['search', 'Buscar'], ['favorite', 'Favorito'], ['playlist_add', 'Adicionar à playlist'],
-  ['more_vert', 'Mais opções'], ['bedtime', 'Timer'], ['equalizer', 'Equalizador'], ['settings', 'Ajustes'], ['expand_more', 'Recolher player']];
-$('#lista-icones').innerHTML = icones.map(([i, n]) => `<div><span class="ms">${i}</span>${n}</div>`).join('');
+/* ---------- Icons ---------- */
+const icons = [['play_arrow', 'Play'], ['pause', 'Pause'], ['skip_previous', 'Previous'], ['skip_next', 'Next'], ['shuffle', 'Shuffle'],
+  ['repeat', 'Repeat'], ['repeat_one', 'Repeat one'], ['queue_music', 'Queue'], ['library_music', 'Library'], ['album', 'Album'],
+  ['mic', 'Artist'], ['folder', 'Folder'], ['search', 'Search'], ['favorite', 'Favorite'], ['playlist_add', 'Add to playlist'],
+  ['more_vert', 'More options'], ['bedtime', 'Timer'], ['equalizer', 'Equalizer'], ['settings', 'Settings'], ['expand_more', 'Collapse player']];
+$('#icon-list').innerHTML = icons.map(([i, n]) => `<div><span class="ms">${i}</span>${n}</div>`).join('');
 
-/* ---------- Capas geradas ---------- */
-const P = T.primitivas;
+/* ---------- Generated covers ---------- */
+const P = T.primitives;
 const combos = [
-  [P.vinho[600], P.neutro[100], P.mostarda[400]], [P.mostarda[400], P.neutro[900], P.vinho[600]],
-  [P.neutro[900], P.mostarda[300], P.vinho[400]], [P.neutro[100], P.vinho[600], P.mostarda[500]],
-  [P.neutro[700], P.neutro[100], P.mostarda[400]], [P.vinho[800], P.mostarda[300], P.neutro[100]]
+  [P.wine[600], P.neutral[100], P.mustard[400]], [P.mustard[400], P.neutral[900], P.wine[600]],
+  [P.neutral[900], P.mustard[300], P.wine[400]], [P.neutral[100], P.wine[600], P.mustard[500]],
+  [P.neutral[700], P.neutral[100], P.mustard[400]], [P.wine[800], P.mustard[300], P.neutral[100]]
 ];
 function hash(s) { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; }
-function iniciais(s) { return s.split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]/.test(w)).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
-function capa(titulo) {
-  const h = hash(titulo); const [bg, fg, ac] = combos[h % combos.length];
+function initials(s) { return s.split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]/.test(w)).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+function cover(title) {
+  const h = hash(title); const [bg, fg, ac] = combos[h % combos.length];
   const cx = 30 + (h >> 3) % 140, cy = 30 + (h >> 7) % 140;
-  const aneis = [150, 120, 90, 60].map((r, i) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${fg}" stroke-opacity="${0.08 + i * 0.04}" stroke-width="10"/>`).join('');
-  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="${bg}"/>${aneis}
+  const rings = [150, 120, 90, 60].map((r, i) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${fg}" stroke-opacity="${0.08 + i * 0.04}" stroke-width="10"/>`).join('');
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="${bg}"/>${rings}
     <circle cx="${cx}" cy="${cy}" r="14" fill="${ac}"/>
-    <text x="100" y="122" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="800" font-size="60" fill="${fg}">${iniciais(titulo)}</text></svg>`;
+    <text x="100" y="122" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="800" font-size="60" fill="${fg}">${initials(title)}</text></svg>`;
 }
-const albuns = [['Clube da Esquina', 'Milton Nascimento'], ['Acabou Chorare', 'Novos Baianos'], ['Elis & Tom', 'Elis Regina'],
+const albums = [['Clube da Esquina', 'Milton Nascimento'], ['Acabou Chorare', 'Novos Baianos'], ['Elis & Tom', 'Elis Regina'],
   ['Construção', 'Chico Buarque'], ['Tim Maia 1971', 'Tim Maia'], ['Transa', 'Caetano Veloso']];
-$('#albuns').innerHTML = albuns.map(([t, a]) => `<div class="album"><div class="art">${capa(t)}</div><div class="ti">${t}</div><div class="ar">${a}</div></div>`).join('');
+$('#albums').innerHTML = albums.map(([t, a]) => `<div class="album"><div class="art">${cover(t)}</div><div class="ti">${t}</div><div class="ar">${a}</div></div>`).join('');
 
-/* ---------- Lista de músicas ---------- */
-const faixas = [['Águas de Março', 'Elis & Tom', '3:41'], ['Tudo Que Você Podia Ser', 'Milton Nascimento', '2:58'],
+/* ---------- Song list ---------- */
+const tracks = [['Águas de Março', 'Elis & Tom', '3:41'], ['Tudo Que Você Podia Ser', 'Milton Nascimento', '2:58'],
   ['Preta Pretinha', 'Novos Baianos', '6:41'], ['Cotidiano', 'Chico Buarque', '2:50']];
-const albumDe = { 'Elis & Tom': 'Elis & Tom', 'Milton Nascimento': 'Clube da Esquina', 'Novos Baianos': 'Acabou Chorare', 'Chico Buarque': 'Construção' };
-$('#lista').innerHTML = faixas.map(([t, a, d], i) => `<div class="track ${i === 0 ? 'ativa' : ''}" tabindex="0">
-  <div class="cover">${capa(albumDe[a])}<div class="eq"><i></i><i></i><i></i></div></div>
+const albumOf = { 'Elis & Tom': 'Elis & Tom', 'Milton Nascimento': 'Clube da Esquina', 'Novos Baianos': 'Acabou Chorare', 'Chico Buarque': 'Construção' };
+$('#song-list').innerHTML = tracks.map(([t, a, d], i) => `<div class="track ${i === 0 ? 'active' : ''}" tabindex="0">
+  <div class="cover">${cover(albumOf[a])}<div class="eq"><i></i><i></i><i></i></div></div>
   <div style="min-width:0"><div class="ti">${t}</div><div class="ar">${a}</div></div>
-  <span class="du">${d}</span><button class="icon-btn" aria-label="Mais opções"><span class="ms">more_vert</span></button></div>`).join('');
-$$('#lista .track').forEach(tr => tr.addEventListener('click', e => {
+  <span class="du">${d}</span><button class="icon-btn" aria-label="More options"><span class="ms">more_vert</span></button></div>`).join('');
+$$('#song-list .track').forEach(tr => tr.addEventListener('click', e => {
   if (e.target.closest('.icon-btn')) return;
-  $$('#lista .track').forEach(x => x.classList.remove('ativa')); tr.classList.add('ativa');
+  $$('#song-list .track').forEach(x => x.classList.remove('active')); tr.classList.add('active');
 }));
 
-/* ---------- Disco com selo ---------- */
-function disco(label, comBraco) {
-  const sulcos = [88, 80, 72, 64, 56, 48].map((r, i) => `<circle cx="100" cy="100" r="${r}" fill="none" stroke="var(--cor-sulco)" stroke-width="1.2" stroke-opacity="${i % 2 ? .6 : 1}"/>`).join('');
+/* ---------- Record with label ---------- */
+function record(label, withArm) {
+  const grooves = [88, 80, 72, 64, 56, 48].map((r, i) => `<circle cx="100" cy="100" r="${r}" fill="none" stroke="var(--color-groove)" stroke-width="1.2" stroke-opacity="${i % 2 ? .6 : 1}"/>`).join('');
   const lbl = encodeURIComponent(label);
-  return `<defs><clipPath id="cl${comBraco ? 1 : 0}"><circle cx="100" cy="100" r="36"/></clipPath></defs>
-    <g class="gira">
-      <circle cx="100" cy="100" r="96" fill="var(--cor-disco)"/>
+  return `<defs><clipPath id="cl${withArm ? 1 : 0}"><circle cx="100" cy="100" r="36"/></clipPath></defs>
+    <g class="rotor">
+      <circle cx="100" cy="100" r="96" fill="var(--color-record)"/>
       <circle cx="100" cy="100" r="94.5" fill="none" stroke="#6A5B50" stroke-width="2.5"/>
-      ${sulcos}
+      ${grooves}
       <path d="M30 70 A76 76 0 0 1 70 30" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="8" stroke-linecap="round"/>
-      <image href="data:image/svg+xml,${lbl}" x="64" y="64" width="72" height="72" clip-path="url(#cl${comBraco ? 1 : 0})"/>
-      <circle cx="100" cy="100" r="36" fill="none" stroke="var(--cor-destaque)" stroke-width="1.5" stroke-opacity=".8"/>
-      <circle cx="100" cy="100" r="4" fill="var(--cor-fundo)"/>
+      <image href="data:image/svg+xml,${lbl}" x="64" y="64" width="72" height="72" clip-path="url(#cl${withArm ? 1 : 0})"/>
+      <circle cx="100" cy="100" r="36" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-opacity=".8"/>
+      <circle cx="100" cy="100" r="4" fill="var(--color-background)"/>
     </g>`;
 }
-$('#disco-grande').innerHTML = disco(capa('Elis & Tom'), true);
-$('#mini-disco').innerHTML = disco(capa('Elis & Tom'), false);
+$('#big-record').innerHTML = record(cover('Elis & Tom'), true);
+$('#mini-record').innerHTML = record(cover('Elis & Tom'), false);
 
-const dg = $('#disco-grande'), dbtn = $('#disco-btn');
-dbtn.addEventListener('click', () => {
-  const on = dg.classList.toggle('tocando');
-  dbtn.innerHTML = `<span class="ms">${on ? 'pause' : 'play_arrow'}</span>${on ? 'Parar' : 'Girar'}`;
+const bigRecord = $('#big-record'), recordBtn = $('#record-btn');
+recordBtn.addEventListener('click', () => {
+  const on = bigRecord.classList.toggle('playing');
+  recordBtn.innerHTML = `<span class="ms">${on ? 'pause' : 'play_arrow'}</span>${on ? 'Stop' : 'Spin'}`;
 });
 
 /* ---------- Player ---------- */
 function bindPlay(btn, onToggle) {
   btn.addEventListener('click', () => {
-    const on = btn.getAttribute('aria-label') === 'Tocar';
-    btn.setAttribute('aria-label', on ? 'Pausar' : 'Tocar');
+    const on = btn.getAttribute('aria-label') === 'Play';
+    btn.setAttribute('aria-label', on ? 'Pause' : 'Play');
     btn.querySelector('.ms').textContent = on ? 'pause' : 'play_arrow';
     onToggle && onToggle(on);
   });
 }
-bindPlay($('#play-main'), on => $('#play-main').classList.toggle('tocando', on));
-bindPlay($('#mini-play'), on => $('#mini').classList.toggle('tocando', on));
+bindPlay($('#play-main'), on => $('#play-main').classList.toggle('playing', on));
+bindPlay($('#mini-play'), on => $('#mini').classList.toggle('playing', on));
 $('[data-toggle="shuffle"]').addEventListener('click', e => e.currentTarget.classList.toggle('on'));
 const rep = $('#repeat'); let repMode = 0;
 rep.addEventListener('click', () => {
   repMode = (repMode + 1) % 3;
   rep.classList.toggle('on', repMode > 0);
   rep.querySelector('.ms').textContent = repMode === 2 ? 'repeat_one' : 'repeat';
-  rep.setAttribute('aria-label', ['Repetir: desligado', 'Repetir: todas', 'Repetir: uma'][repMode]);
+  rep.setAttribute('aria-label', ['Repeat: off', 'Repeat: all', 'Repeat: one'][repMode]);
 });
 const seek = $('#seek');
 const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 const upd = () => { seek.style.setProperty('--p', (seek.value / seek.max * 100) + '%'); $('#t-now').textContent = fmt(+seek.value); };
 seek.addEventListener('input', upd); upd();
 
-/* ---------- Chips, navegação, switches ---------- */
+/* ---------- Chips, navigation, switches ---------- */
 $$('#chips .chip-f').forEach(c => c.addEventListener('click', () => {
   $$('#chips .chip-f').forEach(x => x.setAttribute('aria-pressed', 'false')); c.setAttribute('aria-pressed', 'true');
 }));
@@ -797,16 +797,16 @@ $$('#bnav button').forEach(b => b.addEventListener('click', () => {
 }));
 $$('.switch').forEach(s => s.addEventListener('click', () => s.setAttribute('aria-checked', s.getAttribute('aria-checked') !== 'true')));
 
-/* ---------- Movimento ---------- */
-$('#duracoes').innerHTML = Object.entries(T.movimento.duracao).map(([k, v]) => `<dt class="mono">${k}</dt><dd>${v}ms</dd>`).join('');
+/* ---------- Motion ---------- */
+$('#durations').innerHTML = Object.entries(T.motion.duration).map(([k, v]) => `<dt class="mono">${k}</dt><dd>${v}ms</dd>`).join('');
 $$('[data-anim]').forEach(b => b.addEventListener('click', () => {
   const el = $('#' + b.dataset.anim); el.classList.toggle(b.dataset.anim === 'dot' ? 'go' : 'open');
 }));
 
-/* ---------- Início ---------- */
-let salvo = 'auto';
-try { salvo = localStorage.getItem('vitrola-tema') || 'auto'; } catch (e) {}
-setTheme(salvo);
+/* ---------- Start ---------- */
+let savedTheme = 'auto';
+try { savedTheme = localStorage.getItem('vitrola-theme') || 'auto'; } catch (e) {}
+setTheme(savedTheme);
 </script>
 </body>
 </html>

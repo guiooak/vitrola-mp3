@@ -1,9 +1,9 @@
-/* Mockup navegável do Vitrola Mp3.
-   Só para validar telas e interações: nada aqui é código do app. */
+/* Vitrola Mp3 clickable mockup.
+   Only for validating screens and interactions: none of this is app code. */
 (() => {
 'use strict';
 
-const D = window.DADOS;
+const D = window.DATA;
 const T = window.TOKENS;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -11,566 +11,563 @@ const app = $('#app');
 const screensEl = $('#screens');
 const npEl = $('#np');
 const overlayEl = $('#overlay');
-const reduzMovimento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const LOCALE = 'en-US';
 
 /* ============================================================
-   Utilidades
+   Utilities
    ============================================================ */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const norm = s => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-const plural = (n, um, varios) => `${n.toLocaleString('pt-BR')} ${n === 1 ? um : varios}`;
-function duracaoTotal(seg) {
-  const min = Math.round(seg / 60);
+const plural = (n, one, many) => `${n.toLocaleString(LOCALE)} ${n === 1 ? one : many}`;
+function totalDuration(sec) {
+  const min = Math.round(sec / 60);
   return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h ${min % 60} min`;
 }
 let _uid = 0; const uid = () => ++_uid;
 const clone = o => JSON.parse(JSON.stringify(o));
-const embaralhar = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-function realcar(texto, q) {
-  if (!q) return esc(texto);
-  const i = norm(texto).indexOf(norm(q));
-  if (i < 0) return esc(texto);
-  return esc(texto.slice(0, i)) + `<mark class="hl">${esc(texto.slice(i, i + q.length))}</mark>` + esc(texto.slice(i + q.length));
+const shuffled = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function highlight(text, q) {
+  if (!q) return esc(text);
+  const i = norm(text).indexOf(norm(q));
+  if (i < 0) return esc(text);
+  return esc(text.slice(0, i)) + `<mark class="hl">${esc(text.slice(i, i + q.length))}</mark>` + esc(text.slice(i + q.length));
 }
 
 /* ============================================================
-   Estado
+   State
    ============================================================ */
-const ESTADO_INICIAL = () => ({
-  configurado: false,
-  pastas: [],
-  subpastas: true,
-  retomar: true,
-  pausarFone: true,
-  usarImagens: true,
+const INITIAL_STATE = () => ({
+  configured: false,
+  folders: [],
+  subfolders: true,
+  resume: true,
+  pauseOnUnplug: true,
+  useFolderImages: true,
   playlists: clone(D.playlists),
-  favoritas: new Set(D.favoritas),
-  albunsFavoritos: new Set(D.albunsFavoritos),
-  recentes: ['Milton', 'Águas de Março', 'Caetano'],
-  libTab: 'artistas', // filtro padrão ao abrir o app
-  ordem: 'az',
+  favoriteSongs: new Set(D.favoriteSongs),
+  favoriteAlbums: new Set(D.favoriteAlbums),
+  recentSearches: ['Milton', 'Águas de Março', 'Caetano'],
+  libTab: 'artists', // default filter when the app opens
+  sort: 'az',
+  showAllSongs: false,
   // player
-  fila: [], filaOriginal: [], idx: 0, tocando: false, pos: 0,
-  aleatorio: false, repetir: 0, origem: null,
+  queue: [], originalQueue: [], idx: 0, playing: false, pos: 0,
+  shuffle: false, repeat: 0, source: null,
   timer: null,
-  angulo: 0, giroDesde: 0,
+  angle: 0, spinningSince: 0,
 });
-let S = ESTADO_INICIAL();
+let S = INITIAL_STATE();
 
-const album = id => D.albuns.find(a => a.id === id);
-const musica = id => D.musicas.find(m => m.id === id);
-const atual = () => S.fila.length ? musica(S.fila[S.idx]) : null;
+const album = id => D.albums.find(a => a.id === id);
+const song = id => D.songs.find(m => m.id === id);
+const current = () => S.queue.length ? song(S.queue[S.idx]) : null;
 
-function naBiblioteca(m) {
-  return S.pastas.some(p => S.subpastas ? (m.pasta === p.caminho || m.pasta.startsWith(p.caminho + '/')) : m.pasta === p.caminho);
+function inLibrary(m) {
+  return S.folders.some(p => S.subfolders ? (m.folder === p.path || m.folder.startsWith(p.path + '/')) : m.folder === p.path);
 }
-const biblioteca = () => D.musicas.filter(naBiblioteca);
-const albunsVisiveis = () => D.albuns.filter(a => biblioteca().some(m => m.album === a.id));
-function artistas() {
+const library = () => D.songs.filter(inLibrary);
+const visibleAlbums = () => D.albums.filter(a => library().some(m => m.album === a.id));
+function artists() {
   const map = new Map();
-  biblioteca().forEach(m => {
-    if (!map.has(m.artista)) map.set(m.artista, { nome: m.artista, musicas: [], albuns: new Set() });
-    const a = map.get(m.artista); a.musicas.push(m.id); a.albuns.add(m.album);
+  library().forEach(m => {
+    if (!map.has(m.artist)) map.set(m.artist, { name: m.artist, songs: [], albums: new Set() });
+    const a = map.get(m.artist); a.songs.push(m.id); a.albums.add(m.album);
   });
-  // "Artista desconhecido" (arquivos sem metadados) sempre por último
-  const ultimo = a => a.nome === 'Artista desconhecido' ? 1 : 0;
-  return [...map.values()].sort((a, b) => ultimo(a) - ultimo(b) || a.nome.localeCompare(b.nome, 'pt-BR'));
+  // "Unknown artist" (files without metadata) always goes last
+  const last = a => a.name === 'Unknown artist' ? 1 : 0;
+  return [...map.values()].sort((a, b) => last(a) - last(b) || a.name.localeCompare(b.name, LOCALE));
 }
-const musicasDaPasta = (pasta, sub) => biblioteca().filter(m => sub ? (m.pasta === pasta || m.pasta.startsWith(pasta + '/')) : m.pasta === pasta);
-function subpastasDe(pasta) {
+const songsInFolder = (folder, sub) => library().filter(m => sub ? (m.folder === folder || m.folder.startsWith(folder + '/')) : m.folder === folder);
+function subfoldersOf(folder) {
   const set = new Set();
-  biblioteca().forEach(m => { if (m.pasta.startsWith(pasta + '/')) set.add(m.pasta.slice(pasta.length + 1).split('/')[0]); });
-  return [...set].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  library().forEach(m => { if (m.folder.startsWith(folder + '/')) set.add(m.folder.slice(folder.length + 1).split('/')[0]); });
+  return [...set].sort((a, b) => a.localeCompare(b, LOCALE));
 }
 
 /* ============================================================
-   Capas geradas (mesma regra do style guide)
+   Covers and photos
    ============================================================ */
-const P = T.primitivas;
+const P = T.primitives;
+// Generated cover (no image in the folder): same rule as the style guide
 const COMBOS = [
-  [P.vinho[600], P.neutro[100], P.mostarda[400]], [P.mostarda[400], P.neutro[900], P.vinho[600]],
-  [P.neutro[900], P.mostarda[300], P.vinho[400]], [P.neutro[100], P.vinho[600], P.mostarda[500]],
-  [P.neutro[700], P.neutro[100], P.mostarda[400]], [P.vinho[800], P.mostarda[300], P.neutro[100]],
+  [P.wine[600], P.neutral[100], P.mustard[400]], [P.mustard[400], P.neutral[900], P.wine[600]],
+  [P.neutral[900], P.mustard[300], P.wine[400]], [P.neutral[100], P.wine[600], P.mustard[500]],
+  [P.neutral[700], P.neutral[100], P.mustard[400]], [P.wine[800], P.mustard[300], P.neutral[100]],
 ];
-const hash = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
-const iniciais = s => s.split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]/.test(w)).slice(0, 2).map(w => w[0]).join('').toUpperCase();
-const corDoAlbum = a => a.semMetadados ? P.neutro[500] : (S.usarImagens && a.capa) ? CORES_FOTO[hash(a.titulo + '#') % CORES_FOTO.length][0] : COMBOS[hash(a.titulo) % COMBOS.length][0];
-// Capa: imagem da pasta do álbum (simulada) → capa gerada (fallback)
-const CORES_FOTO = [['#1F3A5F', '#E8B04B'], ['#0F5257', '#F2C57C'], ['#5B2333', '#F7B267'], ['#2D3A2E', '#D9C5A0'],
+// Colors for simulated "real" images from the folders
+const PHOTO_COLORS = [['#1F3A5F', '#E8B04B'], ['#0F5257', '#F2C57C'], ['#5B2333', '#F7B267'], ['#2D3A2E', '#D9C5A0'],
   ['#3B1F4A', '#F28C8C'], ['#7A3E1D', '#F4D35E'], ['#24476B', '#9AD1D4'], ['#4A3B2A', '#E07A5F']];
-const usaImagem = x => S.usarImagens && !!(x.url || x.capa || x.foto);
-function capaDaPasta(a) {
-  // Simula uma capa "fotográfica" de verdade: cores e formas variadas, com o título pequeno
-  const h = hash(a.titulo + '#'); const [c1, c2] = CORES_FOTO[h % CORES_FOTO.length];
-  const formas = [
+const hash = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
+const initials = s => s.split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]/.test(w)).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+const hasImage = x => S.useFolderImages && !!(x.url || x.cover || x.photo);
+const albumColor = a => a.noMetadata ? P.neutral[500]
+  : (S.useFolderImages && a.cover) ? PHOTO_COLORS[hash(a.title + '#') % PHOTO_COLORS.length][0]
+  : COMBOS[hash(a.title) % COMBOS.length][0];
+
+// Album cover: image from the album folder (simulated) → generated cover (fallback)
+function folderCover(a) {
+  // Simulates a real, photographic cover: varied colors and shapes, with a small title
+  const h = hash(a.title + '#'); const [c1, c2] = PHOTO_COLORS[h % PHOTO_COLORS.length];
+  const shapes = [
     `<circle cx="${120 + h % 40}" cy="${70 + h % 30}" r="58" fill="${c2}"/><rect y="132" width="200" height="68" fill="#000" fill-opacity=".28"/><rect y="148" width="200" height="6" fill="${c2}" fill-opacity=".5"/>`,
     [0, 1, 2, 3, 4].map(i => `<polygon points="${-40 + i * 56},200 ${i * 56},200 ${100 + i * 56},0 ${60 + i * 56},0" fill="${c2}" fill-opacity="${0.15 + (i % 2) * 0.35}"/>`).join(''),
     [80, 60, 40, 20].map((r, i) => `<rect x="${100 - r}" y="${100 - r}" width="${r * 2}" height="${r * 2}" fill="${i % 2 ? c1 : c2}" transform="rotate(${12 + h % 30} 100 100)"/>`).join(''),
   ][h % 3];
-  return `<rect width="200" height="200" fill="${c1}"/>${formas}
-    <text x="14" y="26" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="15" fill="#FFFDF8" fill-opacity=".92">${esc(a.titulo)}</text>`;
+  return `<rect width="200" height="200" fill="${c1}"/>${shapes}
+    <text x="14" y="26" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="15" fill="#FFFDF8" fill-opacity=".92">${esc(a.title)}</text>`;
 }
-function capaInterna(a) {
-  if (S.usarImagens && a.url) return `<image href="${esc(a.url)}" width="200" height="200" preserveAspectRatio="xMidYMid slice"/>`;
-  if (S.usarImagens && a.capa) return capaDaPasta(a);
-  return capaGerada(a);
-}
-// Capa gerada pelo app (sem imagem na pasta): mesma regra do style guide
-function capaGerada(a) {
-  if (a.semMetadados) {
-    return `<rect width="200" height="200" fill="${P.neutro[300]}"/>
-      ${[80, 60, 40].map(r => `<circle cx="100" cy="100" r="${r}" fill="none" stroke="${P.neutro[500]}" stroke-opacity=".35" stroke-width="8"/>`).join('')}
-      <path d="M112 62v52a16 16 0 1 1-8-14V70h-20V62z" fill="${P.neutro[600]}"/>`;
+function generatedCover(a) {
+  if (a.noMetadata) {
+    return `<rect width="200" height="200" fill="${P.neutral[300]}"/>
+      ${[80, 60, 40].map(r => `<circle cx="100" cy="100" r="${r}" fill="none" stroke="${P.neutral[500]}" stroke-opacity=".35" stroke-width="8"/>`).join('')}
+      <path d="M112 62v52a16 16 0 1 1-8-14V70h-20V62z" fill="${P.neutral[600]}"/>`;
   }
-  const h = hash(a.titulo); const [bg, fg, ac] = COMBOS[h % COMBOS.length];
+  const h = hash(a.title); const [bg, fg, ac] = COMBOS[h % COMBOS.length];
   const cx = 30 + (h >> 3) % 140, cy = 30 + (h >> 7) % 140;
   return `<rect width="200" height="200" fill="${bg}"/>
     ${[150, 120, 90, 60].map((r, i) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${fg}" stroke-opacity="${0.08 + i * 0.04}" stroke-width="10"/>`).join('')}
     <circle cx="${cx}" cy="${cy}" r="14" fill="${ac}"/>
-    <text x="100" y="122" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="800" font-size="60" fill="${fg}">${esc(iniciais(a.titulo))}</text>`;
+    <text x="100" y="122" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="800" font-size="60" fill="${fg}">${esc(initials(a.title))}</text>`;
 }
-const capa = a => `<svg viewBox="0 0 200 200" aria-hidden="true">${capaInterna(a)}</svg>`;
-const capaMusica = m => capa(album(m.album));
+function coverInner(a) {
+  if (S.useFolderImages && a.url) return `<image href="${esc(a.url)}" width="200" height="200" preserveAspectRatio="xMidYMid slice"/>`;
+  if (S.useFolderImages && a.cover) return folderCover(a);
+  return generatedCover(a);
+}
+const cover = a => `<svg viewBox="0 0 200 200" aria-hidden="true">${coverInner(a)}</svg>`;
 
-// Foto do artista: imagem da pasta do artista (simulada) → capa do primeiro álbum (fallback)
-const artistaInfo = nome => D.artistas.find(a => a.nome === nome) || { nome, foto: null };
-function fotoDaPasta(info) {
-  // Simula um retrato: fundo colorido, luz e silhueta
-  const h = hash(info.nome + '@'); const [c1, c2] = CORES_FOTO[h % CORES_FOTO.length];
+// Artist photo: image from the artist folder (simulated) → first album cover (fallback)
+const artistInfo = name => D.artists.find(a => a.name === name) || { name, photo: null };
+function folderPhoto(info) {
+  // Simulates a portrait: colored background, light and silhouette
+  const h = hash(info.name + '@'); const [c1, c2] = PHOTO_COLORS[h % PHOTO_COLORS.length];
   return `<rect width="200" height="200" fill="${c1}"/>
     <circle cx="${130 + h % 40}" cy="${40 + h % 30}" r="80" fill="${c2}" fill-opacity=".35"/>
     <circle cx="100" cy="86" r="36" fill="#000" fill-opacity=".42"/>
     <path d="M24 210 C30 146 66 128 100 128 C134 128 170 146 176 210 Z" fill="#000" fill-opacity=".42"/>`;
 }
-function fotoInterna(nome) {
-  const info = artistaInfo(nome);
-  if (S.usarImagens && info.url) return `<image href="${esc(info.url)}" width="200" height="200" preserveAspectRatio="xMidYMin slice"/>`;
-  if (S.usarImagens && info.foto) return fotoDaPasta(info);
-  const primeiro = D.albuns.find(a => a.artistaNome === nome && biblioteca().some(m => m.album === a.id)) || D.albuns.find(a => a.artistaNome === nome);
-  return primeiro ? capaInterna(primeiro) : capaGerada({ titulo: nome });
+function photoInner(name) {
+  const info = artistInfo(name);
+  if (S.useFolderImages && info.url) return `<image href="${esc(info.url)}" width="200" height="200" preserveAspectRatio="xMidYMin slice"/>`;
+  if (S.useFolderImages && info.photo) return folderPhoto(info);
+  const first = D.albums.find(a => a.artistName === name && library().some(m => m.album === a.id)) || D.albums.find(a => a.artistName === name);
+  return first ? coverInner(first) : generatedCover({ title: name });
 }
-const foto = (nome, ajuste = 'xMidYMid slice') => `<svg viewBox="0 0 200 200" preserveAspectRatio="${ajuste}" aria-hidden="true">${fotoInterna(nome)}</svg>`;
+const photo = (name, fit = 'xMidYMid slice') => `<svg viewBox="0 0 200 200" preserveAspectRatio="${fit}" aria-hidden="true">${photoInner(name)}</svg>`;
 
-// Pastas de artista e de álbum (para mostrar a imagem certa na navegação por pasta)
-const artistaDaPasta = c => D.artistas.find(a => a.pasta === c);
-const albumDaPasta = c => D.albuns.find(a => a.pasta === c && !a.semMetadados);
-function miniaturaPasta(c, icon = 'folder') {
-  const ar = artistaDaPasta(c); if (ar) return `<div class="ic round">${foto(ar.nome)}</div>`;
-  const al = albumDaPasta(c); if (al) return `<div class="ic">${capa(al)}</div>`;
-  return `<div class="ic">${icone(icon)}</div>`;
+// Artist and album folders (to show the right image while browsing folders)
+const artistOfFolder = c => D.artists.find(a => a.folder === c);
+const albumOfFolder = c => D.albums.find(a => a.folder === c && !a.noMetadata);
+function folderThumb(c, icon = 'folder') {
+  const ar = artistOfFolder(c); if (ar) return `<div class="ic round">${photo(ar.name)}</div>`;
+  const al = albumOfFolder(c); if (al) return `<div class="ic">${cover(al)}</div>`;
+  return `<div class="ic">${iconHtml(icon)}</div>`;
 }
-function imagensDaPasta(c) {
-  const ar = artistaDaPasta(c), al = albumDaPasta(c), out = [];
-  if (ar && ar.foto) out.push({ arquivo: ar.foto, uso: 'foto do artista' });
-  if (al && al.capa) out.push({ arquivo: al.capa, uso: 'capa do álbum' });
+function folderImages(c) {
+  const ar = artistOfFolder(c), al = albumOfFolder(c), out = [];
+  if (ar && ar.photo) out.push({ file: ar.photo, use: 'artist photo' });
+  if (al && al.cover) out.push({ file: al.cover, use: 'album cover' });
   return out;
 }
 
 /* ============================================================
-   Disco com braço (player, boas-vindas, escaneamento)
+   Record with tonearm (player, welcome, scan)
    ============================================================ */
-function disco({ a = null, braco = true, player = false, demo = false } = {}) {
+function record({ a = null, withArm = true, player = false, demo = false } = {}) {
   const id = uid();
-  const cx = braco ? 150 : 100, cy = braco ? 160 : 100, R = braco ? 130 : 96, L = braco ? 50 : 38;
-  const vb = braco ? '0 0 320 300' : '0 0 200 200';
-  const sulcos = [];
-  for (let r = R - 10; r > L + 6; r -= (braco ? 9 : 8)) sulcos.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" style="stroke:var(--cor-sulco)" stroke-width="1.3" stroke-opacity="${sulcos.length % 2 ? .55 : 1}"/>`);
-  const selo = a
-    ? `<g clip-path="url(#sl${id})"><svg x="${cx - L}" y="${cy - L}" width="${L * 2}" height="${L * 2}" viewBox="0 0 200 200">${capaInterna(a)}</svg></g>`
+  const cx = withArm ? 150 : 100, cy = withArm ? 160 : 100, R = withArm ? 130 : 96, L = withArm ? 50 : 38;
+  const vb = withArm ? '0 0 320 300' : '0 0 200 200';
+  const grooves = [];
+  for (let r = R - 10; r > L + 6; r -= (withArm ? 9 : 8)) grooves.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" style="stroke:var(--color-groove)" stroke-width="1.3" stroke-opacity="${grooves.length % 2 ? .55 : 1}"/>`);
+  const label = a
+    ? `<g clip-path="url(#lb${id})"><svg x="${cx - L}" y="${cy - L}" width="${L * 2}" height="${L * 2}" viewBox="0 0 200 200">${coverInner(a)}</svg></g>`
     : `<circle cx="${cx}" cy="${cy}" r="${L}" fill="#7A1F2B"/>`;
-  const armSvg = braco ? `
-    <g class="braco" style="transform-origin:296px 24px">
+  const armSvg = withArm ? `
+    <g class="tonearm" style="transform-origin:296px 24px">
       <rect x="288" y="0" width="16" height="15" rx="4" fill="#8E8676"/>
       <path d="M296 24 L282 150 L240 190" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" transform="translate(3 4)"/>
       <path d="M296 24 L282 150 L240 190" fill="none" stroke="#CFC8B8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
       <rect x="228" y="183" width="24" height="14" rx="3.5" transform="rotate(-45 240 190)" fill="#E0A526"/>
       <circle cx="296" cy="24" r="17" fill="#8E8676"/><circle cx="296" cy="24" r="12.5" fill="#E0A526"/><circle cx="296" cy="24" r="5" fill="#1B1714"/>
     </g>` : '';
-  const cls = [player ? '' : '', demo ? 'demo' : ''].join(' ').trim();
-  return `<svg viewBox="${vb}" class="${cls}" ${player ? 'data-disco' : ''} aria-hidden="true">
-    <defs><clipPath id="sl${id}"><circle cx="${cx}" cy="${cy}" r="${L}"/></clipPath></defs>
-    <g class="gira" style="transform-origin:${cx}px ${cy}px">
-      <circle cx="${cx}" cy="${cy}" r="${R}" style="fill:var(--cor-disco)"/>
+  return `<svg viewBox="${vb}" class="${demo ? 'demo' : ''}" ${player ? 'data-record' : ''} aria-hidden="true">
+    <defs><clipPath id="lb${id}"><circle cx="${cx}" cy="${cy}" r="${L}"/></clipPath></defs>
+    <g class="rotor" style="transform-origin:${cx}px ${cy}px">
+      <circle cx="${cx}" cy="${cy}" r="${R}" style="fill:var(--color-record)"/>
       <circle cx="${cx}" cy="${cy}" r="${R - 1.5}" fill="none" stroke="#6A5B50" stroke-width="3"/>
-      ${sulcos.join('')}
-      <path d="M${cx - R * .78} ${cy - R * .34} A${R * .85} ${R * .85} 0 0 1 ${cx - R * .34} ${cy - R * .78}" fill="none" stroke="#fff" stroke-opacity=".17" stroke-width="${braco ? 10 : 8}" stroke-linecap="round"/>
-      <path d="M${cx + R * .78} ${cy + R * .34} A${R * .85} ${R * .85} 0 0 1 ${cx + R * .34} ${cy + R * .78}" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="${braco ? 10 : 8}" stroke-linecap="round"/>
-      ${selo}
+      ${grooves.join('')}
+      <path d="M${cx - R * .78} ${cy - R * .34} A${R * .85} ${R * .85} 0 0 1 ${cx - R * .34} ${cy - R * .78}" fill="none" stroke="#fff" stroke-opacity=".17" stroke-width="${withArm ? 10 : 8}" stroke-linecap="round"/>
+      <path d="M${cx + R * .78} ${cy + R * .34} A${R * .85} ${R * .85} 0 0 1 ${cx + R * .34} ${cy + R * .78}" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="${withArm ? 10 : 8}" stroke-linecap="round"/>
+      ${label}
       <circle cx="${cx}" cy="${cy}" r="${L}" fill="none" stroke="#E0A526" stroke-width="2" stroke-opacity=".85"/>
-      <circle cx="${cx}" cy="${cy}" r="${braco ? 5 : 4}" style="fill:var(--cor-fundo)"/>
+      <circle cx="${cx}" cy="${cy}" r="${withArm ? 5 : 4}" style="fill:var(--color-background)"/>
     </g>
     ${armSvg}
   </svg>`;
 }
 
-/* Rotação contínua dos discos do player: o ângulo é global, então
-   mini player e tela cheia giram juntos e não "pulam" ao re-renderizar. */
-const VOLTA = T.movimento.duracao['volta-disco'];
-const anguloAtual = () => S.tocando ? S.angulo + (performance.now() - S.giroDesde) / VOLTA * 360 : S.angulo;
-function sincronizarDiscos(desacelerar = false) {
-  $$('svg[data-disco]').forEach(svg => {
-    const g = $('.gira', svg);
-    svg.classList.toggle('baixo', S.tocando);
-    if (reduzMovimento) { g.style.animation = 'none'; return; }
-    if (S.tocando) {
+/* Continuous rotation of the player records: the angle is global, so the
+   mini player and the full screen spin together and never "jump" on re-render. */
+const TURN = T.motion.duration['record-spin'];
+const currentAngle = () => S.playing ? S.angle + (performance.now() - S.spinningSince) / TURN * 360 : S.angle;
+function syncRecords(slowDown = false) {
+  $$('svg[data-record]').forEach(svg => {
+    const g = $('.rotor', svg);
+    svg.classList.toggle('down', S.playing);
+    if (reduceMotion) { g.style.animation = 'none'; return; }
+    if (S.playing) {
       g.style.transform = '';
-      g.style.animation = `spin ${VOLTA}ms linear ${-((anguloAtual() % 360) / 360) * VOLTA}ms infinite`;
-    } else if (desacelerar) {
-      const de = S.angulo - 50;
+      g.style.animation = `spin ${TURN}ms linear ${-((currentAngle() % 360) / 360) * TURN}ms infinite`;
+    } else if (slowDown) {
+      const from = S.angle - 50;
       g.style.animation = 'none';
-      g.animate([{ transform: `rotate(${de}deg)` }, { transform: `rotate(${S.angulo}deg)` }], { duration: 800, easing: 'cubic-bezier(.2,.6,.4,1)' });
-      g.style.transform = `rotate(${S.angulo}deg)`;
+      g.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${S.angle}deg)` }], { duration: 800, easing: 'cubic-bezier(.2,.6,.4,1)' });
+      g.style.transform = `rotate(${S.angle}deg)`;
     } else {
       g.style.animation = 'none';
-      g.style.transform = `rotate(${S.angulo}deg)`;
+      g.style.transform = `rotate(${S.angle}deg)`;
     }
   });
 }
 
 /* ============================================================
-   Navegação
+   Navigation
    ============================================================ */
-const ABAS = ['biblioteca', 'playlists', 'busca', 'ajustes'];
-let pilha = [];
-let telaAtual = null;
-let contextos = {}; // listas tocáveis da tela atual
+let stack = [];
+let currentScreen = null;
+let contexts = {}; // playable lists on the current screen
 
-function ir(nome, params = {}, anim = 'push') {
-  pilha.push({ nome, params });
+function go(name, params = {}, anim = 'push') {
+  stack.push({ name, params });
   render(anim);
 }
-function voltar() {
-  if (fecharSobreposicao()) return;
-  if (npEl.classList.contains('aberto')) return fecharNP();
-  if (pilha.length > 1) { pilha.pop(); render('pop'); }
+function back() {
+  if (closeOverlay()) return;
+  if (npEl.classList.contains('open')) return closeNowPlaying();
+  if (stack.length > 1) { stack.pop(); render('pop'); }
 }
-function aba(nome) {
-  if (pilha[0] && pilha[0].nome === nome && pilha.length === 1) { const sc = $('.screen', screensEl); sc && sc.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-  pilha = [{ nome, params: {} }];
+function tab(name) {
+  if (stack[0] && stack[0].name === name && stack.length === 1) { const sc = $('.screen', screensEl); sc && sc.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  stack = [{ name, params: {} }];
   render('fade');
 }
-function raiz(nome, params = {}) { pilha = [{ nome, params }]; render('fade'); }
+function root(name, params = {}) { stack = [{ name, params }]; render('fade'); }
 
 function render(anim = 'fade') {
-  const { nome, params } = pilha[pilha.length - 1];
-  const def = TELAS[nome];
-  contextos = {};
-  const velho = $('.screen:last-child', screensEl);
+  const { name, params } = stack[stack.length - 1];
+  const def = SCREENS[name];
+  contexts = {};
+  const old = $('.screen:last-child', screensEl);
   const el = document.createElement('div');
   el.className = 'screen';
   el.innerHTML = def.render(params);
   screensEl.appendChild(el);
-  if (velho) {
-    if (anim === 'push') { el.classList.add('push-in'); velho.classList.add('push-out'); }
-    else if (anim === 'pop') { el.classList.add('pop-in'); velho.classList.add('pop-out'); }
+  if (old) {
+    if (anim === 'push') { el.classList.add('push-in'); old.classList.add('push-out'); }
+    else if (anim === 'pop') { el.classList.add('pop-in'); old.classList.add('pop-out'); }
     else el.classList.add('fade-in');
-    const tempo = anim === 'none' ? 0 : T.movimento.duracao.media + 30;
-    setTimeout(() => velho.remove(), tempo);
+    const delay = anim === 'none' ? 0 : T.motion.duration.medium + 30;
+    setTimeout(() => old.remove(), delay);
     $$('.screen', screensEl).slice(0, -2).forEach(s => s.remove());
   }
-  telaAtual = nome;
-  def.montar && def.montar(el, params);
+  currentScreen = name;
+  def.mount && def.mount(el, params);
   const bar = $('.topbar', el);
   if (bar) el.addEventListener('scroll', () => bar.classList.toggle('scrolled', el.scrollTop > 4), { passive: true });
-  atualizarChrome();
-  marcarAtivas();
-  marcarFavoritos();
-  sincronizarDiscos();
-  atualizarPainel(def.chave ? def.chave(params) : nome);
+  updateChrome();
+  markActive();
+  markFavorites();
+  syncRecords();
+  updatePanel(def.key ? def.key(params) : name);
 }
 
-function atualizarChrome() {
-  const def = TELAS[telaAtual];
-  const semChrome = def.semChrome;
-  $('#bottom').hidden = !!semChrome;
-  const raizNome = pilha[0] && pilha[0].nome;
-  $$('#bnav button').forEach(b => b.dataset.tab === raizNome ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+function updateChrome() {
+  const def = SCREENS[currentScreen];
+  $('#bottom').hidden = !!def.noChrome;
+  const rootName = stack[0] && stack[0].name;
+  $$('#bnav button').forEach(b => b.dataset.tab === rootName ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
   renderMini();
-  posicionarAviso();
+  positionSnackbar();
 }
 
-/* Lista tocável: guarda os ids para o clique saber o que tocar */
-function ctx(ids, origem) { const k = 'c' + uid(); contextos[k] = { ids, origem }; return k; }
+/* Playable list: stores the ids so a click knows what to play */
+function ctx(ids, source) { const k = 'c' + uid(); contexts[k] = { ids, source }; return k; }
 
 /* ============================================================
-   Peças de interface
+   UI pieces
    ============================================================ */
-const icone = (n, extra = '') => `<span class="ms ${extra}">${n}</span>`;
-const topbar = (titulo, { voltar: v = true, acoes = '', pequeno = false, sobreFoto = false } = {}) => `
-  <header class="topbar ${sobreFoto ? 'sobre-foto' : ''}">
-    ${v ? `<button class="icon-btn" data-a="voltar" aria-label="Voltar">${icone('arrow_back')}</button>` : ''}
-    <h1 class="${pequeno ? 'small' : ''}">${titulo}</h1>${acoes}
+const iconHtml = (n, extra = '') => `<span class="ms ${extra}">${n}</span>`;
+const topbar = (title, { back: showBack = true, actions = '', small = false, overPhoto = false } = {}) => `
+  <header class="topbar ${overPhoto ? 'over-photo' : ''}">
+    ${showBack ? `<button class="icon-btn" data-action="back" aria-label="Back">${iconHtml('arrow_back')}</button>` : ''}
+    <h1 class="${small ? 'small' : ''}">${title}</h1>${actions}
   </header>`;
 const eq = '<div class="eq"><i></i><i></i><i></i></div>';
 
-function linhaMusica(m, k, i, { numero = false, q = '' } = {}) {
+function songRow(m, k, i, { numbered = false, q = '' } = {}) {
   const a = album(m.album);
-  return `<div class="track" data-mid="${m.id}" data-a="tocar" data-ctx="${k}" data-i="${i}" tabindex="0">
-    ${numero ? `<div class="num"><span class="n">${m.numero}</span>${eq}</div>` : `<div class="cover">${capa(a)}${eq}</div>`}
-    <div style="min-width:0"><div class="ti">${realcar(m.titulo, q)}</div><div class="ar">${numero ? fmtArquivoSe(m) : realcar(m.artista, q)}</div></div>
-    <span class="du">${icone('favorite', 'fill fav-mini')}${fmt(m.duracao)}</span>
-    <button class="icon-btn" data-a="menu" data-mid="${m.id}" aria-label="Mais opções de ${esc(m.titulo)}">${icone('more_vert')}</button>
+  return `<div class="track" data-mid="${m.id}" data-action="play-from" data-ctx="${k}" data-i="${i}" tabindex="0">
+    ${numbered ? `<div class="num"><span class="n">${m.number}</span>${eq}</div>` : `<div class="cover">${cover(a)}${eq}</div>`}
+    <div style="min-width:0"><div class="ti">${highlight(m.title, q)}</div><div class="ar">${numbered ? subtitleFor(m) : highlight(m.artist, q)}</div></div>
+    <span class="du">${iconHtml('favorite', 'fill fav-mini')}${fmt(m.duration)}</span>
+    <button class="icon-btn" data-action="menu" data-mid="${m.id}" aria-label="More options for ${esc(m.title)}">${iconHtml('more_vert')}</button>
   </div>`;
 }
-const fmtArquivoSe = m => album(m.album).semMetadados ? esc(m.arquivo) : esc(m.artista);
+const subtitleFor = m => album(m.album).noMetadata ? esc(m.file) : esc(m.artist);
 
-function listaMusicas(ids, origem, opts = {}) {
-  const k = ctx(ids, origem);
-  return ids.map((id, i) => linhaMusica(musica(id), k, i, opts)).join('');
-}
-function cartaoAlbum(a) {
-  const n = biblioteca().filter(m => m.album === a.id).length;
-  return `<div class="album" data-a="album" data-id="${a.id}" tabindex="0">
-    <div class="art">${capa(a)}<span class="fav-badge" aria-label="Álbum favorito">${icone('favorite', 'fill')}</span></div>
-    <div class="ti">${esc(a.titulo)}</div>
-    <div class="ar">${esc(a.artistaNome)}${a.ano ? ' · ' + a.ano : ''}</div>
+function albumCard(a) {
+  return `<div class="album" data-action="album" data-id="${a.id}" tabindex="0">
+    <div class="art">${cover(a)}<span class="fav-badge" aria-label="Favorite album">${iconHtml('favorite', 'fill')}</span></div>
+    <div class="ti">${esc(a.title)}</div>
+    <div class="ar">${esc(a.artistName)}${a.year ? ' · ' + a.year : ''}</div>
   </div>`;
 }
-function vazioDisco(titulo, texto, botao = true) {
+function emptyRecord(title, text, button = true) {
   return `<div class="empty">
     <svg viewBox="0 0 200 200" aria-hidden="true">
-      <circle cx="100" cy="100" r="84" fill="none" style="stroke:var(--cor-borda-forte)" stroke-width="2" stroke-dasharray="6 6"/>
-      <circle cx="100" cy="100" r="58" style="fill:var(--cor-superficie-2)"/>
-      <circle cx="100" cy="100" r="40" fill="none" style="stroke:var(--cor-borda)" stroke-width="2"/>
-      <circle cx="100" cy="100" r="18" style="fill:var(--cor-primaria-container)"/>
-      <circle cx="100" cy="100" r="4" style="fill:var(--cor-primaria)"/>
+      <circle cx="100" cy="100" r="84" fill="none" style="stroke:var(--color-border-strong)" stroke-width="2" stroke-dasharray="6 6"/>
+      <circle cx="100" cy="100" r="58" style="fill:var(--color-surface-2)"/>
+      <circle cx="100" cy="100" r="40" fill="none" style="stroke:var(--color-border)" stroke-width="2"/>
+      <circle cx="100" cy="100" r="18" style="fill:var(--color-primary-container)"/>
+      <circle cx="100" cy="100" r="4" style="fill:var(--color-primary)"/>
     </svg>
-    <h3>${titulo}</h3><p>${texto}</p>
-    ${botao ? `<button class="btn btn-pri" data-a="escolher-pasta">${icone('folder_open')}Escolher pasta</button>` : ''}
+    <h3>${title}</h3><p>${text}</p>
+    ${button ? `<button class="btn btn-primary" data-action="choose-folder">${iconHtml('folder_open')}Choose folder</button>` : ''}
   </div>`;
 }
-const acoesTocar = (k, albumId) => `<div class="detail-actions">
-  <button class="btn btn-dest" data-a="tocar-tudo" data-ctx="${k}">${icone('play_arrow', 'fill')}Tocar</button>
-  <button class="btn btn-ton" data-a="aleatorio-tudo" data-ctx="${k}">${icone('shuffle')}Aleatório</button>
-  ${albumId ? botaoFavAlbum(albumId) : ''}
+const playActions = (k, albumId) => `<div class="detail-actions">
+  <button class="btn btn-accent" data-action="play-all" data-ctx="${k}">${iconHtml('play_arrow', 'fill')}Play</button>
+  <button class="btn btn-tonal" data-action="shuffle-all" data-ctx="${k}">${iconHtml('shuffle')}Shuffle</button>
+  ${albumId ? favoriteAlbumButton(albumId) : ''}
 </div>`;
-function botaoFavAlbum(id) {
-  const on = S.albunsFavoritos.has(id);
-  return `<button class="icon-btn fav-album ${on ? 'fav-on' : ''}" data-a="favoritar-album" data-id="${id}" aria-pressed="${on}" aria-label="${on ? 'Remover dos álbuns favoritos' : 'Adicionar aos álbuns favoritos'}">${icone('favorite', on ? 'fill' : '')}</button>`;
+function favoriteAlbumButton(id) {
+  const on = S.favoriteAlbums.has(id);
+  return `<button class="icon-btn fav-album ${on ? 'fav-on' : ''}" data-action="favorite-album" data-id="${id}" aria-pressed="${on}" aria-label="${on ? 'Remove from favorite albums' : 'Add to favorite albums'}">${iconHtml('favorite', on ? 'fill' : '')}</button>`;
 }
-// Atualiza os corações na tela sem re-renderizar (mantém a rolagem)
-function marcarFavoritos() {
-  $$('.track[data-mid]').forEach(r => r.classList.toggle('fav', S.favoritas.has(r.dataset.mid)));
-  $$('.album[data-id]').forEach(c => c.classList.toggle('fav', S.albunsFavoritos.has(c.dataset.id)));
-  $$('[data-a="favoritar-album"]').forEach(b => {
-    const on = S.albunsFavoritos.has(b.dataset.id);
+// Updates the hearts on screen without re-rendering (keeps the scroll position)
+function markFavorites() {
+  $$('.track[data-mid]').forEach(r => r.classList.toggle('fav', S.favoriteSongs.has(r.dataset.mid)));
+  $$('.album[data-id]').forEach(c => c.classList.toggle('fav', S.favoriteAlbums.has(c.dataset.id)));
+  $$('[data-action="favorite-album"]').forEach(b => {
+    const on = S.favoriteAlbums.has(b.dataset.id);
     b.classList.toggle('fav-on', on); b.setAttribute('aria-pressed', on);
-    b.setAttribute('aria-label', on ? 'Remover dos álbuns favoritos' : 'Adicionar aos álbuns favoritos');
-    $('.ms', b).classList.toggle('fill', on);
+    b.setAttribute('aria-label', on ? 'Remove from favorite albums' : 'Add to favorite albums');
+    const ic = $('.ms', b); ic && ic.classList.toggle('fill', on);
   });
 }
 
 /* ============================================================
-   Telas
+   Screens
    ============================================================ */
-const ORDENS = { az: 'A–Z', recentes: 'Adicionadas recentemente', tocadas: 'Mais tocadas' };
-function ordenar(ms) {
+const SORTS = { az: 'A–Z', recent: 'Recently added', plays: 'Most played' };
+function sortSongs(ms) {
   ms = ms.slice();
-  if (S.ordem === 'az') ms.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
-  if (S.ordem === 'recentes') ms.reverse();
-  if (S.ordem === 'tocadas') ms.sort((a, b) => b.tocadas - a.tocadas);
+  if (S.sort === 'az') ms.sort((a, b) => a.title.localeCompare(b.title, LOCALE));
+  if (S.sort === 'recent') ms.reverse();
+  if (S.sort === 'plays') ms.sort((a, b) => b.plays - a.plays);
   return ms;
 }
 
-const TELAS = {
-  /* ---------- 1. Boas-vindas ---------- */
-  'boas-vindas': {
-    semChrome: true,
+const SCREENS = {
+  /* ---------- 1. Welcome ---------- */
+  'welcome': {
+    noChrome: true,
     render: () => `<div class="welcome">
       <div class="hero">
-        ${disco({ demo: true })}
+        ${record({ demo: true })}
         <h1>Vitrola <span>Mp3</span></h1>
-        <p>Suas músicas, do seu jeito. Sem conta, sem internet, sem anúncios.</p>
+        <p>Your music, your way. No account, no internet, no ads.</p>
       </div>
-      <div class="promessas">
-        <div>${icone('folder_special')}<span><b>Só as pastas que você escolher</b>Áudios do WhatsApp e gravações ficam de fora.</span></div>
-        <div>${icone('headphones')}<span><b>Toca com a tela apagada</b>Controles na notificação, na tela de bloqueio e no fone.</span></div>
-        <div>${icone('lock')}<span><b>Nada sai do seu celular</b>Sem conta e sem coleta de dados.</span></div>
+      <div class="promises">
+        <div>${iconHtml('folder_special')}<span><b>Only the folders you choose</b>WhatsApp audio and voice recordings stay out.</span></div>
+        <div>${iconHtml('headphones')}<span><b>Plays with the screen off</b>Controls in the notification, on the lock screen and on your headphones.</span></div>
+        <div>${iconHtml('lock')}<span><b>Nothing leaves your phone</b>No account and no data collection.</span></div>
       </div>
-      <button class="btn btn-pri" style="width:100%" data-a="escolher-pasta" data-origem="onboarding">${icone('folder_open')}Escolher pasta de músicas</button>
+      <button class="btn btn-primary" style="width:100%" data-action="choose-folder" data-origin="onboarding">${iconHtml('folder_open')}Choose music folder</button>
     </div>`,
-    montar: el => { const svg = $('svg', el); setTimeout(() => svg.classList.add('baixo'), 500); },
+    mount: el => { const svg = $('svg', el); setTimeout(() => svg.classList.add('down'), 500); },
   },
 
-  /* ---------- 3. Escaneamento ---------- */
-  'escaneamento': {
-    semChrome: true,
+  /* ---------- 3. Scan ---------- */
+  'scan': {
+    noChrome: true,
     render: () => `<div class="scan" id="scan">
-      ${disco({ demo: true })}
-      <h2>Procurando músicas…</h2>
-      <div class="count" id="scan-count">0 músicas</div>
+      ${record({ demo: true })}
+      <h2>Looking for songs…</h2>
+      <div class="count" id="scan-count">0 songs</div>
       <div class="bar"><i id="scan-bar"></i></div>
       <div class="file" id="scan-file"></div>
     </div>`,
-    montar: el => {
-      const svg = $('svg', el); svg.classList.add('baixo');
-      const lista = biblioteca();
-      const total = lista.length;
+    mount: el => {
+      const svg = $('svg', el); svg.classList.add('down');
+      const list = library();
+      const total = list.length;
       let i = 0;
-      const passo = Math.max(40, 2400 / Math.max(total, 1));
+      const step = Math.max(40, 2400 / Math.max(total, 1));
       const t = setInterval(() => {
         if (!el.isConnected) return clearInterval(t);
         if (i < total) {
           i++;
-          $('#scan-count', el).textContent = `${plural(i, 'música', 'músicas')}`;
+          $('#scan-count', el).textContent = `${plural(i, 'song', 'songs')}`;
           $('#scan-bar', el).style.width = (i / total * 100) + '%';
-          const m = lista[i - 1]; const im = imagensDaPasta(m.pasta)[0];
-          $('#scan-file', el).textContent = m.numero === 1 && im && S.usarImagens ? `${m.pasta}/${im.arquivo}` : `${m.pasta}/${m.arquivo}`;
+          const m = list[i - 1]; const im = folderImages(m.folder)[0];
+          $('#scan-file', el).textContent = m.number === 1 && im && S.useFolderImages ? `${m.folder}/${im.file}` : `${m.folder}/${m.file}`;
           return;
         }
         clearInterval(t);
         const scan = $('#scan', el);
         if (!total) {
-          scan.innerHTML = vazioDisco('Nenhuma música aqui', `Não encontramos arquivos de música em "${esc(S.pastas.map(p => p.nome).join('", "'))}". Escolha a pasta onde ficam suas músicas.`)
-            .replace('data-a="escolher-pasta"', 'data-a="escolher-pasta" data-origem="onboarding"');
+          scan.innerHTML = emptyRecord('No music here', `We couldn't find any music files in "${esc(S.folders.map(p => p.name).join('", "'))}". Choose the folder where your music lives.`)
+            .replace('data-action="choose-folder"', 'data-action="choose-folder" data-origin="onboarding"');
           return;
         }
-        const nAlb = albunsVisiveis().length;
-        scan.innerHTML = `${disco({ demo: true })}<div class="done">
-          <h2>Pronto!</h2>
-          <div class="count">${plural(total, 'música', 'músicas')} em ${plural(nAlb, 'álbum', 'álbuns')}</div>
-          ${S.usarImagens ? `<div class="file" style="height:auto">${plural(albunsVisiveis().filter(a => a.capa).length, 'capa', 'capas')} e ${plural(artistas().filter(a => artistaInfo(a.nome).foto).length, 'foto', 'fotos')} de artista encontradas</div>` : ''}
-          <button class="btn btn-pri" data-a="ir-biblioteca">${icone('library_music')}Abrir a biblioteca</button>
+        const nAlbums = visibleAlbums().length;
+        scan.innerHTML = `${record({ demo: true })}<div class="done">
+          <h2>All set!</h2>
+          <div class="count">${plural(total, 'song', 'songs')} in ${plural(nAlbums, 'album', 'albums')}</div>
+          ${S.useFolderImages ? `<div class="file" style="height:auto">Found ${plural(visibleAlbums().filter(a => a.cover).length, 'cover', 'covers')} and ${plural(artists().filter(a => artistInfo(a.name).photo).length, 'artist photo', 'artist photos')}</div>` : ''}
+          <button class="btn btn-primary" data-action="go-library">${iconHtml('library_music')}Open library</button>
         </div>`;
-        $('svg', scan).classList.add('baixo');
-      }, passo);
+        $('svg', scan).classList.add('down');
+      }, step);
     },
   },
 
-  /* ---------- 4. Biblioteca ---------- */
-  'biblioteca': {
-    chave: () => 'biblioteca-' + S.libTab,
+  /* ---------- 4. Library ---------- */
+  'library': {
+    key: () => 'library-' + S.libTab,
     render: () => {
-      const vazia = !S.pastas.length || !biblioteca().length;
-      const chips = [['artistas', 'Artistas'], ['musicas', 'Músicas'], ['albuns', 'Álbuns'], ['pastas', 'Pastas']]
-        .map(([k, n]) => `<button class="chip-f" data-a="lib-tab" data-tab="${k}" aria-pressed="${S.libTab === k}">${icone('check')}${n}</button>`).join('');
-      let corpo = '';
-      if (!S.pastas.length) corpo = vazioDisco('Nenhum disco na vitrola', 'Escolha a pasta onde estão suas músicas. Só ela será lida, nada mais do celular.');
-      else if (vazia) corpo = vazioDisco('Nenhuma música encontrada', S.subpastas ? 'As pastas escolhidas não têm arquivos de música.' : 'Suas músicas estão em subpastas. Ligue "Incluir subpastas" nos ajustes.', false)
-        + (S.subpastas ? '' : `<div style="text-align:center"><button class="btn btn-ton" data-a="aba" data-tab="ajustes">${icone('settings')}Abrir ajustes</button></div>`);
-      else if (S.libTab === 'musicas') {
-        const ms = ordenar(biblioteca());
-        const k = ctx(ms.map(m => m.id), { tipo: 'Tocando de', nome: 'Todas as músicas' });
-        corpo = `<div class="list-head"><span class="count">${plural(ms.length, 'música', 'músicas')}</span>
-            <button class="sort" data-a="ordem">${icone('swap_vert')}${ORDENS[S.ordem]}</button></div>
-          ${acoesTocar(k)}
-          ${ms.map((m, i) => linhaMusica(m, k, i)).join('')}`;
-      } else if (S.libTab === 'albuns') {
-        const as = albunsVisiveis().sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
-        corpo = `<div class="list-head"><span class="count">${plural(as.length, 'álbum', 'álbuns')}</span></div><div class="albums">${as.map(cartaoAlbum).join('')}</div>`;
-      } else if (S.libTab === 'artistas') {
-        const ar = artistas();
-        corpo = `<div class="list-head"><span class="count">${plural(ar.length, 'artista', 'artistas')}</span></div><div class="artists-grid">` + ar.map(a => `
-          <div class="artist-card" data-a="artista" data-nome="${esc(a.nome)}" tabindex="0">
-            <div class="foto">${foto(a.nome)}</div>
-            <div class="ti">${esc(a.nome)}</div><div class="sb">${plural(a.albuns.size, 'álbum', 'álbuns')}</div>
+      const empty = !S.folders.length || !library().length;
+      const chips = [['artists', 'Artists'], ['songs', 'Songs'], ['albums', 'Albums'], ['folders', 'Folders']]
+        .map(([k, n]) => `<button class="chip-f" data-action="lib-tab" data-tab="${k}" aria-pressed="${S.libTab === k}">${iconHtml('check')}${n}</button>`).join('');
+      let body = '';
+      if (!S.folders.length) body = emptyRecord('No record on the turntable', 'Choose the folder where your music lives. Only that folder is read, nothing else on your phone.');
+      else if (empty) body = emptyRecord('No songs found', S.subfolders ? 'The chosen folders have no music files.' : 'Your music is in subfolders. Turn on "Include subfolders" in Settings.', false)
+        + (S.subfolders ? '' : `<div style="text-align:center"><button class="btn btn-tonal" data-action="tab" data-tab="settings">${iconHtml('settings')}Open Settings</button></div>`);
+      else if (S.libTab === 'songs') {
+        const ms = sortSongs(library());
+        const k = ctx(ms.map(m => m.id), { type: 'Playing from', name: 'All songs' });
+        body = `<div class="list-head"><span class="count">${plural(ms.length, 'song', 'songs')}</span>
+            <button class="sort" data-action="sort">${iconHtml('swap_vert')}${SORTS[S.sort]}</button></div>
+          ${playActions(k)}
+          ${ms.map((m, i) => songRow(m, k, i)).join('')}`;
+      } else if (S.libTab === 'albums') {
+        const as = visibleAlbums().sort((a, b) => a.title.localeCompare(b.title, LOCALE));
+        body = `<div class="list-head"><span class="count">${plural(as.length, 'album', 'albums')}</span></div><div class="albums">${as.map(albumCard).join('')}</div>`;
+      } else if (S.libTab === 'artists') {
+        const ar = artists();
+        body = `<div class="list-head"><span class="count">${plural(ar.length, 'artist', 'artists')}</span></div><div class="artists-grid">` + ar.map(a => `
+          <div class="artist-card" data-action="artist" data-name="${esc(a.name)}" tabindex="0">
+            <div class="photo">${photo(a.name)}</div>
+            <div class="ti">${esc(a.name)}</div><div class="sb">${plural(a.albums.size, 'album', 'albums')}</div>
           </div>`).join('') + '</div>';
       } else {
-        corpo = S.pastas.map(p => `<div class="group-title">${esc(p.local)}</div><div class="group">
-          <div class="row-i" data-a="pasta" data-caminho="${esc(p.caminho)}"><div class="ic">${icone('folder_special')}</div>
-            <div><div class="ti">${esc(p.nome)}</div><div class="sb">Pasta escolhida · ${plural(musicasDaPasta(p.caminho, S.subpastas).length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>
-          ${subpastasDe(p.caminho).map(sp => `<div class="row-i" data-a="pasta" data-caminho="${esc(p.caminho + '/' + sp)}">${miniaturaPasta(p.caminho + '/' + sp)}
-            <div><div class="ti">${esc(sp)}</div><div class="sb">${plural(musicasDaPasta(p.caminho + '/' + sp, true).length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}
+        body = S.folders.map(p => `<div class="group-title">${esc(p.location)}</div><div class="group">
+          <div class="row-i" data-action="folder" data-path="${esc(p.path)}"><div class="ic">${iconHtml('folder_special')}</div>
+            <div><div class="ti">${esc(p.name)}</div><div class="sb">Chosen folder · ${plural(songsInFolder(p.path, S.subfolders).length, 'song', 'songs')}</div></div>${iconHtml('chevron_right', 'chev')}</div>
+          ${subfoldersOf(p.path).map(sp => `<div class="row-i" data-action="folder" data-path="${esc(p.path + '/' + sp)}">${folderThumb(p.path + '/' + sp)}
+            <div><div class="ti">${esc(sp)}</div><div class="sb">${plural(songsInFolder(p.path + '/' + sp, true).length, 'song', 'songs')}</div></div>${iconHtml('chevron_right', 'chev')}</div>`).join('')}
         </div>`).join('');
       }
-      return `${topbar('Biblioteca', { voltar: false })}
-        ${S.pastas.length && !vazia ? `<div class="chips">${chips}</div>` : ''}${corpo}`;
+      return `${topbar('Library', { back: false })}
+        ${S.folders.length && !empty ? `<div class="chips">${chips}</div>` : ''}${body}`;
     },
   },
 
-  /* ---------- 5. Álbum ---------- */
+  /* ---------- 5. Album ---------- */
   'album': {
     render: ({ id }) => {
       const a = album(id);
-      const ms = biblioteca().filter(m => m.album === id);
-      const k = ctx(ms.map(m => m.id), { tipo: 'Tocando do álbum', nome: a.titulo });
-      const total = ms.reduce((s, m) => s + m.duracao, 0);
-      return `${topbar('', { acoes: `<button class="icon-btn" data-a="menu-album" data-id="${id}" aria-label="Mais opções">${icone('more_vert')}</button>` })}
+      const ms = library().filter(m => m.album === id);
+      const k = ctx(ms.map(m => m.id), { type: 'Playing from album', name: a.title });
+      const total = ms.reduce((s, m) => s + m.duration, 0);
+      return `${topbar('', { actions: `<button class="icon-btn" data-action="album-menu" data-id="${id}" aria-label="More options">${iconHtml('more_vert')}</button>` })}
         <div class="detail-head">
-          <div class="art">${capa(a)}</div>
-          <h2>${esc(a.titulo)}</h2>
-          ${a.semMetadados ? `<span class="by">${esc(a.artistaNome)}</span>` : `<button class="artist-chip" data-a="artista" data-nome="${esc(a.artistaNome)}"><span class="av">${foto(a.artistaNome)}</span>${esc(a.artistaNome)}</button>`}
-          <div class="meta">${a.ano ? a.ano + ' · ' : ''}${plural(ms.length, 'música', 'músicas')} · ${duracaoTotal(total)}</div>
+          <div class="art">${cover(a)}</div>
+          <h2>${esc(a.title)}</h2>
+          ${a.noMetadata ? `<span class="by">${esc(a.artistName)}</span>` : `<button class="artist-chip" data-action="artist" data-name="${esc(a.artistName)}"><span class="av">${photo(a.artistName)}</span>${esc(a.artistName)}</button>`}
+          <div class="meta">${a.year ? a.year + ' · ' : ''}${plural(ms.length, 'song', 'songs')} · ${totalDuration(total)}</div>
         </div>
-        ${acoesTocar(k, a.semMetadados ? null : id)}
-        ${a.semMetadados ? `<p class="pad" style="font:var(--tipo-corpo-p);color:var(--cor-texto-2);margin:0 0 8px">Estes arquivos não têm informações de álbum e artista. O app mostra o nome do arquivo.</p>` : ''}
-        ${ms.map((m, i) => linhaMusica(m, k, i, { numero: true })).join('')}
-        <div class="crumbs" style="padding-top:16px">${icone('folder')} ${esc(a.pasta)}</div>`;
+        ${playActions(k, a.noMetadata ? null : id)}
+        ${a.noMetadata ? `<p class="pad" style="font:var(--type-body-s);color:var(--color-text-2);margin:0 0 8px">These files have no album or artist information. The app shows the file name.</p>` : ''}
+        ${ms.map((m, i) => songRow(m, k, i, { numbered: true })).join('')}
+        <div class="crumbs" style="padding-top:16px">${iconHtml('folder')} ${esc(a.folder)}</div>`;
     },
   },
 
-  /* ---------- 6. Artista ---------- */
-  'artista': {
-    render: ({ nome }) => {
-      const ms = biblioteca().filter(m => m.artista === nome);
+  /* ---------- 6. Artist ---------- */
+  'artist': {
+    render: ({ name }) => {
+      const ms = library().filter(m => m.artist === name);
       const as = [...new Set(ms.map(m => m.album))].map(album);
-      const k = ctx(ms.map(m => m.id), { tipo: 'Tocando do artista', nome });
-      const temFoto = usaImagem(artistaInfo(nome));
-      return `${topbar('', { sobreFoto: true })}
-        <div class="artist-hero ${temFoto ? '' : 'sem-foto'}">
-          <div class="bg">${foto(nome, 'xMidYMin slice')}</div>
+      const k = ctx(ms.map(m => m.id), { type: 'Playing from artist', name });
+      const withPhoto = hasImage(artistInfo(name));
+      return `${topbar('', { overPhoto: true })}
+        <div class="artist-hero ${withPhoto ? '' : 'no-photo'}">
+          <div class="bg">${photo(name, 'xMidYMin slice')}</div>
           <div class="grad"></div>
-          <div class="info"><h2>${esc(nome)}</h2>
-            <div class="meta">${plural(as.length, 'álbum', 'álbuns')} · ${plural(ms.length, 'música', 'músicas')}</div></div>
+          <div class="info"><h2>${esc(name)}</h2>
+            <div class="meta">${plural(as.length, 'album', 'albums')} · ${plural(ms.length, 'song', 'songs')}</div></div>
         </div>
-        ${acoesTocar(k)}
-        <div class="sec-title">Álbuns</div>
-        <div class="hscroll">${as.map(cartaoAlbum).join('')}</div>
-        <div class="sec-title">Músicas</div>
-        ${ms.map((m, i) => linhaMusica(m, k, i)).join('')}`;
+        ${playActions(k)}
+        <div class="sec-title">Albums</div>
+        <div class="hscroll">${as.map(albumCard).join('')}</div>
+        <div class="sec-title">Songs</div>
+        ${ms.map((m, i) => songRow(m, k, i)).join('')}`;
     },
   },
 
-  /* ---------- 7. Pasta ---------- */
-  'pasta': {
-    render: ({ caminho }) => {
-      const partes = caminho.split('/');
-      const subs = subpastasDe(caminho);
-      const diretas = musicasDaPasta(caminho, false);
-      const todas = musicasDaPasta(caminho, true);
-      const k = ctx(todas.map(m => m.id), { tipo: 'Tocando da pasta', nome: partes[partes.length - 1] });
-      const k2 = ctx(diretas.map(m => m.id), { tipo: 'Tocando da pasta', nome: partes[partes.length - 1] });
-      return `${topbar(esc(partes[partes.length - 1]))}
-        <div class="crumbs">${icone('smartphone')} Memória interna ${partes.map(p => `${icone('chevron_right')} ${esc(p)}`).join(' ')}</div>
-        ${todas.length ? acoesTocar(k) : ''}
-        ${imagensDaPasta(caminho).map(im => `<div class="img-file">${icone('image')}<span><b>${esc(im.arquivo)}</b> · usada como ${im.uso}</span></div>`).join('')}
-        ${subs.length ? `<div class="group">${subs.map(sp => `<div class="row-i" data-a="pasta" data-caminho="${esc(caminho + '/' + sp)}">${miniaturaPasta(caminho + '/' + sp)}
-          <div><div class="ti">${esc(sp)}</div><div class="sb">${plural(musicasDaPasta(caminho + '/' + sp, true).length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}</div>` : ''}
-        ${diretas.map((m, i) => `<div class="track" data-mid="${m.id}" data-a="tocar" data-ctx="${k2}" data-i="${i}" tabindex="0">
-            <div class="cover">${capa(album(m.album))}${eq}</div>
-            <div style="min-width:0"><div class="ti">${esc(m.arquivo)}</div><div class="ar">${esc(m.titulo)} · ${esc(m.artista)}</div></div>
-            <span class="du">${fmt(m.duracao)}</span>
-            <button class="icon-btn" data-a="menu" data-mid="${m.id}" aria-label="Mais opções">${icone('more_vert')}</button></div>`).join('')}
-        ${!subs.length && !diretas.length ? vazioDisco('Pasta vazia', 'Nenhuma música nesta pasta.', false) : ''}`;
+  /* ---------- 7. Folder ---------- */
+  'folder': {
+    render: ({ path }) => {
+      const parts = path.split('/');
+      const subs = subfoldersOf(path);
+      const direct = songsInFolder(path, false);
+      const all = songsInFolder(path, true);
+      const k = ctx(all.map(m => m.id), { type: 'Playing from folder', name: parts[parts.length - 1] });
+      const k2 = ctx(direct.map(m => m.id), { type: 'Playing from folder', name: parts[parts.length - 1] });
+      return `${topbar(esc(parts[parts.length - 1]))}
+        <div class="crumbs">${iconHtml('smartphone')} Internal storage ${parts.map(p => `${iconHtml('chevron_right')} ${esc(p)}`).join(' ')}</div>
+        ${all.length ? playActions(k) : ''}
+        ${folderImages(path).map(im => `<div class="img-file">${iconHtml('image')}<span><b>${esc(im.file)}</b> · used as the ${im.use}</span></div>`).join('')}
+        ${subs.length ? `<div class="group">${subs.map(sp => `<div class="row-i" data-action="folder" data-path="${esc(path + '/' + sp)}">${folderThumb(path + '/' + sp)}
+          <div><div class="ti">${esc(sp)}</div><div class="sb">${plural(songsInFolder(path + '/' + sp, true).length, 'song', 'songs')}</div></div>${iconHtml('chevron_right', 'chev')}</div>`).join('')}</div>` : ''}
+        ${direct.map((m, i) => `<div class="track" data-mid="${m.id}" data-action="play-from" data-ctx="${k2}" data-i="${i}" tabindex="0">
+            <div class="cover">${cover(album(m.album))}${eq}</div>
+            <div style="min-width:0"><div class="ti">${esc(m.file)}</div><div class="ar">${esc(m.title)} · ${esc(m.artist)}</div></div>
+            <span class="du">${fmt(m.duration)}</span>
+            <button class="icon-btn" data-action="menu" data-mid="${m.id}" aria-label="More options">${iconHtml('more_vert')}</button></div>`).join('')}
+        ${!subs.length && !direct.length ? emptyRecord('Empty folder', 'No songs in this folder.', false) : ''}`;
     },
   },
 
-  /* ---------- 8. Busca ---------- */
-  'busca': {
-    render: ({ q = '' }) => `${topbar('Buscar', { voltar: false })}
-      <label class="search">${icone('search')}<input id="q" placeholder="Música, artista ou álbum" value="${esc(q)}" autocomplete="off" enterkeyhint="search">
-        <button class="icon-btn" data-a="limpar-busca" aria-label="Limpar" style="width:44px;height:44px${q ? '' : ';visibility:hidden'}">${icone('close')}</button></label>
-      <div id="resultados"></div>`,
-    montar: (el, params) => {
+  /* ---------- 8. Search ---------- */
+  'search': {
+    render: ({ q = '' }) => `${topbar('Search', { back: false })}
+      <label class="search">${iconHtml('search')}<input id="q" placeholder="Song, artist or album" value="${esc(q)}" autocomplete="off" enterkeyhint="search">
+        <button class="icon-btn" data-action="clear-search" aria-label="Clear" style="width:44px;height:44px${q ? '' : ';visibility:hidden'}">${iconHtml('close')}</button></label>
+      <div id="results"></div>`,
+    mount: (el, params) => {
       const input = $('#q', el);
-      const pintar = () => {
+      const paint = () => {
         const q = input.value.trim();
-        if (norm(input.value.trim()) !== norm((params.q || '').trim())) S.buscaTodas = false;
+        if (norm(input.value.trim()) !== norm((params.q || '').trim())) S.showAllSongs = false;
         params.q = input.value;
-        $('[data-a="limpar-busca"]', el).style.visibility = q ? 'visible' : 'hidden';
-        $('#resultados', el).innerHTML = resultadosBusca(q);
-        marcarAtivas(); marcarFavoritos();
+        $('[data-action="clear-search"]', el).style.visibility = q ? 'visible' : 'hidden';
+        $('#results', el).innerHTML = searchResults(q);
+        markActive(); markFavorites();
       };
-      input.addEventListener('input', pintar);
+      input.addEventListener('input', paint);
       input.addEventListener('keydown', e => {
         if (e.key === 'Enter' && input.value.trim()) {
           const q = input.value.trim();
-          S.recentes = [q, ...S.recentes.filter(r => norm(r) !== norm(q))].slice(0, 6);
+          S.recentSearches = [q, ...S.recentSearches.filter(r => norm(r) !== norm(q))].slice(0, 6);
           input.blur();
         }
       });
-      pintar();
+      paint();
       if (!params.q) setTimeout(() => input.focus({ preventScroll: true }), 350);
     },
   },
@@ -578,780 +575,777 @@ const TELAS = {
   /* ---------- 9. Playlists ---------- */
   'playlists': {
     render: () => {
-      const fav = [...S.favoritas].filter(id => naBiblioteca(musica(id)));
-      const albFav = [...S.albunsFavoritos].filter(id => albunsVisiveis().some(a => a.id === id));
+      const favSongs = [...S.favoriteSongs].filter(id => inLibrary(song(id)));
+      const favAlbums = [...S.favoriteAlbums].filter(id => visibleAlbums().some(a => a.id === id));
       const auto = [
-        ['favoritas', 'Músicas favoritas', 'favorite', fav.length],
-        ['albuns-favoritos', 'Álbuns favoritos', 'album', albFav.length, 'álbum', 'álbuns'],
-        ['tocadas', 'Mais tocadas', 'trending_up', Math.min(20, biblioteca().length)],
-        ['recentes', 'Adicionadas recentemente', 'schedule', Math.min(20, biblioteca().length)],
+        ['favorite-songs', 'Favorite songs', 'favorite', favSongs.length],
+        ['favorite-albums', 'Favorite albums', 'album', favAlbums.length, 'album', 'albums'],
+        ['most-played', 'Most played', 'trending_up', Math.min(20, library().length)],
+        ['recently-added', 'Recently added', 'schedule', Math.min(20, library().length)],
       ];
-      return `${topbar('Playlists', { voltar: false, acoes: `<button class="icon-btn" data-a="nova-playlist" aria-label="Nova playlist">${icone('add')}</button>` })}
-        <div class="group-title">Automáticas</div>
-        <div class="group">${auto.map(([id, n, ic, c, um = 'música', varios = 'músicas']) => `<div class="row-i" data-a="${id === 'albuns-favoritos' ? 'albuns-favoritos' : 'playlist'}" data-id="${id}" tabindex="0">
-          <div class="ic pri">${icone(ic, 'fill')}</div><div><div class="ti">${n}</div><div class="sb">${plural(c, um, varios)}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}</div>
-        <div class="group-title">Suas playlists</div>
-        <div class="group">${S.playlists.map(p => `<div class="row-i" data-a="playlist" data-id="${p.id}" tabindex="0">
-          <div class="ic">${mosaico(p.musicas)}</div><div style="min-width:0"><div class="ti">${esc(p.nome)}</div><div class="sb">${plural(p.musicas.length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}
-          <div class="row-i" data-a="nova-playlist" tabindex="0"><div class="ic pri">${icone('add')}</div><div><div class="ti">Nova playlist</div></div><span></span></div>
+      return `${topbar('Playlists', { back: false, actions: `<button class="icon-btn" data-action="new-playlist" aria-label="New playlist">${iconHtml('add')}</button>` })}
+        <div class="group-title">Automatic</div>
+        <div class="group">${auto.map(([id, n, ic, c, one = 'song', many = 'songs']) => `<div class="row-i" data-action="${id === 'favorite-albums' ? 'favorite-albums' : 'playlist'}" data-id="${id}" tabindex="0">
+          <div class="ic tinted">${iconHtml(ic, 'fill')}</div><div><div class="ti">${n}</div><div class="sb">${plural(c, one, many)}</div></div>${iconHtml('chevron_right', 'chev')}</div>`).join('')}</div>
+        <div class="group-title">Your playlists</div>
+        <div class="group">${S.playlists.map(p => `<div class="row-i" data-action="playlist" data-id="${p.id}" tabindex="0">
+          <div class="ic">${mosaic(p.songs)}</div><div style="min-width:0"><div class="ti">${esc(p.name)}</div><div class="sb">${plural(p.songs.length, 'song', 'songs')}</div></div>${iconHtml('chevron_right', 'chev')}</div>`).join('')}
+          <div class="row-i" data-action="new-playlist" tabindex="0"><div class="ic tinted">${iconHtml('add')}</div><div><div class="ti">New playlist</div></div><span></span></div>
         </div>`;
     },
   },
 
-  /* ---------- 9b. Álbuns favoritos ---------- */
-  'albuns-favoritos': {
-    chave: () => 'albuns-favoritos',
+  /* ---------- 9b. Favorite albums ---------- */
+  'favorite-albums': {
+    key: () => 'favorite-albums',
     render: () => {
-      const as = [...S.albunsFavoritos].map(album).filter(a => albunsVisiveis().includes(a));
-      return `${topbar('Álbuns favoritos', { pequeno: true })}
-        ${as.length ? `<div class="list-head"><span class="count">${plural(as.length, 'álbum', 'álbuns')}</span></div><div class="albums">${as.map(cartaoAlbum).join('')}</div>`
-          : `<div class="empty"><span class="ms big">album</span><h3>Nenhum álbum favorito</h3><p>Toque no coração na página de um álbum, ou use o menu ⋮ dele, para ele aparecer aqui.</p></div>`}`;
+      const as = [...S.favoriteAlbums].map(album).filter(a => visibleAlbums().includes(a));
+      return `${topbar('Favorite albums', { small: true })}
+        ${as.length ? `<div class="list-head"><span class="count">${plural(as.length, 'album', 'albums')}</span></div><div class="albums">${as.map(albumCard).join('')}</div>`
+          : `<div class="empty"><span class="ms big">album</span><h3>No favorite albums</h3><p>Tap the heart on an album page, or use its ⋮ menu, to see it here.</p></div>`}`;
     },
   },
 
   /* ---------- 10. Playlist ---------- */
   'playlist': {
     render: ({ id }) => {
-      const info = dadosPlaylist(id);
-      if (!info) return `${topbar('')}${vazioDisco('Playlist excluída', '', false)}`;
-      const ids = info.ids.filter(i => naBiblioteca(musica(i)));
-      const k = ctx(ids, { tipo: 'Tocando da playlist', nome: info.nome });
-      const total = ids.reduce((s, i) => s + musica(i).duracao, 0);
-      const arte = info.icone
-        ? `<div class="pl-art" style="background:var(--cor-primaria-container);color:var(--cor-sobre-primaria-container)">${icone(info.icone, 'fill')}</div>`
-        : `<div class="pl-art" style="overflow:hidden">${mosaico(ids, true)}</div>`;
-      return `${topbar('', { acoes: info.editavel ? `<button class="icon-btn" data-a="menu-playlist" data-id="${id}" aria-label="Opções da playlist">${icone('more_vert')}</button>` : '' })}
-        <div class="detail-head">${arte}<h2>${esc(info.nome)}</h2>
-          <div class="meta">${info.desc ? info.desc + ' · ' : ''}${plural(ids.length, 'música', 'músicas')}${ids.length ? ' · ' + duracaoTotal(total) : ''}</div></div>
-        ${ids.length ? acoesTocar(k) + ids.map((mid, i) => linhaMusica(musica(mid), k, i)).join('')
-          : `<div class="empty"><span class="ms big">${info.icone || 'queue_music'}</span><h3>Nada por aqui ainda</h3><p>${id === 'favoritas' ? 'Toque no coração de uma música, no player ou no menu ⋮, para ela aparecer aqui.' : 'Use o menu ⋮ de qualquer música e escolha "Adicionar à playlist".'}</p></div>`}`;
+      const info = playlistData(id);
+      if (!info) return `${topbar('')}${emptyRecord('Playlist deleted', '', false)}`;
+      const ids = info.ids.filter(i => inLibrary(song(i)));
+      const k = ctx(ids, { type: 'Playing from playlist', name: info.name });
+      const total = ids.reduce((s, i) => s + song(i).duration, 0);
+      const art = info.icon
+        ? `<div class="pl-art" style="background:var(--color-primary-container);color:var(--color-on-primary-container)">${iconHtml(info.icon, 'fill')}</div>`
+        : `<div class="pl-art" style="overflow:hidden">${mosaic(ids)}</div>`;
+      return `${topbar('', { actions: info.editable ? `<button class="icon-btn" data-action="playlist-menu" data-id="${id}" aria-label="Playlist options">${iconHtml('more_vert')}</button>` : '' })}
+        <div class="detail-head">${art}<h2>${esc(info.name)}</h2>
+          <div class="meta">${info.desc ? info.desc + ' · ' : ''}${plural(ids.length, 'song', 'songs')}${ids.length ? ' · ' + totalDuration(total) : ''}</div></div>
+        ${ids.length ? playActions(k) + ids.map((mid, i) => songRow(song(mid), k, i)).join('')
+          : `<div class="empty"><span class="ms big">${info.icon || 'queue_music'}</span><h3>Nothing here yet</h3><p>${id === 'favorite-songs' ? 'Tap the heart on a song, in the player or in the ⋮ menu, to see it here.' : 'Use the ⋮ menu on any song and choose "Add to playlist".'}</p></div>`}`;
     },
   },
 
-  /* ---------- 11. Ajustes ---------- */
-  'ajustes': {
+  /* ---------- 11. Settings ---------- */
+  'settings': {
     render: () => {
-      const tema = document.documentElement.dataset.theme || 'auto';
-      const timerTxt = S.timer ? (S.timer.fimMusica ? 'Pausa no fim desta música' : `Pausa em ${fmt(Math.max(0, (S.timer.fim - Date.now()) / 1000))}`) : 'Desligado';
-      return `${topbar('Ajustes', { voltar: false })}
-        <div class="group-title">Pastas da biblioteca</div>
+      const theme = document.documentElement.dataset.theme || 'auto';
+      const timerText = S.timer ? timerLabel() : 'Off';
+      return `${topbar('Settings', { back: false })}
+        <div class="group-title">Library folders</div>
         <div class="group">
-          ${S.pastas.map(p => `<div class="row-i" style="cursor:default"><div class="ic">${icone(p.local === 'Cartão SD' ? 'sd_card' : 'folder')}</div>
-            <div style="min-width:0"><div class="ti">${esc(p.nome)}</div><div class="sb">${esc(p.local)} · ${plural(musicasDaPasta(p.caminho, S.subpastas).length, 'música', 'músicas')}</div></div>
-            <button class="icon-btn" data-a="remover-pasta" data-id="${p.id}" aria-label="Remover pasta ${esc(p.nome)}">${icone('remove_circle_outline')}</button></div>`).join('')}
-          <div class="row-i" data-a="escolher-pasta" data-origem="ajustes" tabindex="0"><div class="ic pri">${icone('create_new_folder')}</div><div><div class="ti">Adicionar pasta</div><div class="sb">Só as pastas escolhidas entram na biblioteca</div></div><span></span></div>
-          <div class="row-i" data-a="toggle" data-k="subpastas"><div class="ic pri">${icone('subdirectory_arrow_right')}</div><div><div class="ti">Incluir subpastas</div><div class="sb">Procurar músicas dentro das pastas escolhidas</div></div><button class="switch" role="switch" aria-checked="${S.subpastas}" aria-label="Incluir subpastas"></button></div>
-          <div class="row-i" data-a="toggle" data-k="usarImagens"><div class="ic pri">${icone('photo_library')}</div><div><div class="ti">Usar fotos e capas das pastas</div><div class="sb">artista.jpg na pasta do artista e capa.jpg na do álbum</div></div><button class="switch" role="switch" aria-checked="${S.usarImagens}" aria-label="Usar fotos e capas das pastas"></button></div>
-          <div class="row-i" data-a="reescanear" tabindex="0"><div class="ic pri">${icone('refresh')}</div><div><div class="ti">Procurar músicas novas</div><div class="sb">Também acontece sozinho quando você abre o app</div></div><span></span></div>
+          ${S.folders.map(p => `<div class="row-i" style="cursor:default"><div class="ic">${iconHtml(p.location === 'SD card' ? 'sd_card' : 'folder')}</div>
+            <div style="min-width:0"><div class="ti">${esc(p.name)}</div><div class="sb">${esc(p.location)} · ${plural(songsInFolder(p.path, S.subfolders).length, 'song', 'songs')}</div></div>
+            <button class="icon-btn" data-action="remove-folder" data-id="${p.id}" aria-label="Remove folder ${esc(p.name)}">${iconHtml('remove_circle_outline')}</button></div>`).join('')}
+          <div class="row-i" data-action="choose-folder" data-origin="settings" tabindex="0"><div class="ic tinted">${iconHtml('create_new_folder')}</div><div><div class="ti">Add folder</div><div class="sb">Only chosen folders go into the library</div></div><span></span></div>
+          <div class="row-i" data-action="toggle" data-k="subfolders"><div class="ic tinted">${iconHtml('subdirectory_arrow_right')}</div><div><div class="ti">Include subfolders</div><div class="sb">Look for songs inside the chosen folders</div></div><button class="switch" role="switch" aria-checked="${S.subfolders}" aria-label="Include subfolders"></button></div>
+          <div class="row-i" data-action="toggle" data-k="useFolderImages"><div class="ic tinted">${iconHtml('photo_library')}</div><div><div class="ti">Use folder photos and covers</div><div class="sb">artist.jpg in the artist folder and cover.jpg in the album folder</div></div><button class="switch" role="switch" aria-checked="${S.useFolderImages}" aria-label="Use folder photos and covers"></button></div>
+          <div class="row-i" data-action="rescan" tabindex="0"><div class="ic tinted">${iconHtml('refresh')}</div><div><div class="ti">Look for new songs</div><div class="sb">Also happens automatically when you open the app</div></div><span></span></div>
         </div>
-        <div class="group-title">Reprodução</div>
+        <div class="group-title">Playback</div>
         <div class="group">
-          <div class="row-i" data-a="timer" tabindex="0"><div class="ic pri">${icone('bedtime')}</div><div><div class="ti">Timer para dormir</div><div class="sb" id="timer-sb">${timerTxt}</div></div>${icone('chevron_right', 'chev')}</div>
-          <div class="row-i" data-a="toggle" data-k="retomar"><div class="ic pri">${icone('history')}</div><div><div class="ti">Retomar de onde parou</div><div class="sb">Ao abrir o app, a última música fica pronta para tocar</div></div><button class="switch" role="switch" aria-checked="${S.retomar}" aria-label="Retomar de onde parou"></button></div>
-          <div class="row-i" data-a="toggle" data-k="pausarFone"><div class="ic pri">${icone('headset_off')}</div><div><div class="ti">Pausar ao tirar o fone</div><div class="sb">Fone com fio ou Bluetooth</div></div><button class="switch" role="switch" aria-checked="${S.pausarFone}" aria-label="Pausar ao tirar o fone"></button></div>
+          <div class="row-i" data-action="timer" tabindex="0"><div class="ic tinted">${iconHtml('bedtime')}</div><div><div class="ti">Sleep timer</div><div class="sb" id="timer-status">${timerText}</div></div>${iconHtml('chevron_right', 'chev')}</div>
+          <div class="row-i" data-action="toggle" data-k="resume"><div class="ic tinted">${iconHtml('history')}</div><div><div class="ti">Resume where you left off</div><div class="sb">When the app opens, the last song is ready to play</div></div><button class="switch" role="switch" aria-checked="${S.resume}" aria-label="Resume where you left off"></button></div>
+          <div class="row-i" data-action="toggle" data-k="pauseOnUnplug"><div class="ic tinted">${iconHtml('headset_off')}</div><div><div class="ti">Pause when headphones disconnect</div><div class="sb">Wired or Bluetooth</div></div><button class="switch" role="switch" aria-checked="${S.pauseOnUnplug}" aria-label="Pause when headphones disconnect"></button></div>
         </div>
-        <div class="tip">${icone('battery_alert')}<div><b>A música para sozinha?</b>Alguns celulares (Xiaomi, Samsung, Motorola…) fecham apps em segundo plano para economizar bateria. Libere o Vitrola Mp3 da otimização de bateria.<br><button data-a="bateria">Abrir ajustes de bateria</button></div></div>
-        <div class="group-title">Aparência</div>
-        <div class="seg theme-seg" role="group" aria-label="Tema">
-          ${[['auto', 'Automático'], ['light', 'Claro'], ['dark', 'Escuro']].map(([k, n]) => `<button data-a="tema" data-tema="${k}" aria-pressed="${tema === k}">${n}</button>`).join('')}
+        <div class="tip">${iconHtml('battery_alert')}<div><b>Music stops on its own?</b>Some phones (Xiaomi, Samsung, Motorola…) close background apps to save battery. Exempt Vitrola Mp3 from battery optimization.<br><button data-action="battery">Open battery settings</button></div></div>
+        <div class="group-title">Appearance</div>
+        <div class="seg theme-seg" role="group" aria-label="Theme">
+          ${[['auto', 'Automatic'], ['light', 'Light'], ['dark', 'Dark']].map(([k, n]) => `<button data-action="theme" data-theme-choice="${k}" aria-pressed="${theme === k}">${n}</button>`).join('')}
         </div>
         <div class="about">
-          <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3">
-          <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negativo.svg" alt="Vitrola Mp3" style="margin:0 auto 8px">
-          <div>Versão 0.1 · mockup</div><div>Sem anúncios. Nada sai do seu celular.</div>
+          <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positive.svg" alt="Vitrola Mp3">
+          <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negative.svg" alt="Vitrola Mp3" style="margin:0 auto 8px">
+          <div>Version 0.1 · mockup</div><div>No ads. Nothing leaves your phone.</div>
         </div>`;
     },
-    montar: el => {
-      const t = setInterval(() => { if (!el.isConnected) return clearInterval(t); const sb = $('#timer-sb', el); if (sb && S.timer && !S.timer.fimMusica) sb.textContent = `Pausa em ${fmt(Math.max(0, (S.timer.fim - Date.now()) / 1000))}`; }, 1000);
+    mount: el => {
+      const t = setInterval(() => { if (!el.isConnected) return clearInterval(t); const sb = $('#timer-status', el); if (sb && S.timer && !S.timer.endOfSong) sb.textContent = timerLabel(); }, 1000);
     },
   },
 };
 
-function resultadosBusca(q) {
+function searchResults(q) {
   if (!q) {
-    return `${S.recentes.length ? `<div class="sec-title">Buscas recentes<button data-a="limpar-recentes">Limpar</button></div>
-      <div class="recentes">${S.recentes.map(r => `<button class="chip-f" data-a="recente" data-q="${esc(r)}">${icone('history')}${esc(r)}</button>`).join('')}</div>` : ''}
-      <div class="sec-title">Artistas</div>
-      <div class="hscroll">${artistas().map(a => `<div class="album" data-a="artista" data-nome="${esc(a.nome)}" style="width:96px;text-align:center"><div class="art" style="border-radius:50%">${foto(a.nome)}</div><div class="ti">${esc(a.nome)}</div></div>`).join('')}</div>`;
+    return `${S.recentSearches.length ? `<div class="sec-title">Recent searches<button data-action="clear-recents">Clear</button></div>
+      <div class="recent">${S.recentSearches.map(r => `<button class="chip-f" data-action="recent" data-q="${esc(r)}">${iconHtml('history')}${esc(r)}</button>`).join('')}</div>` : ''}
+      <div class="sec-title">Artists</div>
+      <div class="hscroll">${artists().map(a => `<div class="album" data-action="artist" data-name="${esc(a.name)}" style="width:96px;text-align:center"><div class="art" style="border-radius:50%">${photo(a.name)}</div><div class="ti">${esc(a.name)}</div></div>`).join('')}</div>`;
   }
-  // 1) O que bate direto com o texto
+  // 1) Direct matches
   const n = norm(q);
-  const peso = t => norm(t).startsWith(n) ? 0 : 1; // começa com o texto vem antes de só conter
-  const porPeso = campo => (a, b) => peso(campo(a)) - peso(campo(b));
-  const lib = biblioteca();
-  const msDiretas = lib.filter(m => norm(m.titulo).includes(n) || norm(m.arquivo).includes(n)).sort(porPeso(m => m.titulo));
-  const asDiretos = albunsVisiveis().filter(a => norm(a.titulo).includes(n)).sort(porPeso(a => a.titulo));
-  const arDiretos = artistas().filter(a => norm(a.nome).includes(n)).sort(porPeso(a => a.nome));
-  if (!msDiretas.length && !asDiretos.length && !arDiretos.length) {
-    return `<div class="empty"><span class="ms big">search_off</span><h3>Nada encontrado</h3><p>Nenhuma música, álbum ou artista com "${esc(q)}". Confira a grafia ou tente outra palavra.</p></div>`;
+  const weight = t => norm(t).startsWith(n) ? 0 : 1; // "starts with" ranks above "contains"
+  const byWeight = field => (a, b) => weight(field(a)) - weight(field(b));
+  const lib = library();
+  const directSongs = lib.filter(m => norm(m.title).includes(n) || norm(m.file).includes(n)).sort(byWeight(m => m.title));
+  const directAlbums = visibleAlbums().filter(a => norm(a.title).includes(n)).sort(byWeight(a => a.title));
+  const directArtists = artists().filter(a => norm(a.name).includes(n)).sort(byWeight(a => a.name));
+  if (!directSongs.length && !directAlbums.length && !directArtists.length) {
+    return `<div class="empty"><span class="ms big">search_off</span><h3>Nothing found</h3><p>No song, album or artist matches "${esc(q)}". Check the spelling or try another word.</p></div>`;
   }
-  // 2) Cada camada também traz o que está ligado aos resultados das outras
-  const nomesArtistas = new Set([...arDiretos.map(a => a.nome), ...asDiretos.map(a => a.artistaNome), ...msDiretas.map(m => m.artista)]);
-  const idsAlbuns = new Set([...asDiretos.map(a => a.id), ...msDiretas.map(m => m.album)]);
-  albunsVisiveis().forEach(a => { if (arDiretos.some(x => x.nome === a.artistaNome)) idsAlbuns.add(a.id); });
-  const ar = [...arDiretos, ...artistas().filter(a => nomesArtistas.has(a.nome) && !arDiretos.some(x => x.nome === a.nome))];
-  const as = [...asDiretos, ...[...idsAlbuns].map(album).filter(a => !asDiretos.includes(a))];
-  const relacionadas = lib.filter(m => !msDiretas.includes(m) && (asDiretos.some(a => a.id === m.album) || arDiretos.some(a => a.nome === m.artista)));
-  const ms = [...msDiretas, ...relacionadas];
+  // 2) Each layer also brings what is linked to the other layers' results
+  const artistNames = new Set([...directArtists.map(a => a.name), ...directAlbums.map(a => a.artistName), ...directSongs.map(m => m.artist)]);
+  const albumIds = new Set([...directAlbums.map(a => a.id), ...directSongs.map(m => m.album)]);
+  visibleAlbums().forEach(a => { if (directArtists.some(x => x.name === a.artistName)) albumIds.add(a.id); });
+  const ar = [...directArtists, ...artists().filter(a => artistNames.has(a.name) && !directArtists.some(x => x.name === a.name))];
+  const as = [...directAlbums, ...[...albumIds].map(album).filter(a => !directAlbums.includes(a))];
+  const related = lib.filter(m => !directSongs.includes(m) && (directAlbums.some(a => a.id === m.album) || directArtists.some(a => a.name === m.artist)));
+  const ms = [...directSongs, ...related];
 
-  const LIMITE = 6;
-  const mostrar = S.buscaTodas ? ms : ms.slice(0, LIMITE);
-  const k = ctx(ms.map(m => m.id), { tipo: 'Tocando da busca', nome: `"${q}"` });
-  const titulo = (nome, qtd) => `<div class="sec-title">${nome} <span class="qtd">${qtd}</span></div>`;
-  return `<section aria-label="Artistas">${titulo('Artistas', ar.length)}
-      ${ar.map(a => `<div class="row-i" data-a="artista" data-nome="${esc(a.nome)}"><div class="ic round">${foto(a.nome)}</div>
-        <div style="min-width:0"><div class="ti">${realcar(a.nome, q)}</div><div class="sb">${plural(a.albuns.size, 'álbum', 'álbuns')} · ${plural(a.musicas.length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}
+  const LIMIT = 6;
+  const shown = S.showAllSongs ? ms : ms.slice(0, LIMIT);
+  const k = ctx(ms.map(m => m.id), { type: 'Playing from search', name: `"${q}"` });
+  const heading = (name, qty) => `<div class="sec-title">${name} <span class="qty">${qty}</span></div>`;
+  return `<section aria-label="Artists">${heading('Artists', ar.length)}
+      ${ar.map(a => `<div class="row-i" data-action="artist" data-name="${esc(a.name)}"><div class="ic round">${photo(a.name)}</div>
+        <div style="min-width:0"><div class="ti">${highlight(a.name, q)}</div><div class="sb">${plural(a.albums.size, 'album', 'albums')} · ${plural(a.songs.length, 'song', 'songs')}</div></div>${iconHtml('chevron_right', 'chev')}</div>`).join('')}
     </section>
-    <section aria-label="Álbuns">${titulo('Álbuns', as.length)}
-      <div class="hscroll">${as.map(a => cartaoAlbum(a).replace(`<div class="ti">${esc(a.titulo)}</div>`, `<div class="ti">${realcar(a.titulo, q)}</div>`)).join('')}</div>
+    <section aria-label="Albums">${heading('Albums', as.length)}
+      <div class="hscroll">${as.map(a => albumCard(a).replace(`<div class="ti">${esc(a.title)}</div>`, `<div class="ti">${highlight(a.title, q)}</div>`)).join('')}</div>
     </section>
-    <section aria-label="Músicas">${titulo('Músicas', ms.length)}
-      ${mostrar.map((m, i) => linhaMusica(m, k, i, { q })).join('')}
-      ${ms.length > LIMITE && !S.buscaTodas ? `<div style="padding:4px 16px"><button class="btn btn-cont" style="width:100%" data-a="ver-todas-musicas">Ver todas as ${ms.length} músicas</button></div>` : ''}
+    <section aria-label="Songs">${heading('Songs', ms.length)}
+      ${shown.map((m, i) => songRow(m, k, i, { q })).join('')}
+      ${ms.length > LIMIT && !S.showAllSongs ? `<div style="padding:4px 16px"><button class="btn btn-outline" style="width:100%" data-action="show-all-songs">See all ${ms.length} songs</button></div>` : ''}
     </section>`;
 }
 
-function mosaico(ids, grande = false) {
-  const as = [...new Set(ids.map(i => musica(i).album))].slice(0, 4).map(album);
-  if (!as.length) return icone('queue_music');
-  if (as.length < 4) return capa(as[0]);
-  return `<div class="pl-mosaic" style="width:100%;height:100%">${as.map(capa).join('')}</div>`;
+function mosaic(ids) {
+  const as = [...new Set(ids.map(i => song(i).album))].slice(0, 4).map(album);
+  if (!as.length) return iconHtml('queue_music');
+  if (as.length < 4) return cover(as[0]);
+  return `<div class="pl-mosaic" style="width:100%;height:100%">${as.map(cover).join('')}</div>`;
 }
-function dadosPlaylist(id) {
-  if (id === 'favoritas') return { nome: 'Músicas favoritas', icone: 'favorite', ids: [...S.favoritas], desc: 'Automática' };
-  if (id === 'tocadas') return { nome: 'Mais tocadas', icone: 'trending_up', ids: biblioteca().slice().sort((a, b) => b.tocadas - a.tocadas).slice(0, 20).map(m => m.id), desc: 'Automática' };
-  if (id === 'recentes') return { nome: 'Adicionadas recentemente', icone: 'schedule', ids: biblioteca().slice().reverse().slice(0, 20).map(m => m.id), desc: 'Automática' };
+function playlistData(id) {
+  if (id === 'favorite-songs') return { name: 'Favorite songs', icon: 'favorite', ids: [...S.favoriteSongs], desc: 'Automatic' };
+  if (id === 'most-played') return { name: 'Most played', icon: 'trending_up', ids: library().slice().sort((a, b) => b.plays - a.plays).slice(0, 20).map(m => m.id), desc: 'Automatic' };
+  if (id === 'recently-added') return { name: 'Recently added', icon: 'schedule', ids: library().slice().reverse().slice(0, 20).map(m => m.id), desc: 'Automatic' };
   const p = S.playlists.find(x => x.id === id);
-  return p && { nome: p.nome, ids: p.musicas, editavel: true };
+  return p && { name: p.name, ids: p.songs, editable: true };
 }
 
 /* ============================================================
-   Player (simulado: o tempo passa, mas não sai som)
+   Player (simulated: time passes, but there is no sound)
    ============================================================ */
-function tocarLista(ids, i, origem, aleatorio = S.aleatorio) {
+function playList(ids, i, source, shuffle = S.shuffle) {
   if (!ids.length) return;
-  S.filaOriginal = ids.slice();
-  S.aleatorio = aleatorio;
-  if (aleatorio) {
-    const primeiro = ids[i];
-    S.fila = [primeiro, ...embaralhar(ids.filter((_, j) => j !== i))];
+  S.originalQueue = ids.slice();
+  S.shuffle = shuffle;
+  if (shuffle) {
+    const first = ids[i];
+    S.queue = [first, ...shuffled(ids.filter((_, j) => j !== i))];
     S.idx = 0;
-  } else { S.fila = ids.slice(); S.idx = i; }
-  S.origem = origem; S.pos = 0;
+  } else { S.queue = ids.slice(); S.idx = i; }
+  S.source = source; S.pos = 0;
   play(true);
 }
-function play(on = !S.tocando) {
-  if (!atual()) return;
-  if (on === S.tocando) { atualizarPlayer(); return; }
-  if (on) { S.giroDesde = performance.now(); S.tocando = true; }
-  else { S.angulo = anguloAtual() + 50; S.tocando = false; }
-  atualizarPlayer(!on);
+function play(on = !S.playing) {
+  if (!current()) return;
+  if (on === S.playing) { updatePlayer(); return; }
+  if (on) { S.spinningSince = performance.now(); S.playing = true; }
+  else { S.angle = currentAngle() + 50; S.playing = false; }
+  updatePlayer(!on);
 }
-function proxima(auto = false) {
-  if (!atual()) return;
-  if (auto && S.repetir === 2) { S.pos = 0; return atualizarPlayer(); }
-  if (S.idx < S.fila.length - 1) { S.idx++; S.pos = 0; }
-  else if (S.repetir === 1 || !auto) { S.idx = 0; S.pos = 0; }
+function next(auto = false) {
+  if (!current()) return;
+  if (auto && S.repeat === 2) { S.pos = 0; return updatePlayer(); }
+  if (S.idx < S.queue.length - 1) { S.idx++; S.pos = 0; }
+  else if (S.repeat === 1 || !auto) { S.idx = 0; S.pos = 0; }
   else { S.pos = 0; play(false); return; }
-  atualizarPlayer();
+  updatePlayer();
 }
-function anterior() {
-  if (!atual()) return;
+function previous() {
+  if (!current()) return;
   if (S.pos > 3 || S.idx === 0) S.pos = 0; else { S.idx--; S.pos = 0; }
-  atualizarPlayer();
+  updatePlayer();
 }
-function alternarAleatorio() {
-  const id = S.fila[S.idx];
-  S.aleatorio = !S.aleatorio;
-  if (S.aleatorio) S.fila = [id, ...embaralhar(S.filaOriginal.filter(x => x !== id))], S.idx = 0;
-  else S.fila = S.filaOriginal.slice(), S.idx = Math.max(0, S.fila.indexOf(id));
-  aviso(S.aleatorio ? 'Aleatório ligado' : 'Aleatório desligado');
-  atualizarPlayer();
+function toggleShuffle() {
+  const id = S.queue[S.idx];
+  S.shuffle = !S.shuffle;
+  if (S.shuffle) S.queue = [id, ...shuffled(S.originalQueue.filter(x => x !== id))], S.idx = 0;
+  else S.queue = S.originalQueue.slice(), S.idx = Math.max(0, S.queue.indexOf(id));
+  snackbar(S.shuffle ? 'Shuffle on' : 'Shuffle off');
+  updatePlayer();
 }
-function alternarRepetir() {
-  S.repetir = (S.repetir + 1) % 3;
-  aviso(['Repetir desligado', 'Repetindo a fila', 'Repetindo esta música'][S.repetir]);
-  atualizarPlayer();
+function toggleRepeat() {
+  S.repeat = (S.repeat + 1) % 3;
+  snackbar(['Repeat off', 'Repeating the queue', 'Repeating this song'][S.repeat]);
+  updatePlayer();
 }
 
 setInterval(() => {
-  // relógio da barra de status
-  const d = new Date(); $('#relogio').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
-  if (S.timer && !S.timer.fimMusica && Date.now() >= S.timer.fim) { S.timer = null; if (S.tocando) play(false); aviso('Timer encerrado. Boa noite!'); }
-  if (!S.tocando || !atual()) return;
+  // status bar clock
+  const d = new Date(); $('#clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+  if (S.timer && !S.timer.endOfSong && Date.now() >= S.timer.end) { S.timer = null; if (S.playing) play(false); snackbar('Sleep timer ended. Good night!'); }
+  if (!S.playing || !current()) return;
   S.pos += 1;
-  if (S.pos >= atual().duracao) {
-    if (S.timer && S.timer.fimMusica) { S.timer = null; S.pos = 0; play(false); aviso('Timer encerrado. Boa noite!'); return; }
-    proxima(true);
-  } else atualizarProgresso();
+  if (S.pos >= current().duration) {
+    if (S.timer && S.timer.endOfSong) { S.timer = null; S.pos = 0; play(false); snackbar('Sleep timer ended. Good night!'); return; }
+    next(true);
+  } else updateProgress();
 }, 1000);
 
-function atualizarPlayer(desacelerar = false) {
+function updatePlayer(slowDown = false) {
   renderMini();
-  if (npEl.classList.contains('aberto')) renderNP();
-  marcarAtivas();
-  sincronizarDiscos(desacelerar);
-  atualizarProgresso();
-  const sh = $('.shade, .lock', app); if (sh) sh.dispatchEvent(new CustomEvent('atualizar'));
-  const q = $('#fila-lista'); if (q) q.innerHTML = linhasFila();
+  if (npEl.classList.contains('open')) renderNowPlaying();
+  markActive();
+  syncRecords(slowDown);
+  updateProgress();
+  const sh = $('.shade, .lock', app); if (sh) sh.dispatchEvent(new CustomEvent('refresh'));
+  const q = $('#queue-list'); if (q) q.innerHTML = queueRows();
 }
-function atualizarProgresso() {
-  const m = atual(); if (!m) return;
-  const pct = (S.pos / m.duracao * 100) + '%';
+function updateProgress() {
+  const m = current(); if (!m) return;
+  const pct = (S.pos / m.duration * 100) + '%';
   const bar = $('#mini .prog i'); if (bar) bar.style.width = pct;
   const seek = $('#np-seek'); if (seek && !seek.matches(':active')) { seek.value = S.pos; seek.style.setProperty('--p', pct); }
   const t = $('#np-pos'); if (t) t.textContent = fmt(S.pos);
-  const tt = $('#np-timer'); if (tt) tt.textContent = textoTimer();
+  const tt = $('#np-timer'); if (tt) tt.textContent = S.timer ? timerLabel() : '';
   $$('.notif .bar i').forEach(b => b.style.width = pct);
 }
-function marcarAtivas() {
-  const m = atual();
-  $$('[data-mid].track, .q-row[data-mid]').forEach(r => r.classList.toggle('ativa', !!m && r.dataset.mid === m.id));
-  app.classList.toggle('pausado', !S.tocando);
+function markActive() {
+  const m = current();
+  $$('[data-mid].track, .q-row[data-mid]').forEach(r => r.classList.toggle('active', !!m && r.dataset.mid === m.id));
+  app.classList.toggle('paused', !S.playing);
 }
-const textoTimer = () => !S.timer ? '' : S.timer.fimMusica ? 'Pausa no fim desta música' : `Pausa em ${fmt(Math.max(0, (S.timer.fim - Date.now()) / 1000))}`;
+const timerLabel = () => !S.timer ? '' : S.timer.endOfSong ? 'Pauses at the end of this song' : `Pauses in ${fmt(Math.max(0, (S.timer.end - Date.now()) / 1000))}`;
 
 /* ---------- Mini player ---------- */
 function renderMini() {
   const mini = $('#mini');
-  const m = atual();
-  const ocultar = !m || TELAS[telaAtual] && TELAS[telaAtual].semChrome;
-  mini.hidden = !!ocultar;
-  if (ocultar) return posicionarAviso();
-  mini.innerHTML = `<div class="prog"><i style="width:${S.pos / m.duracao * 100}%"></i></div>
-    <div class="row" data-a="abrir-np">
-      ${disco({ a: album(m.album), braco: false, player: true }).replace('<svg ', '<svg class="mdisc" ')}
-      <div style="min-width:0"><div class="ti">${esc(m.titulo)}</div><div class="ar">${esc(m.artista)}</div></div>
-      <button class="icon-btn" data-a="play" aria-label="${S.tocando ? 'Pausar' : 'Tocar'}">${icone(S.tocando ? 'pause' : 'play_arrow', 'fill')}</button>
-      <button class="icon-btn" data-a="proxima" aria-label="Próxima música">${icone('skip_next', 'fill')}</button>
+  const m = current();
+  const hide = !m || SCREENS[currentScreen] && SCREENS[currentScreen].noChrome;
+  mini.hidden = !!hide;
+  if (hide) return positionSnackbar();
+  mini.innerHTML = `<div class="prog"><i style="width:${S.pos / m.duration * 100}%"></i></div>
+    <div class="row" data-action="open-np">
+      ${record({ a: album(m.album), withArm: false, player: true }).replace('<svg ', '<svg class="mdisc" ')}
+      <div style="min-width:0"><div class="ti">${esc(m.title)}</div><div class="ar">${esc(m.artist)}</div></div>
+      <button class="icon-btn" data-action="play" aria-label="${S.playing ? 'Pause' : 'Play'}">${iconHtml(S.playing ? 'pause' : 'play_arrow', 'fill')}</button>
+      <button class="icon-btn" data-action="next" aria-label="Next song">${iconHtml('skip_next', 'fill')}</button>
     </div>`;
-  sincronizarDiscos();
-  posicionarAviso();
+  syncRecords();
+  positionSnackbar();
 }
 
-/* ---------- Tocando agora ---------- */
-function abrirNP() {
-  if (!atual()) return;
-  renderNP();
-  npEl.classList.remove('fechando');
-  npEl.classList.add('aberto');
+/* ---------- Now playing ---------- */
+function openNowPlaying() {
+  if (!current()) return;
+  renderNowPlaying();
+  npEl.classList.remove('closing');
+  npEl.classList.add('open');
   npEl.setAttribute('aria-hidden', 'false');
-  atualizarPainel('tocando');
-  posicionarAviso();
+  updatePanel('now-playing');
+  positionSnackbar();
 }
-function fecharNP() {
-  npEl.classList.add('fechando');
-  npEl.classList.remove('aberto');
+function closeNowPlaying() {
+  npEl.classList.add('closing');
+  npEl.classList.remove('open');
   npEl.setAttribute('aria-hidden', 'true');
-  atualizarPainel(TELAS[telaAtual].chave ? TELAS[telaAtual].chave(pilha[pilha.length - 1].params) : telaAtual);
-  posicionarAviso();
+  updatePanelForCurrent();
+  positionSnackbar();
 }
-function renderNP() {
-  const m = atual(); if (!m) return;
+function renderNowPlaying() {
+  const m = current(); if (!m) return;
   const a = album(m.album);
-  const fav = S.favoritas.has(m.id);
-  npEl.style.setProperty('--np-fundo', `color-mix(in srgb, ${corDoAlbum(a)} 16%, var(--cor-fundo))`);
+  const fav = S.favoriteSongs.has(m.id);
+  npEl.style.setProperty('--np-background', `color-mix(in srgb, ${albumColor(a)} 16%, var(--color-background))`);
   npEl.innerHTML = `
     <div class="np-top">
-      <button class="icon-btn" data-a="fechar-np" aria-label="Recolher player">${icone('expand_more')}</button>
-      <div class="src"><small>${esc(S.origem ? S.origem.tipo : 'Tocando')}</small><b>${esc(S.origem ? S.origem.nome : a.titulo)}</b></div>
-      <button class="icon-btn" data-a="menu" data-mid="${m.id}" aria-label="Mais opções">${icone('more_vert')}</button>
+      <button class="icon-btn" data-action="close-np" aria-label="Collapse player">${iconHtml('expand_more')}</button>
+      <div class="src"><small>${esc(S.source ? S.source.type : 'Playing')}</small><b>${esc(S.source ? S.source.name : a.title)}</b></div>
+      <button class="icon-btn" data-action="menu" data-mid="${m.id}" aria-label="More options">${iconHtml('more_vert')}</button>
     </div>
-    <div class="np-disc">${disco({ a, braco: true, player: true })}</div>
+    <div class="np-disc">${record({ a, withArm: true, player: true })}</div>
     <div class="np-info">
-      <div style="min-width:0"><h2>${esc(m.titulo)}</h2><button class="ar" data-a="artista-np" data-nome="${esc(m.artista)}">${a.semMetadados ? '' : `<span class="av">${foto(m.artista)}</span>`}${esc(m.artista)}${a.semMetadados ? '' : ' · ' + esc(a.titulo)}</button></div>
-      <button class="icon-btn ${fav ? 'fav-on' : ''}" data-a="favoritar" data-mid="${m.id}" aria-label="${fav ? 'Remover das favoritas' : 'Adicionar às favoritas'}" aria-pressed="${fav}">${icone('favorite', fav ? 'fill' : '')}</button>
+      <div style="min-width:0"><h2>${esc(m.title)}</h2><button class="ar" data-action="artist-np" data-name="${esc(m.artist)}">${a.noMetadata ? '' : `<span class="av">${photo(m.artist)}</span>`}${esc(m.artist)}${a.noMetadata ? '' : ' · ' + esc(a.title)}</button></div>
+      <button class="icon-btn ${fav ? 'fav-on' : ''}" data-action="favorite" data-mid="${m.id}" aria-label="${fav ? 'Remove from favorite songs' : 'Add to favorite songs'}" aria-pressed="${fav}">${iconHtml('favorite', fav ? 'fill' : '')}</button>
     </div>
     <div class="np-seek">
-      <input type="range" id="np-seek" min="0" max="${m.duracao}" value="${S.pos}" aria-label="Posição da música" style="--p:${S.pos / m.duracao * 100}%">
-      <div class="times"><span id="np-pos">${fmt(S.pos)}</span><span>${fmt(m.duracao)}</span></div>
+      <input type="range" id="np-seek" min="0" max="${m.duration}" value="${S.pos}" aria-label="Song position" style="--p:${S.pos / m.duration * 100}%">
+      <div class="times"><span id="np-pos">${fmt(S.pos)}</span><span>${fmt(m.duration)}</span></div>
     </div>
     <div class="np-controls">
-      <button class="icon-btn ${S.aleatorio ? 'on' : ''}" data-a="aleatorio" aria-label="Aleatório" aria-pressed="${S.aleatorio}">${icone('shuffle')}</button>
-      <button class="icon-btn" data-a="anterior" aria-label="Música anterior">${icone('skip_previous', 'fill big')}</button>
-      <button class="play ${S.tocando ? 'tocando-btn' : ''}" data-a="play" aria-label="${S.tocando ? 'Pausar' : 'Tocar'}">${icone(S.tocando ? 'pause' : 'play_arrow', 'fill')}</button>
-      <button class="icon-btn" data-a="proxima" aria-label="Próxima música">${icone('skip_next', 'fill big')}</button>
-      <button class="icon-btn ${S.repetir ? 'on' : ''}" data-a="repetir" aria-label="${['Repetir: desligado', 'Repetir: todas', 'Repetir: uma'][S.repetir]}">${icone(S.repetir === 2 ? 'repeat_one' : 'repeat')}</button>
+      <button class="icon-btn ${S.shuffle ? 'on' : ''}" data-action="shuffle" aria-label="Shuffle" aria-pressed="${S.shuffle}">${iconHtml('shuffle')}</button>
+      <button class="icon-btn" data-action="previous" aria-label="Previous song">${iconHtml('skip_previous', 'fill big')}</button>
+      <button class="play ${S.playing ? 'is-playing' : ''}" data-action="play" aria-label="${S.playing ? 'Pause' : 'Play'}">${iconHtml(S.playing ? 'pause' : 'play_arrow', 'fill')}</button>
+      <button class="icon-btn" data-action="next" aria-label="Next song">${iconHtml('skip_next', 'fill big')}</button>
+      <button class="icon-btn ${S.repeat ? 'on' : ''}" data-action="repeat" aria-label="${['Repeat: off', 'Repeat: all', 'Repeat: one'][S.repeat]}">${iconHtml(S.repeat === 2 ? 'repeat_one' : 'repeat')}</button>
     </div>
-    <div class="timer-tag" id="np-timer">${textoTimer()}</div>
+    <div class="timer-tag" id="np-timer">${S.timer ? timerLabel() : ''}</div>
     <div class="np-extra">
-      <button class="icon-btn ${S.timer ? 'on' : ''}" data-a="timer" aria-label="Timer para dormir">${icone('bedtime')}</button>
-      <button class="icon-btn" data-a="fila" aria-label="Fila">${icone('queue_music')}</button>
-      <button class="icon-btn" data-a="info-arquivo" data-mid="${m.id}" aria-label="Detalhes do arquivo">${icone('info')}</button>
+      <button class="icon-btn ${S.timer ? 'on' : ''}" data-action="timer" aria-label="Sleep timer">${iconHtml('bedtime')}</button>
+      <button class="icon-btn" data-action="queue" aria-label="Queue">${iconHtml('queue_music')}</button>
+      <button class="icon-btn" data-action="file-info" data-mid="${m.id}" aria-label="File details">${iconHtml('info')}</button>
     </div>`;
   const seek = $('#np-seek', npEl);
-  seek.addEventListener('input', () => { S.pos = +seek.value; seek.style.setProperty('--p', (S.pos / m.duracao * 100) + '%'); $('#np-pos').textContent = fmt(S.pos); const b = $('#mini .prog i'); if (b) b.style.width = (S.pos / m.duracao * 100) + '%'; });
-  sincronizarDiscos();
+  seek.addEventListener('input', () => { S.pos = +seek.value; seek.style.setProperty('--p', (S.pos / m.duration * 100) + '%'); $('#np-pos').textContent = fmt(S.pos); const b = $('#mini .prog i'); if (b) b.style.width = (S.pos / m.duration * 100) + '%'; });
+  syncRecords();
 }
 
 /* ============================================================
-   Folhas, diálogos e avisos
+   Sheets, dialogs and snackbars
    ============================================================ */
-function abrirFolha(html, chave) {
-  fecharSobreposicao(true);
-  overlayEl.innerHTML = `<div class="veu" data-a="fechar-sobreposicao"></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
-  requestAnimationFrame(() => { $('.veu', overlayEl).classList.add('on'); $('.sheet', overlayEl).classList.add('on'); });
-  if (chave) atualizarPainel(chave);
+function openSheet(html, key) {
+  closeOverlay(true);
+  overlayEl.innerHTML = `<div class="scrim" data-action="close-overlay"></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  requestAnimationFrame(() => { $('.scrim', overlayEl).classList.add('on'); $('.sheet', overlayEl).classList.add('on'); });
+  if (key) updatePanel(key);
 }
-function abrirDialogo(html, chave) {
-  fecharSobreposicao(true);
-  overlayEl.innerHTML = `<div class="veu" data-a="fechar-sobreposicao"></div><div class="dialog-wrap"><div class="dialog" role="alertdialog" aria-modal="true">${html}</div></div>`;
-  requestAnimationFrame(() => { $('.veu', overlayEl).classList.add('on'); $('.dialog', overlayEl).classList.add('on'); const f = $('input', overlayEl); f && f.focus(); });
-  if (chave) atualizarPainel(chave);
+function openDialog(html, key) {
+  closeOverlay(true);
+  overlayEl.innerHTML = `<div class="scrim" data-action="close-overlay"></div><div class="dialog-wrap"><div class="dialog" role="alertdialog" aria-modal="true">${html}</div></div>`;
+  requestAnimationFrame(() => { $('.scrim', overlayEl).classList.add('on'); $('.dialog', overlayEl).classList.add('on'); const f = $('input', overlayEl); f && f.focus(); });
+  if (key) updatePanel(key);
 }
-function fecharSobreposicao(imediato = false) {
+function closeOverlay(immediate = false) {
   const sys = $('.sys, .sys-dialog, .shade, .lock', app);
-  if (sys && !imediato) { $$('.sys, .sys-dialog, .shade, .lock, .sys-tag', app).forEach(e => e.remove()); return true; }
+  if (sys && !immediate) { $$('.sys, .sys-dialog, .shade, .lock, .sys-tag', app).forEach(e => e.remove()); return true; }
   if (!overlayEl.children.length) return false;
-  if (imediato) { overlayEl.innerHTML = ''; return true; }
-  const v = $('.veu', overlayEl), s = $('.sheet, .dialog', overlayEl);
+  if (immediate) { overlayEl.innerHTML = ''; return true; }
+  const v = $('.scrim', overlayEl), s = $('.sheet, .dialog', overlayEl);
   v && v.classList.remove('on'); s && s.classList.remove('on');
-  setTimeout(() => { if (!overlayEl.querySelector('.on')) overlayEl.innerHTML = ''; }, T.movimento.duracao.media);
-  const def = TELAS[telaAtual];
-  atualizarPainel(npEl.classList.contains('aberto') ? 'tocando' : def.chave ? def.chave(pilha[pilha.length - 1].params) : telaAtual);
+  setTimeout(() => { if (!overlayEl.querySelector('.on')) overlayEl.innerHTML = ''; }, T.motion.duration.medium);
+  updatePanelForCurrent();
   return true;
 }
-let avisoTimer;
-function aviso(msg, acao, fn) {
+let snackbarTimer;
+function snackbar(msg, action, fn) {
   const area = $('#snack-area');
-  clearTimeout(avisoTimer);
-  area.innerHTML = `<div class="snack" role="status"><span>${msg}</span>${acao ? `<button>${acao}</button>` : ''}</div>`;
-  posicionarAviso();
-  if (acao) $('button', area).addEventListener('click', () => { fn(); area.innerHTML = ''; });
-  avisoTimer = setTimeout(() => { const s = $('.snack', area); if (s) { s.classList.add('sai'); setTimeout(() => s.remove(), 200); } }, acao ? 5000 : 3000);
+  clearTimeout(snackbarTimer);
+  area.innerHTML = `<div class="snack" role="status"><span>${msg}</span>${action ? `<button>${action}</button>` : ''}</div>`;
+  positionSnackbar();
+  if (action) $('button', area).addEventListener('click', () => { fn(); area.innerHTML = ''; });
+  snackbarTimer = setTimeout(() => { const s = $('.snack', area); if (s) { s.classList.add('leaving'); setTimeout(() => s.remove(), 200); } }, action ? 5000 : 3000);
 }
-function posicionarAviso() {
+function positionSnackbar() {
   const area = $('#snack-area');
-  const np = npEl.classList.contains('aberto');
+  const np = npEl.classList.contains('open');
   const b = $('#bottom');
   area.style.bottom = (np ? 40 : b.hidden ? 40 : b.offsetHeight + 12) + 'px';
 }
 
-/* Menu da música */
-function menuMusica(id) {
-  const m = musica(id), a = album(m.album);
-  const fav = S.favoritas.has(id);
-  abrirFolha(`<div class="s-head"><div class="cover">${capa(a)}</div><div style="min-width:0"><div class="ti">${esc(m.titulo)}</div><div class="ar">${esc(m.artista)}</div></div></div>
+/* Song menu */
+function songMenu(id) {
+  const m = song(id), a = album(m.album);
+  const fav = S.favoriteSongs.has(id);
+  openSheet(`<div class="s-head"><div class="cover">${cover(a)}</div><div style="min-width:0"><div class="ti">${esc(m.title)}</div><div class="ar">${esc(m.artist)}</div></div></div>
     <div class="s-body">
-      <button class="menu-i" data-a="tocar-seguir" data-mid="${id}">${icone('playlist_play')}Tocar a seguir</button>
-      <button class="menu-i" data-a="add-fila" data-mid="${id}">${icone('add_to_queue')}Adicionar ao fim da fila</button>
-      <button class="menu-i" data-a="add-playlist" data-mid="${id}">${icone('playlist_add')}Adicionar à playlist</button>
-      <button class="menu-i" data-a="favoritar" data-mid="${id}">${icone('favorite', fav ? 'fill' : '')}${fav ? 'Remover das músicas favoritas' : 'Adicionar às músicas favoritas'}</button>
-      ${a.semMetadados ? '' : `<button class="menu-i" data-a="album" data-id="${a.id}">${icone('album')}Ir para o álbum</button>
-      <button class="menu-i" data-a="artista" data-nome="${esc(m.artista)}">${icone('mic')}Ir para o artista</button>`}
-      <button class="menu-i" data-a="info-arquivo" data-mid="${id}">${icone('info')}Detalhes do arquivo</button>
+      <button class="menu-i" data-action="play-next" data-mid="${id}">${iconHtml('playlist_play')}Play next</button>
+      <button class="menu-i" data-action="add-to-queue" data-mid="${id}">${iconHtml('add_to_queue')}Add to end of queue</button>
+      <button class="menu-i" data-action="add-to-playlist" data-mid="${id}">${iconHtml('playlist_add')}Add to playlist</button>
+      <button class="menu-i" data-action="favorite" data-mid="${id}">${iconHtml('favorite', fav ? 'fill' : '')}${fav ? 'Remove from favorite songs' : 'Add to favorite songs'}</button>
+      ${a.noMetadata ? '' : `<button class="menu-i" data-action="album" data-id="${a.id}">${iconHtml('album')}Go to album</button>
+      <button class="menu-i" data-action="artist" data-name="${esc(m.artist)}">${iconHtml('mic')}Go to artist</button>`}
+      <button class="menu-i" data-action="file-info" data-mid="${id}">${iconHtml('info')}File details</button>
     </div>`, 'menu');
 }
-function infoArquivo(id) {
-  const m = musica(id);
-  abrirDialogo(`${icone('description')}<h4>Detalhes do arquivo</h4>
+function fileInfo(id) {
+  const m = song(id);
+  openDialog(`${iconHtml('description')}<h4>File details</h4>
     <p style="display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin-bottom:20px">
-      <b>Arquivo</b><span style="word-break:break-all">${esc(m.arquivo)}</span>
-      <b>Pasta</b><span>${esc(m.pasta)}</span>
-      <b>Duração</b><span>${fmt(m.duracao)}</span>
-      <b>Formato</b><span>MP3 · 320 kbps · 44,1 kHz</span>
-      <b>Capa</b><span>${S.usarImagens && album(m.album).capa ? esc(album(m.album).capa) + ' (pasta do álbum)' : 'Gerada pelo app'}</span>
+      <b>File</b><span style="word-break:break-all">${esc(m.file)}</span>
+      <b>Folder</b><span>${esc(m.folder)}</span>
+      <b>Duration</b><span>${fmt(m.duration)}</span>
+      <b>Format</b><span>MP3 · 320 kbps · 44.1 kHz</span>
+      <b>Cover</b><span>${S.useFolderImages && album(m.album).cover ? esc(album(m.album).cover) + ' (album folder)' : 'Generated by the app'}</span>
     </p>
-    <div class="acts"><button class="btn btn-txt" data-a="fechar-sobreposicao">Fechar</button></div>`);
+    <div class="acts"><button class="btn btn-text" data-action="close-overlay">Close</button></div>`);
 }
-function escolherPlaylist(id) {
-  abrirFolha(`<h3>Adicionar à playlist</h3><div class="s-body">
-    <button class="menu-i" data-a="nova-playlist" data-mid="${id}">${icone('add')}Nova playlist</button>
-    ${S.playlists.map(p => { const tem = p.musicas.includes(id); return `<button class="menu-i ${tem ? 'sel' : ''}" data-a="add-na-playlist" data-pid="${p.id}" data-mid="${id}">${icone('queue_music')}${esc(p.nome)}${tem ? `<span class="end">${icone('check')}</span>` : ''}</button>`; }).join('')}
+function pickPlaylist(id) {
+  openSheet(`<h3>Add to playlist</h3><div class="s-body">
+    <button class="menu-i" data-action="new-playlist" data-mid="${id}">${iconHtml('add')}New playlist</button>
+    ${S.playlists.map(p => { const has = p.songs.includes(id); return `<button class="menu-i ${has ? 'sel' : ''}" data-action="add-to-this-playlist" data-pid="${p.id}" data-mid="${id}">${iconHtml('queue_music')}${esc(p.name)}${has ? `<span class="end">${iconHtml('check')}</span>` : ''}</button>`; }).join('')}
   </div>`);
 }
-function linhasFila() {
-  return S.fila.map((mid, i) => {
-    const m = musica(mid);
-    const cls = i === S.idx ? 'ativa' : i < S.idx ? 'passada' : '';
-    return `${i === S.idx ? '<div class="q-label">Tocando agora</div>' : ''}${i === S.idx + 1 ? '<div class="q-label">A seguir</div>' : ''}
-      <div class="q-row ${cls}" data-mid="${mid}" data-a="pular-para" data-i="${i}">
-        ${icone('drag_indicator', 'drag')}<div class="cover">${capa(album(m.album))}${eq}</div>
-        <div style="min-width:0"><div class="ti">${esc(m.titulo)}</div><div class="ar">${esc(m.artista)} · ${fmt(m.duracao)}</div></div>
-        ${i > S.idx ? `<button class="icon-btn" data-a="tirar-fila" data-i="${i}" aria-label="Tirar da fila">${icone('close')}</button>` : '<span style="width:48px"></span>'}
+function queueRows() {
+  return S.queue.map((mid, i) => {
+    const m = song(mid);
+    const cls = i === S.idx ? 'active' : i < S.idx ? 'played' : '';
+    return `${i === S.idx ? '<div class="q-label">Now playing</div>' : ''}${i === S.idx + 1 ? '<div class="q-label">Up next</div>' : ''}
+      <div class="q-row ${cls}" data-mid="${mid}" data-action="jump-to" data-i="${i}">
+        ${iconHtml('drag_indicator', 'drag')}<div class="cover">${cover(album(m.album))}${eq}</div>
+        <div style="min-width:0"><div class="ti">${esc(m.title)}</div><div class="ar">${esc(m.artist)} · ${fmt(m.duration)}</div></div>
+        ${i > S.idx ? `<button class="icon-btn" data-action="remove-from-queue" data-i="${i}" aria-label="Remove from queue">${iconHtml('close')}</button>` : '<span style="width:48px"></span>'}
       </div>`;
   }).join('');
 }
-function abrirFila() {
-  const restantes = S.fila.length - S.idx - 1;
-  abrirFolha(`<h3 style="display:flex;justify-content:space-between;align-items:center">Fila <span style="font:var(--tipo-legenda);color:var(--cor-texto-2)">${plural(restantes, 'música', 'músicas')} a seguir</span></h3>
-    <div class="s-body" id="fila-lista">${linhasFila()}</div>`, 'fila');
-  marcarAtivas();
-  const atualEl = $('.q-row.ativa', overlayEl); atualEl && atualEl.scrollIntoView({ block: 'center' });
+function openQueue() {
+  const remaining = S.queue.length - S.idx - 1;
+  openSheet(`<h3 style="display:flex;justify-content:space-between;align-items:center">Queue <span style="font:var(--type-caption);color:var(--color-text-2)">${plural(remaining, 'song', 'songs')} up next</span></h3>
+    <div class="s-body" id="queue-list">${queueRows()}</div>`, 'queue');
+  markActive();
+  const activeEl = $('.q-row.active', overlayEl); activeEl && activeEl.scrollIntoView({ block: 'center' });
 }
-function abrirTimer() {
-  const opts = [[15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 hora']];
-  abrirFolha(`<h3>Timer para dormir</h3>
-    <p style="margin:-6px 20px 16px;font:var(--tipo-corpo-p);color:var(--cor-texto-2)">A música para sozinha depois do tempo escolhido.</p>
-    <div class="timer-opts">${opts.map(([m, n]) => `<button data-a="set-timer" data-min="${m}">${n}</button>`).join('')}
-      <button class="wide ${S.timer && S.timer.fimMusica ? 'sel' : ''}" data-a="set-timer" data-min="fim">No fim desta música</button>
-      ${S.timer ? `<button class="wide" data-a="set-timer" data-min="0" style="color:var(--cor-erro)">Desligar timer</button>` : ''}</div>`, 'timer');
+function openTimer() {
+  const opts = [[15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 hour']];
+  openSheet(`<h3>Sleep timer</h3>
+    <p style="margin:-6px 20px 16px;font:var(--type-body-s);color:var(--color-text-2)">Music stops on its own after the chosen time.</p>
+    <div class="timer-opts">${opts.map(([m, n]) => `<button data-action="set-timer" data-min="${m}">${n}</button>`).join('')}
+      <button class="wide ${S.timer && S.timer.endOfSong ? 'sel' : ''}" data-action="set-timer" data-min="end">At the end of this song</button>
+      ${S.timer ? `<button class="wide" data-action="set-timer" data-min="0" style="color:var(--color-error)">Turn off timer</button>` : ''}</div>`, 'timer');
 }
 
-/* ---------- Seletor de pasta do sistema (SAF) ---------- */
-let seletorOrigem = 'onboarding';
-function abrirSeletor(origem = 'onboarding', caminho = '') {
-  seletorOrigem = origem;
+/* ---------- System folder picker (SAF) ---------- */
+let pickerOrigin = 'onboarding';
+function openPicker(origin = 'onboarding', path = '') {
+  pickerOrigin = origin;
   $$('.sys, .sys-dialog, .sys-tag', app).forEach(e => e.remove());
-  const nomes = caminho ? caminho.split('/') : [];
-  const pastas = D.pastasSistema.filter(x => caminho ? x.startsWith(caminho + '/') && !x.slice(caminho.length + 1).includes('/') : !x.includes('/'))
-    .map(x => x.split('/').pop()).sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  const arquivos = [...imagensDaPasta(caminho).map(i => i.arquivo), ...D.musicas.filter(m => m.pasta === caminho).map(m => m.arquivo)];
-  const bloqueada = !caminho || caminho === 'Download' || caminho === 'Android';
+  const names = path ? path.split('/') : [];
+  const folders = D.systemFolders.filter(x => path ? x.startsWith(path + '/') && !x.slice(path.length + 1).includes('/') : !x.includes('/'))
+    .map(x => x.split('/').pop()).sort((a, b) => a.localeCompare(b, LOCALE));
+  const files = [...folderImages(path).map(i => i.file), ...D.songs.filter(m => m.folder === path).map(m => m.file)];
+  const blocked = !path || path === 'Download' || path === 'Android';
   const div = document.createElement('div');
   div.className = 'sys';
   div.innerHTML = `
-    <div class="sys-top"><button data-sys="fechar" aria-label="Cancelar">${icone('close')}</button><span class="t">${caminho ? esc(nomes[nomes.length - 1]) : 'Memória interna'}</span><button aria-label="Mais">${icone('more_vert')}</button></div>
-    <div class="sys-crumb"><button data-sys-ir="">Memória interna</button>${nomes.map((n, i) => ` ${icone('chevron_right')} <button data-sys-ir="${esc(nomes.slice(0, i + 1).join('/'))}">${esc(n)}</button>`).join('')}</div>
+    <div class="sys-top"><button data-sys="close" aria-label="Cancel">${iconHtml('close')}</button><span class="t">${path ? esc(names[names.length - 1]) : 'Internal storage'}</span><button aria-label="More">${iconHtml('more_vert')}</button></div>
+    <div class="sys-crumb"><button data-sys-go="">Internal storage</button>${names.map((n, i) => ` ${iconHtml('chevron_right')} <button data-sys-go="${esc(names.slice(0, i + 1).join('/'))}">${esc(n)}</button>`).join('')}</div>
     <div class="sys-list">
-      ${pastas.map(p => `<div class="sys-item" data-sys-ir="${esc((caminho ? caminho + '/' : '') + p)}">${icone('folder', 'fill')}${esc(p)}</div>`).join('')}
-      ${arquivos.map(f => `<div class="sys-item file">${icone(/\.(jpe?g|png|webp)$/i.test(f) ? 'image' : 'audio_file')}${esc(f)}</div>`).join('')}
-      ${!pastas.length && !arquivos.length ? '<div class="sys-empty">Nenhum item</div>' : ''}
-      ${bloqueada ? `<div class="sys-empty">${!caminho ? 'Abra uma pasta para escolher.' : 'Para proteger sua privacidade, escolha outra pasta.'}</div>` : ''}
+      ${folders.map(p => `<div class="sys-item" data-sys-go="${esc((path ? path + '/' : '') + p)}">${iconHtml('folder', 'fill')}${esc(p)}</div>`).join('')}
+      ${files.map(f => `<div class="sys-item file">${iconHtml(/\.(jpe?g|png|webp)$/i.test(f) ? 'image' : 'audio_file')}${esc(f)}</div>`).join('')}
+      ${!folders.length && !files.length ? '<div class="sys-empty">No items</div>' : ''}
+      ${blocked ? `<div class="sys-empty">${!path ? 'Open a folder to choose it.' : 'To protect your privacy, choose another folder.'}</div>` : ''}
     </div>
-    <div class="sys-bottom"><button data-sys="usar" ${bloqueada ? 'disabled' : ''}>Usar esta pasta</button></div>`;
+    <div class="sys-bottom"><button data-sys="use" ${blocked ? 'disabled' : ''}>Use this folder</button></div>`;
   app.appendChild(div);
-  const tag = document.createElement('div'); tag.className = 'sys-tag'; tag.textContent = 'Tela do Android'; app.appendChild(tag);
+  const tag = document.createElement('div'); tag.className = 'sys-tag'; tag.textContent = 'Android screen'; app.appendChild(tag);
   div.addEventListener('click', e => {
-    const ir2 = e.target.closest('[data-sys-ir]');
-    if (ir2) return abrirSeletor(origem, ir2.dataset.sysIr);
+    const goTo = e.target.closest('[data-sys-go]');
+    if (goTo) return openPicker(origin, goTo.dataset.sysGo);
     const b = e.target.closest('[data-sys]');
     if (!b) return;
-    if (b.dataset.sys === 'fechar') { div.remove(); tag.remove(); atualizarPainelAtual(); }
-    if (b.dataset.sys === 'usar') pedirPermissao(caminho, div, tag);
+    if (b.dataset.sys === 'close') { div.remove(); tag.remove(); updatePanelForCurrent(); }
+    if (b.dataset.sys === 'use') requestAccess(path, div, tag);
   });
-  atualizarPainel('seletor');
+  updatePanel('picker');
 }
-function pedirPermissao(caminho, sysEl, tag) {
-  const nome = caminho.split('/').pop();
+function requestAccess(path, sysEl, tag) {
+  const name = path.split('/').pop();
   const dlg = document.createElement('div');
   dlg.className = 'sys-dialog';
-  dlg.innerHTML = `<div class="box"><h3>Permitir que o app <b>Vitrola Mp3</b> acesse arquivos em ${esc(nome)}?</h3>
-    <p>Isso permitirá que o Vitrola Mp3 acesse o conteúdo atual e futuro armazenado em ${esc(nome)}.</p>
-    <div class="acts"><button data-r="nao">Cancelar</button><button data-r="sim">Permitir</button></div></div>`;
+  dlg.innerHTML = `<div class="box"><h3>Allow <b>Vitrola Mp3</b> to access files in ${esc(name)}?</h3>
+    <p>This will let Vitrola Mp3 access current and future content stored in ${esc(name)}.</p>
+    <div class="acts"><button data-r="no">Cancel</button><button data-r="yes">Allow</button></div></div>`;
   app.appendChild(dlg);
   dlg.addEventListener('click', e => {
     const r = e.target.closest('[data-r]'); if (!r) return;
     dlg.remove();
-    if (r.dataset.r === 'nao') return;
+    if (r.dataset.r === 'no') return;
     sysEl.remove(); tag.remove();
-    const nova = { id: 'p' + uid(), nome, local: 'Memória interna', caminho };
-    const jaCoberta = S.pastas.some(p => caminho === p.caminho || caminho.startsWith(p.caminho + '/'));
-    S.pastas = S.pastas.filter(p => !p.caminho.startsWith(caminho + '/'));
-    if (!jaCoberta) S.pastas.push(nova);
-    S.configurado = true;
-    if (seletorOrigem === 'onboarding') { S.pastas = [nova]; raiz('escaneamento'); return; }
-    const novas = musicasDaPasta(caminho, true).length;
+    const added = { id: 'p' + uid(), name, location: 'Internal storage', path };
+    const alreadyCovered = S.folders.some(p => path === p.path || path.startsWith(p.path + '/'));
+    S.folders = S.folders.filter(p => !p.path.startsWith(path + '/'));
+    if (!alreadyCovered) S.folders.push(added);
+    S.configured = true;
+    if (pickerOrigin === 'onboarding') { S.folders = [added]; root('scan'); return; }
+    const found = songsInFolder(path, true).length;
     render('none');
-    if (jaCoberta) aviso(`"${esc(nome)}" já faz parte da biblioteca`);
-    else aviso(novas ? `Pasta adicionada · ${plural(novas, 'música', 'músicas')}` : `Pasta adicionada · nenhuma música encontrada`, 'Desfazer', () => { S.pastas = S.pastas.filter(p => p.id !== nova.id); render('none'); });
+    if (alreadyCovered) snackbar(`"${esc(name)}" is already in the library`);
+    else snackbar(found ? `Folder added · ${plural(found, 'song', 'songs')}` : 'Folder added · no songs found', 'Undo', () => { S.folders = S.folders.filter(p => p.id !== added.id); render('none'); });
   });
 }
 
-/* ---------- Notificação e tela de bloqueio ---------- */
-function notificacaoHTML() {
-  const m = atual(); const a = album(m.album);
-  return `<div class="notif" role="region" aria-label="Notificação de mídia" style="background:color-mix(in srgb, ${corDoAlbum(a)} 28%, #1B1714)">
-    <div class="h">${icone('album')}Vitrola Mp3 · ${esc(S.origem ? S.origem.nome : a.titulo)}</div>
-    <div class="main"><div style="min-width:0"><div class="t">${esc(m.titulo)}</div><div class="a">${esc(m.artista)}</div></div><div class="c">${capa(a)}</div></div>
+/* ---------- Notification and lock screen ---------- */
+function notificationHtml() {
+  const m = current(); const a = album(m.album);
+  return `<div class="notif" role="region" aria-label="Media notification" style="background:color-mix(in srgb, ${albumColor(a)} 28%, #1B1714)">
+    <div class="h">${iconHtml('album')}Vitrola Mp3 · ${esc(S.source ? S.source.name : a.title)}</div>
+    <div class="main"><div style="min-width:0"><div class="t">${esc(m.title)}</div><div class="a">${esc(m.artist)}</div></div><div class="c">${cover(a)}</div></div>
     <div class="ctr">
-      <button data-n="anterior" aria-label="Anterior">${icone('skip_previous', 'fill')}</button>
-      <button class="pp" data-n="play" aria-label="${S.tocando ? 'Pausar' : 'Tocar'}">${icone(S.tocando ? 'pause' : 'play_arrow', 'fill')}</button>
-      <button data-n="proxima" aria-label="Próxima">${icone('skip_next', 'fill')}</button>
-      <div class="bar"><i style="width:${S.pos / m.duracao * 100}%"></i></div>
-      <button data-n="fav" aria-label="Favoritar">${icone('favorite', S.favoritas.has(m.id) ? 'fill' : '')}</button>
+      <button data-n="previous" aria-label="Previous">${iconHtml('skip_previous', 'fill')}</button>
+      <button class="pp" data-n="play" aria-label="${S.playing ? 'Pause' : 'Play'}">${iconHtml(S.playing ? 'pause' : 'play_arrow', 'fill')}</button>
+      <button data-n="next" aria-label="Next">${iconHtml('skip_next', 'fill')}</button>
+      <div class="bar"><i style="width:${S.pos / m.duration * 100}%"></i></div>
+      <button data-n="fav" aria-label="Favorite">${iconHtml('favorite', S.favoriteSongs.has(m.id) ? 'fill' : '')}</button>
     </div>
   </div>`;
 }
-function simularSistema(tipo) {
-  if (!atual()) { const ms = biblioteca(); if (!ms.length) return aviso('Escolha uma pasta e toque uma música primeiro'); tocarLista(ms.map(m => m.id), 0, { tipo: 'Tocando de', nome: 'Todas as músicas' }); }
-  fecharSobreposicao(true); $$('.shade, .lock', app).forEach(e => e.remove());
+function simulateSystem(kind) {
+  if (!current()) { const ms = library(); if (!ms.length) return snackbar('Choose a folder and play a song first'); playList(ms.map(m => m.id), 0, { type: 'Playing from', name: 'All songs' }); }
+  closeOverlay(true); $$('.shade, .lock', app).forEach(e => e.remove());
   const el = document.createElement('div');
-  el.className = tipo === 'bloqueio' ? 'lock' : 'shade';
-  const pintar = () => {
+  el.className = kind === 'lock-screen' ? 'lock' : 'shade';
+  const paint = () => {
     const d = new Date();
-    el.innerHTML = tipo === 'bloqueio'
-      ? `<div class="clock">${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}</div><div class="date">${d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>${notificacaoHTML()}<div class="hint">Toque fora do cartão para desbloquear</div>`
-      : notificacaoHTML();
+    el.innerHTML = kind === 'lock-screen'
+      ? `<div class="clock">${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}</div><div class="date">${d.toLocaleDateString(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' })}</div>${notificationHtml()}<div class="hint">Tap outside the card to unlock</div>`
+      : notificationHtml();
   };
-  pintar();
-  el.addEventListener('atualizar', pintar);
+  paint();
+  el.addEventListener('refresh', paint);
   el.addEventListener('click', e => {
     const b = e.target.closest('[data-n]');
     if (b) {
       e.stopPropagation();
-      if (b.dataset.n === 'play') play(); if (b.dataset.n === 'proxima') proxima(); if (b.dataset.n === 'anterior') anterior();
-      if (b.dataset.n === 'fav') alternarFavorita(atual().id);
+      if (b.dataset.n === 'play') play(); if (b.dataset.n === 'next') next(); if (b.dataset.n === 'previous') previous();
+      if (b.dataset.n === 'fav') toggleFavoriteSong(current().id);
       return;
     }
-    if (!e.target.closest('.notif')) { el.remove(); atualizarPainelAtual(); }
+    if (!e.target.closest('.notif')) { el.remove(); updatePanelForCurrent(); }
   });
   app.appendChild(el);
-  atualizarPainel(tipo === 'bloqueio' ? 'sim-bloqueio' : 'sim-notificacao');
+  updatePanel(kind === 'lock-screen' ? 'sim-lock-screen' : 'sim-notification');
 }
 
-function alternarAlbumFavorito(id) {
-  const tem = S.albunsFavoritos.has(id);
-  const mudar = () => { tem ? S.albunsFavoritos.delete(id) : S.albunsFavoritos.add(id); marcarFavoritos(); if (telaAtual === 'albuns-favoritos') render('none'); };
-  const desfazer = () => { tem ? S.albunsFavoritos.add(id) : S.albunsFavoritos.delete(id); marcarFavoritos(); if (telaAtual === 'albuns-favoritos') render('none'); };
-  mudar();
-  aviso(tem ? 'Álbum removido dos favoritos' : 'Álbum adicionado aos favoritos', 'Desfazer', desfazer);
+function toggleFavoriteAlbum(id) {
+  const had = S.favoriteAlbums.has(id);
+  const refresh = () => { markFavorites(); if (currentScreen === 'favorite-albums') render('none'); };
+  had ? S.favoriteAlbums.delete(id) : S.favoriteAlbums.add(id);
+  refresh();
+  snackbar(had ? 'Album removed from favorites' : 'Album added to favorites', 'Undo', () => { had ? S.favoriteAlbums.add(id) : S.favoriteAlbums.delete(id); refresh(); });
 }
-function alternarFavorita(id) {
-  const tem = S.favoritas.has(id);
-  tem ? S.favoritas.delete(id) : S.favoritas.add(id);
-  marcarFavoritos();
-  aviso(tem ? 'Removida das músicas favoritas' : 'Adicionada às músicas favoritas', 'Desfazer', () => { tem ? S.favoritas.add(id) : S.favoritas.delete(id); marcarFavoritos(); atualizarPlayer(); });
-  atualizarPlayer();
+function toggleFavoriteSong(id) {
+  const had = S.favoriteSongs.has(id);
+  had ? S.favoriteSongs.delete(id) : S.favoriteSongs.add(id);
+  markFavorites();
+  snackbar(had ? 'Removed from favorite songs' : 'Added to favorite songs', 'Undo', () => { had ? S.favoriteSongs.add(id) : S.favoriteSongs.delete(id); markFavorites(); updatePlayer(); });
+  updatePlayer();
 }
 
 /* ============================================================
-   Ações (cliques)
+   Actions (clicks)
    ============================================================ */
-const ACOES = {
-  'voltar': () => voltar(),
-  'aba': b => aba(b.dataset.tab),
-  'escolher-pasta': b => { fecharSobreposicao(true); abrirSeletor(b.dataset.origem || (S.configurado ? 'ajustes' : 'onboarding'), S.configurado ? '' : ''); },
-  'ir-biblioteca': () => { S.libTab = 'artistas'; raiz('biblioteca'); },
-  'lib-tab': b => { S.libTab = b.dataset.tab; pilha[0].params = {}; render('none'); },
-  'ordem': () => abrirFolha(`<h3>Ordenar músicas</h3><div class="s-body">${Object.entries(ORDENS).map(([k, n]) =>
-      `<button class="menu-i ${S.ordem === k ? 'sel' : ''}" data-a="set-ordem" data-k="${k}">${icone(S.ordem === k ? 'radio_button_checked' : 'radio_button_unchecked')}${n}</button>`).join('')}</div>`),
-  'set-ordem': b => { S.ordem = b.dataset.k; fecharSobreposicao(); render('none'); },
-  'album': b => { fecharSobreposicao(true); if (npEl.classList.contains('aberto')) fecharNP(); ir('album', { id: b.dataset.id }); },
-  'artista': b => { fecharSobreposicao(true); if (npEl.classList.contains('aberto')) fecharNP(); ir('artista', { nome: b.dataset.nome }); },
-  'artista-np': b => { if (album(atual().album).semMetadados) return; fecharNP(); ir('artista', { nome: b.dataset.nome }); },
-  'pasta': b => ir('pasta', { caminho: b.dataset.caminho }),
-  'playlist': b => ir('playlist', { id: b.dataset.id }),
-  'tocar': (b, e) => { if (e.target.closest('[data-a="menu"]')) return; const c = contextos[b.dataset.ctx]; tocarLista(c.ids, +b.dataset.i, c.origem, false); },
-  'tocar-tudo': b => { const c = contextos[b.dataset.ctx]; tocarLista(c.ids, 0, c.origem, false); abrirNP(); },
-  'aleatorio-tudo': b => { const c = contextos[b.dataset.ctx]; tocarLista(c.ids, Math.floor(Math.random() * c.ids.length), c.origem, true); abrirNP(); },
-  'menu': b => menuMusica(b.dataset.mid),
-  'menu-album': b => { const a = album(b.dataset.id); const ids = biblioteca().filter(m => m.album === a.id).map(m => m.id);
-    abrirFolha(`<div class="s-head"><div class="cover">${capa(a)}</div><div><div class="ti">${esc(a.titulo)}</div><div class="ar">${esc(a.artistaNome)}</div></div></div><div class="s-body">
-      ${a.semMetadados ? '' : `<button class="menu-i" data-a="favoritar-album" data-id="${a.id}">${icone('favorite', S.albunsFavoritos.has(a.id) ? 'fill' : '')}${S.albunsFavoritos.has(a.id) ? 'Remover dos álbuns favoritos' : 'Adicionar aos álbuns favoritos'}</button>`}
-      <button class="menu-i" data-a="seguir-varias" data-ids="${ids.join(',')}">${icone('playlist_play')}Tocar a seguir</button>
-      <button class="menu-i" data-a="fila-varias" data-ids="${ids.join(',')}">${icone('add_to_queue')}Adicionar ao fim da fila</button>
-      ${a.semMetadados ? '' : `<button class="menu-i" data-a="artista" data-nome="${esc(a.artistaNome)}">${icone('mic')}Ir para o artista</button>`}</div>`); },
-  'seguir-varias': b => { const ids = b.dataset.ids.split(','); if (!atual()) return tocarLista(ids, 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.splice(S.idx + 1, 0, ...ids); S.filaOriginal.push(...ids); fecharSobreposicao(); aviso(`${plural(ids.length, 'música', 'músicas')} vão tocar a seguir`); },
-  'fila-varias': b => { const ids = b.dataset.ids.split(','); if (!atual()) return tocarLista(ids, 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.push(...ids); S.filaOriginal.push(...ids); fecharSobreposicao(); aviso(`${plural(ids.length, 'música adicionada', 'músicas adicionadas')} à fila`); },
-  'menu-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
-    abrirFolha(`<h3>${esc(p.nome)}</h3><div class="s-body">
-      <button class="menu-i" data-a="renomear-playlist" data-id="${p.id}">${icone('edit')}Renomear</button>
-      <button class="menu-i" data-a="excluir-playlist" data-id="${p.id}" style="color:var(--cor-erro)">${icone('delete')}Excluir playlist</button></div>`); },
-  'renomear-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
-    abrirDialogo(`${icone('edit')}<h4>Renomear playlist</h4><input class="field" id="pl-nome" value="${esc(p.nome)}" maxlength="40">
-      <div class="acts"><button class="btn btn-txt" data-a="fechar-sobreposicao">Cancelar</button><button class="btn btn-pri" data-a="salvar-nome" data-id="${p.id}">Salvar</button></div>`); },
-  'salvar-nome': b => { const v = $('#pl-nome').value.trim(); if (!v) return; S.playlists.find(x => x.id === b.dataset.id).nome = v; fecharSobreposicao(); render('none'); aviso('Playlist renomeada'); },
-  'excluir-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
-    abrirDialogo(`${icone('delete', 'perigo')}<h4>Excluir "${esc(p.nome)}"?</h4><p>A playlist some, mas as músicas continuam na biblioteca e no seu celular.</p>
-      <div class="acts"><button class="btn btn-txt" data-a="fechar-sobreposicao">Cancelar</button><button class="btn btn-perigo" data-a="confirmar-excluir" data-id="${p.id}">Excluir</button></div>`); },
-  'confirmar-excluir': b => { const i = S.playlists.findIndex(x => x.id === b.dataset.id); const [p] = S.playlists.splice(i, 1);
-    fecharSobreposicao(); voltar(); aviso(`Playlist "${esc(p.nome)}" excluída`, 'Desfazer', () => { S.playlists.splice(i, 0, p); render('none'); }); },
-  'nova-playlist': b => abrirDialogo(`${icone('queue_music')}<h4>Nova playlist</h4><input class="field" id="pl-nome" placeholder="Nome da playlist" maxlength="40">
-      <div class="acts"><button class="btn btn-txt" data-a="fechar-sobreposicao">Cancelar</button><button class="btn btn-pri" data-a="criar-playlist" data-mid="${b.dataset.mid || ''}">Criar</button></div>`, 'nova-playlist'),
-  'criar-playlist': b => { const v = $('#pl-nome').value.trim(); if (!v) { $('#pl-nome').focus(); return; }
-    const p = { id: 'pl' + uid(), nome: v, musicas: b.dataset.mid ? [b.dataset.mid] : [] }; S.playlists.push(p); fecharSobreposicao();
-    if (b.dataset.mid) aviso(`Adicionada a "${esc(v)}"`); else ir('playlist', { id: p.id }); if (telaAtual === 'playlists') render('none'); },
-  'add-playlist': b => escolherPlaylist(b.dataset.mid),
-  'add-na-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.pid); const id = b.dataset.mid;
-    if (p.musicas.includes(id)) { aviso(`Já está em "${esc(p.nome)}"`); return; }
-    p.musicas.push(id); fecharSobreposicao(); aviso(`Adicionada a "${esc(p.nome)}"`, 'Desfazer', () => { p.musicas = p.musicas.filter(x => x !== id); }); },
-  'tocar-seguir': b => { const id = b.dataset.mid; fecharSobreposicao(); if (!atual()) return tocarLista([id], 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.splice(S.idx + 1, 0, id); S.filaOriginal.push(id); aviso('Vai tocar a seguir'); },
-  'add-fila': b => { const id = b.dataset.mid; fecharSobreposicao(); if (!atual()) return tocarLista([id], 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.push(id); S.filaOriginal.push(id); aviso('Adicionada ao fim da fila'); },
-  'favoritar': b => { fecharSobreposicao(); alternarFavorita(b.dataset.mid); },
-  'favoritar-album': b => { fecharSobreposicao(); alternarAlbumFavorito(b.dataset.id); },
-  'albuns-favoritos': () => ir('albuns-favoritos'),
-  'info-arquivo': b => infoArquivo(b.dataset.mid),
-  'abrir-np': (b, e) => { if (e.target.closest('[data-a="play"],[data-a="proxima"]')) return; abrirNP(); },
-  'fechar-np': () => fecharNP(),
+const ACTIONS = {
+  'back': () => back(),
+  'tab': b => tab(b.dataset.tab),
+  'choose-folder': b => { closeOverlay(true); openPicker(b.dataset.origin || (S.configured ? 'settings' : 'onboarding'), ''); },
+  'go-library': () => { S.libTab = 'artists'; root('library'); },
+  'lib-tab': b => { S.libTab = b.dataset.tab; stack[0].params = {}; render('none'); },
+  'sort': () => openSheet(`<h3>Sort songs</h3><div class="s-body">${Object.entries(SORTS).map(([k, n]) =>
+      `<button class="menu-i ${S.sort === k ? 'sel' : ''}" data-action="set-sort" data-k="${k}">${iconHtml(S.sort === k ? 'radio_button_checked' : 'radio_button_unchecked')}${n}</button>`).join('')}</div>`),
+  'set-sort': b => { S.sort = b.dataset.k; closeOverlay(); render('none'); },
+  'album': b => { closeOverlay(true); if (npEl.classList.contains('open')) closeNowPlaying(); go('album', { id: b.dataset.id }); },
+  'artist': b => { closeOverlay(true); if (npEl.classList.contains('open')) closeNowPlaying(); go('artist', { name: b.dataset.name }); },
+  'artist-np': b => { if (album(current().album).noMetadata) return; closeNowPlaying(); go('artist', { name: b.dataset.name }); },
+  'folder': b => go('folder', { path: b.dataset.path }),
+  'playlist': b => go('playlist', { id: b.dataset.id }),
+  'play-from': (b, e) => { if (e.target.closest('[data-action="menu"]')) return; const c = contexts[b.dataset.ctx]; playList(c.ids, +b.dataset.i, c.source, false); },
+  'play-all': b => { const c = contexts[b.dataset.ctx]; playList(c.ids, 0, c.source, false); openNowPlaying(); },
+  'shuffle-all': b => { const c = contexts[b.dataset.ctx]; playList(c.ids, Math.floor(Math.random() * c.ids.length), c.source, true); openNowPlaying(); },
+  'menu': b => songMenu(b.dataset.mid),
+  'album-menu': b => { const a = album(b.dataset.id); const ids = library().filter(m => m.album === a.id).map(m => m.id);
+    openSheet(`<div class="s-head"><div class="cover">${cover(a)}</div><div><div class="ti">${esc(a.title)}</div><div class="ar">${esc(a.artistName)}</div></div></div><div class="s-body">
+      ${a.noMetadata ? '' : `<button class="menu-i" data-action="favorite-album" data-id="${a.id}">${iconHtml('favorite', S.favoriteAlbums.has(a.id) ? 'fill' : '')}${S.favoriteAlbums.has(a.id) ? 'Remove from favorite albums' : 'Add to favorite albums'}</button>`}
+      <button class="menu-i" data-action="play-next-many" data-ids="${ids.join(',')}">${iconHtml('playlist_play')}Play next</button>
+      <button class="menu-i" data-action="queue-many" data-ids="${ids.join(',')}">${iconHtml('add_to_queue')}Add to end of queue</button>
+      ${a.noMetadata ? '' : `<button class="menu-i" data-action="artist" data-name="${esc(a.artistName)}">${iconHtml('mic')}Go to artist</button>`}</div>`); },
+  'play-next-many': b => { const ids = b.dataset.ids.split(','); if (!current()) return playList(ids, 0, { type: 'Playing', name: 'Queue' }); S.queue.splice(S.idx + 1, 0, ...ids); S.originalQueue.push(...ids); closeOverlay(); snackbar(`${plural(ids.length, 'song', 'songs')} will play next`); },
+  'queue-many': b => { const ids = b.dataset.ids.split(','); if (!current()) return playList(ids, 0, { type: 'Playing', name: 'Queue' }); S.queue.push(...ids); S.originalQueue.push(...ids); closeOverlay(); snackbar(`${plural(ids.length, 'song', 'songs')} added to the queue`); },
+  'playlist-menu': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
+    openSheet(`<h3>${esc(p.name)}</h3><div class="s-body">
+      <button class="menu-i" data-action="rename-playlist" data-id="${p.id}">${iconHtml('edit')}Rename</button>
+      <button class="menu-i" data-action="delete-playlist" data-id="${p.id}" style="color:var(--color-error)">${iconHtml('delete')}Delete playlist</button></div>`); },
+  'rename-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
+    openDialog(`${iconHtml('edit')}<h4>Rename playlist</h4><input class="field" id="playlist-name" value="${esc(p.name)}" maxlength="40">
+      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-primary" data-action="save-name" data-id="${p.id}">Save</button></div>`); },
+  'save-name': b => { const v = $('#playlist-name').value.trim(); if (!v) return; S.playlists.find(x => x.id === b.dataset.id).name = v; closeOverlay(); render('none'); snackbar('Playlist renamed'); },
+  'delete-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
+    openDialog(`${iconHtml('delete', 'danger')}<h4>Delete "${esc(p.name)}"?</h4><p>The playlist goes away, but the songs stay in your library and on your phone.</p>
+      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-danger" data-action="confirm-delete" data-id="${p.id}">Delete</button></div>`); },
+  'confirm-delete': b => { const i = S.playlists.findIndex(x => x.id === b.dataset.id); const [p] = S.playlists.splice(i, 1);
+    closeOverlay(); back(); snackbar(`Playlist "${esc(p.name)}" deleted`, 'Undo', () => { S.playlists.splice(i, 0, p); render('none'); }); },
+  'new-playlist': b => openDialog(`${iconHtml('queue_music')}<h4>New playlist</h4><input class="field" id="playlist-name" placeholder="Playlist name" maxlength="40">
+      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-primary" data-action="create-playlist" data-mid="${b.dataset.mid || ''}">Create</button></div>`, 'new-playlist'),
+  'create-playlist': b => { const v = $('#playlist-name').value.trim(); if (!v) { $('#playlist-name').focus(); return; }
+    const p = { id: 'pl' + uid(), name: v, songs: b.dataset.mid ? [b.dataset.mid] : [] }; S.playlists.push(p); closeOverlay();
+    if (b.dataset.mid) snackbar(`Added to "${esc(v)}"`); else go('playlist', { id: p.id }); if (currentScreen === 'playlists') render('none'); },
+  'add-to-playlist': b => pickPlaylist(b.dataset.mid),
+  'add-to-this-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.pid); const id = b.dataset.mid;
+    if (p.songs.includes(id)) { snackbar(`Already in "${esc(p.name)}"`); return; }
+    p.songs.push(id); closeOverlay(); snackbar(`Added to "${esc(p.name)}"`, 'Undo', () => { p.songs = p.songs.filter(x => x !== id); }); },
+  'play-next': b => { const id = b.dataset.mid; closeOverlay(); if (!current()) return playList([id], 0, { type: 'Playing', name: 'Queue' }); S.queue.splice(S.idx + 1, 0, id); S.originalQueue.push(id); snackbar('Will play next'); },
+  'add-to-queue': b => { const id = b.dataset.mid; closeOverlay(); if (!current()) return playList([id], 0, { type: 'Playing', name: 'Queue' }); S.queue.push(id); S.originalQueue.push(id); snackbar('Added to the end of the queue'); },
+  'favorite': b => { closeOverlay(); toggleFavoriteSong(b.dataset.mid); },
+  'favorite-album': b => { closeOverlay(); toggleFavoriteAlbum(b.dataset.id); },
+  'favorite-albums': () => go('favorite-albums'),
+  'file-info': b => fileInfo(b.dataset.mid),
+  'open-np': (b, e) => { if (e.target.closest('[data-action="play"],[data-action="next"]')) return; openNowPlaying(); },
+  'close-np': () => closeNowPlaying(),
   'play': () => play(),
-  'proxima': () => proxima(),
-  'anterior': () => anterior(),
-  'aleatorio': () => alternarAleatorio(),
-  'repetir': () => alternarRepetir(),
-  'fila': () => abrirFila(),
-  'pular-para': (b, e) => { if (e.target.closest('[data-a="tirar-fila"]')) return; S.idx = +b.dataset.i; S.pos = 0; play(true); atualizarPlayer(); },
-  'tirar-fila': b => { const i = +b.dataset.i; const [id] = S.fila.splice(i, 1); $('#fila-lista').innerHTML = linhasFila(); marcarAtivas(); aviso('Tirada da fila', 'Desfazer', () => { S.fila.splice(i, 0, id); const l = $('#fila-lista'); if (l) l.innerHTML = linhasFila(); }); },
-  'timer': () => abrirTimer(),
-  'set-timer': b => { const v = b.dataset.min; fecharSobreposicao();
-    if (v === '0') { S.timer = null; aviso('Timer desligado'); }
-    else if (v === 'fim') { S.timer = { fimMusica: true }; aviso('A música vai parar no fim desta faixa'); }
-    else { S.timer = { fim: Date.now() + v * 60000 }; aviso(`A música vai parar em ${v} min`); }
-    if (npEl.classList.contains('aberto')) renderNP(); if (telaAtual === 'ajustes') render('none'); },
-  'toggle': (b, e) => { const k = b.dataset.k; S[k] = !S[k]; const sw = $('.switch', b); sw && sw.setAttribute('aria-checked', S[k]);
-    if (k === 'usarImagens') { setTimeout(() => { render('none'); renderMini(); }, 250); aviso(S[k] ? 'Usando fotos e capas das pastas' : 'Usando capas geradas pelo app'); }
-    if (k === 'subpastas') { setTimeout(() => render('none'), 250); aviso(S[k] ? 'Subpastas incluídas' : `Só arquivos direto nas pastas escolhidas · ${plural(biblioteca().length, 'música', 'músicas')}`); } },
-  'remover-pasta': b => { const p = S.pastas.find(x => x.id === b.dataset.id); const n = musicasDaPasta(p.caminho, true).length;
-    abrirDialogo(`${icone('folder_off', 'perigo')}<h4>Remover "${esc(p.nome)}"?</h4><p>${plural(n, 'música sai', 'músicas saem')} da biblioteca. Os arquivos continuam no seu celular.</p>
-      <div class="acts"><button class="btn btn-txt" data-a="fechar-sobreposicao">Cancelar</button><button class="btn btn-perigo" data-a="confirmar-remover" data-id="${p.id}">Remover</button></div>`, 'remover-pasta'); },
-  'confirmar-remover': b => { const i = S.pastas.findIndex(x => x.id === b.dataset.id); const [p] = S.pastas.splice(i, 1); fecharSobreposicao();
-    if (atual() && !naBiblioteca(atual())) { S.fila = []; S.tocando = false; }
-    render('none'); aviso(`Pasta "${esc(p.nome)}" removida`, 'Desfazer', () => { S.pastas.splice(i, 0, p); render('none'); }); },
-  'reescanear': () => { aviso('Procurando músicas novas…'); setTimeout(() => aviso(`Biblioteca em dia · ${plural(biblioteca().length, 'música', 'músicas')}, nenhuma novidade`), 1600); },
-  'bateria': () => aviso('No app, isto abre a tela de bateria do Android'),
-  'tema': b => definirTema(b.dataset.tema),
-  'ver-todas-musicas': () => { S.buscaTodas = true; $('#q').dispatchEvent(new Event('input')); },
-  'limpar-busca': () => { const i = $('#q'); i.value = ''; i.dispatchEvent(new Event('input')); i.focus(); },
-  'recente': b => { const i = $('#q'); i.value = b.dataset.q; i.dispatchEvent(new Event('input')); },
-  'limpar-recentes': () => { S.recentes = []; $('#q').dispatchEvent(new Event('input')); },
-  'fechar-sobreposicao': () => fecharSobreposicao(),
+  'next': () => next(),
+  'previous': () => previous(),
+  'shuffle': () => toggleShuffle(),
+  'repeat': () => toggleRepeat(),
+  'queue': () => openQueue(),
+  'jump-to': (b, e) => { if (e.target.closest('[data-action="remove-from-queue"]')) return; S.idx = +b.dataset.i; S.pos = 0; play(true); updatePlayer(); },
+  'remove-from-queue': b => { const i = +b.dataset.i; const [id] = S.queue.splice(i, 1); $('#queue-list').innerHTML = queueRows(); markActive(); snackbar('Removed from queue', 'Undo', () => { S.queue.splice(i, 0, id); const l = $('#queue-list'); if (l) l.innerHTML = queueRows(); }); },
+  'timer': () => openTimer(),
+  'set-timer': b => { const v = b.dataset.min; closeOverlay();
+    if (v === '0') { S.timer = null; snackbar('Sleep timer off'); }
+    else if (v === 'end') { S.timer = { endOfSong: true }; snackbar('Music will stop at the end of this track'); }
+    else { S.timer = { end: Date.now() + v * 60000 }; snackbar(`Music will stop in ${v} min`); }
+    if (npEl.classList.contains('open')) renderNowPlaying(); if (currentScreen === 'settings') render('none'); },
+  'toggle': b => { const k = b.dataset.k; S[k] = !S[k]; const sw = $('.switch', b); sw && sw.setAttribute('aria-checked', S[k]);
+    if (k === 'useFolderImages') { setTimeout(() => { render('none'); renderMini(); }, 250); snackbar(S[k] ? 'Using folder photos and covers' : 'Using app-generated covers'); }
+    if (k === 'subfolders') { setTimeout(() => render('none'), 250); snackbar(S[k] ? 'Subfolders included' : `Only files directly in the chosen folders · ${plural(library().length, 'song', 'songs')}`); } },
+  'remove-folder': b => { const p = S.folders.find(x => x.id === b.dataset.id); const n = songsInFolder(p.path, true).length;
+    openDialog(`${iconHtml('folder_off', 'danger')}<h4>Remove "${esc(p.name)}"?</h4><p>${plural(n, 'song leaves', 'songs leave')} the library. The files stay on your phone.</p>
+      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-danger" data-action="confirm-remove" data-id="${p.id}">Remove</button></div>`, 'remove-folder'); },
+  'confirm-remove': b => { const i = S.folders.findIndex(x => x.id === b.dataset.id); const [p] = S.folders.splice(i, 1); closeOverlay();
+    if (current() && !inLibrary(current())) { S.queue = []; S.playing = false; }
+    render('none'); snackbar(`Folder "${esc(p.name)}" removed`, 'Undo', () => { S.folders.splice(i, 0, p); render('none'); }); },
+  'rescan': () => { snackbar('Looking for new songs…'); setTimeout(() => snackbar(`Library up to date · ${plural(library().length, 'song', 'songs')}, nothing new`), 1600); },
+  'battery': () => snackbar('In the app, this opens the Android battery settings'),
+  'theme': b => setTheme(b.dataset.themeChoice),
+  'show-all-songs': () => { S.showAllSongs = true; $('#q').dispatchEvent(new Event('input')); },
+  'clear-search': () => { const i = $('#q'); i.value = ''; i.dispatchEvent(new Event('input')); i.focus(); },
+  'recent': b => { const i = $('#q'); i.value = b.dataset.q; i.dispatchEvent(new Event('input')); },
+  'clear-recents': () => { S.recentSearches = []; $('#q').dispatchEvent(new Event('input')); },
+  'close-overlay': () => closeOverlay(),
 };
 
 app.addEventListener('click', e => {
-  const tab = e.target.closest('#bnav [data-tab]');
-  if (tab) return aba(tab.dataset.tab);
-  const b = e.target.closest('[data-a]');
+  const tabBtn = e.target.closest('#bnav [data-tab]');
+  if (tabBtn) return tab(tabBtn.dataset.tab);
+  const b = e.target.closest('[data-action]');
   if (!b || !app.contains(b)) return;
-  // o clique mais interno vence (ex.: botão ⋮ dentro de uma linha)
-  const fn = ACOES[b.dataset.a];
+  // the innermost click wins (e.g. the ⋮ button inside a row)
+  const fn = ACTIONS[b.dataset.action];
   if (fn) { e.preventDefault(); fn(b, e); }
 });
 app.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.matches('[data-a][tabindex]')) { e.target.click(); }
-  if (e.key === 'Enter' && e.target.id === 'pl-nome') { const ok = $('[data-a="criar-playlist"], [data-a="salvar-nome"]', overlayEl); ok && ok.click(); }
+  if (e.key === 'Enter' && e.target.matches('[data-action][tabindex]')) { e.target.click(); }
+  if (e.key === 'Enter' && e.target.id === 'playlist-name') { const ok = $('[data-action="create-playlist"], [data-action="save-name"]', overlayEl); ok && ok.click(); }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') voltar(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') back(); });
 
 /* ============================================================
-   Tema
+   Theme
    ============================================================ */
-function definirTema(t) {
+function setTheme(t) {
   if (t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
-  try { localStorage.setItem('vitrola-mockup-tema', t); } catch (e) {}
-  $$('#panel-theme button').forEach(b => b.setAttribute('aria-pressed', b.dataset.tema === t));
-  $$('.theme-seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.tema === t));
+  try { localStorage.setItem('vitrola-mockup-theme', t); } catch (e) {}
+  $$('#panel-theme button, .theme-seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.themeChoice === t));
 }
-$$('#panel-theme button').forEach(b => b.addEventListener('click', () => definirTema(b.dataset.tema)));
+$$('#panel-theme button').forEach(b => b.addEventListener('click', () => setTheme(b.dataset.themeChoice)));
 
 /* ============================================================
-   Painel: atalhos de tela, simulações e notas
+   Panel: screen shortcuts, simulations and notes
    ============================================================ */
-const NOTAS = {
-  'boas-vindas': 'Primeira abertura. Apresenta as três promessas do app e leva direto para a escolha da pasta. O braço desce no disco ao abrir.',
-  'seletor': 'Tela do próprio Android (SAF), não do app. Você navega até a pasta de músicas e toca em "Usar esta pasta". A raiz e "Download" são bloqueadas pelo sistema. Teste escolher "WhatsApp" para ver o caso sem músicas.',
-  'escaneamento': 'Lê só a pasta escolhida e mostra o progresso real, arquivo por arquivo. No fim, resume o que encontrou.',
-  'biblioteca-musicas': 'Tela principal. Filtros no topo, "Tocar" e "Aleatório", e ordenação (A–Z, recentes, mais tocadas). Toque numa música para tocar; ⋮ abre o menu.',
-  'biblioteca-albuns': 'Grade de álbuns com capas. Os MP3 sem capa ganham uma gerada a partir do nome do álbum.',
-  'biblioteca-artistas': 'Artistas em grade, com a foto da pasta do artista (artista.jpg). Sem foto, aparece a capa do primeiro álbum dele.',
-  'biblioteca-pastas': 'A biblioteca vista pelas pastas. Útil para quem organiza tudo em pastas, e mostra exatamente o que foi lido.',
-  'album': 'O coração ao lado de Tocar/Aleatório favorita o álbum. Detalhe do álbum: capa grande, faixas numeradas e a pasta de origem no rodapé.',
-  'artista': 'Foto grande do artista no topo, com o nome por cima. Sem foto (ex.: Titãs), a capa do álbum vira um fundo desfocado. Depois vêm os álbuns e as músicas.',
-  'pasta': 'Navegação por pasta: pastas de artista mostram a foto e pastas de álbum mostram a capa. As imagens reconhecidas (artista.jpg, capa.jpg) aparecem destacadas.',
-  'busca': 'Busca instantânea em músicas, álbuns e artistas, ignorando acentos ("aguas" acha "Águas"). As buscas recentes ficam salvas.',
-  'playlists': 'Playlists automáticas (músicas favoritas, álbuns favoritos, mais tocadas, recentes) e as suas.',
-  'albuns-favoritos': 'Álbuns marcados com o coração, na página do álbum ou no menu ⋮ dele.',
-  'playlist': 'Detalhe da playlist. Pelo ⋮ do topo dá para renomear ou excluir.',
-  'ajustes': 'Pastas da biblioteca (adicionar e remover), subpastas, timer, retomar, fone, dica de bateria e tema.',
-  'tocando': 'A capa do álbum vira o selo do disco. O braço desce ao tocar e sobe ao pausar, e o disco desacelera. O fundo ganha um toque da cor da capa. Toque no ícone de info para ver o arquivo.',
-  'fila': 'O que já tocou, o que toca agora e o que vem a seguir. Dá para pular para uma música ou tirá-la da fila. (Arrastar para reordenar fica para o app.)',
-  'menu': 'Menu da música: tocar a seguir, fila, playlist, favoritar, ir para álbum ou artista, e detalhes do arquivo.',
-  'timer': 'Timer para dormir: tempos prontos ou "no fim desta música". A contagem aparece no player e nos ajustes.',
-  'nova-playlist': 'Criação rápida: só o nome.',
-  'remover-pasta': 'Remover uma pasta tira as músicas da biblioteca, mas não apaga nada do celular. Dá para desfazer.',
-  'vazia': 'Biblioteca sem nenhuma pasta escolhida.',
-  'sim-notificacao': 'Notificação de mídia do Android: os controles funcionam e acompanham o player. Toque fora para fechar.',
-  'sim-bloqueio': 'Controles na tela de bloqueio. Toque fora do cartão para voltar.',
+const NOTES = {
+  'welcome': 'First launch. Presents the app\'s three promises and goes straight to choosing the folder. The tonearm drops onto the record on open.',
+  'picker': 'This is Android\'s own screen (SAF), not the app. Browse to your music folder and tap "Use this folder". The root and "Download" are blocked by the system. Try choosing "WhatsApp" to see the no-music case.',
+  'scan': 'Reads only the chosen folder and shows real progress, file by file. At the end it summarizes what it found.',
+  'library-songs': 'Filters at the top, "Play" and "Shuffle", and sorting (A–Z, recent, most played). Tap a song to play it; ⋮ opens the menu.',
+  'library-albums': 'Album grid with covers. MP3s without a cover get one generated from the album name.',
+  'library-artists': 'Main screen when the app opens. Artists in a grid, with the photo from the artist folder (artist.jpg). Without a photo, the artist\'s first album cover is shown.',
+  'library-folders': 'The library seen through folders. Useful for people who organize everything in folders, and shows exactly what was read.',
+  'album': 'The heart next to Play/Shuffle favorites the album. Album details: large cover, numbered tracks and the source folder at the bottom.',
+  'artist': 'Large artist photo at the top with the name over it. Without a photo (e.g. Titãs), the album cover becomes a blurred background. Then come the albums and songs.',
+  'folder': 'Browsing by folder: artist folders show the photo and album folders show the cover. Recognized images (artist.jpg, cover.jpg) are highlighted.',
+  'search': 'Instant search across songs, albums and artists, ignoring accents ("aguas" finds "Águas"). Results are always split into three sections. Recent searches are saved.',
+  'playlists': 'Automatic playlists (favorite songs, favorite albums, most played, recently added) and your own.',
+  'favorite-albums': 'Albums marked with the heart, on the album page or in its ⋮ menu.',
+  'playlist': 'Playlist details. The ⋮ at the top lets you rename or delete it.',
+  'settings': 'Library folders (add and remove), subfolders, folder images, timer, resume, headphones, battery tip and theme.',
+  'now-playing': 'The album cover becomes the record label. The arm drops when playing and lifts when paused, and the record slows down. The background takes a hint of the cover color. Tap the info icon to see the file.',
+  'queue': 'What already played, what\'s playing and what\'s up next. Jump to a song or remove it from the queue. (Drag to reorder is left for the app.)',
+  'menu': 'Song menu: play next, queue, playlist, favorite, go to album or artist, and file details.',
+  'timer': 'Sleep timer: preset times or "at the end of this song". The countdown shows in the player and in Settings.',
+  'new-playlist': 'Quick creation: just the name.',
+  'remove-folder': 'Removing a folder takes its songs out of the library but deletes nothing from the phone. It can be undone.',
+  'empty': 'Library with no folder chosen.',
+  'sim-notification': 'Android media notification: the controls work and stay in sync with the player. Tap outside to close.',
+  'sim-lock-screen': 'Controls on the lock screen. Tap outside the card to go back.',
 };
-const ATALHOS = [
-  ['boas-vindas', 'Boas-vindas', () => { zerar(); }],
-  ['seletor', 'Seletor de pasta (Android)', () => { zerar(); abrirSeletor('onboarding', ''); }],
-  ['escaneamento', 'Escaneamento', () => { garantirBiblioteca(); raiz('escaneamento'); }],
-  ['biblioteca-artistas', 'Biblioteca · Artistas', () => { garantirBiblioteca(); S.libTab = 'artistas'; raiz('biblioteca'); }],
-  ['biblioteca-musicas', 'Biblioteca · Músicas', () => { garantirBiblioteca(); S.libTab = 'musicas'; raiz('biblioteca'); }],
-  ['biblioteca-albuns', 'Biblioteca · Álbuns', () => { garantirBiblioteca(); S.libTab = 'albuns'; raiz('biblioteca'); }],
-  ['biblioteca-pastas', 'Biblioteca · Pastas', () => { garantirBiblioteca(); S.libTab = 'pastas'; raiz('biblioteca'); }],
-  ['album', 'Álbum', () => { garantirBiblioteca(); S.libTab = 'albuns'; raiz('biblioteca'); ir('album', { id: 'clube' }); }],
-  ['artista', 'Artista', () => { garantirBiblioteca(); S.libTab = 'artistas'; raiz('biblioteca'); ir('artista', { nome: 'Caetano Veloso' }); }],
-  ['pasta', 'Pasta', () => { garantirBiblioteca(); S.libTab = 'pastas'; raiz('biblioteca'); ir('pasta', { caminho: 'Music/MPB' }); }],
-  ['busca', 'Busca', () => { garantirBiblioteca(); raiz('busca'); }],
-  ['playlists', 'Playlists', () => { garantirBiblioteca(); raiz('playlists'); }],
-  ['playlist', 'Playlist', () => { garantirBiblioteca(); raiz('playlists'); ir('playlist', { id: 'domingo' }); }],
-  ['ajustes', 'Ajustes', () => { garantirBiblioteca(); raiz('ajustes'); }],
-  ['tocando', 'Tocando agora', () => { garantirTocando(); abrirNP(); }],
-  ['fila', 'Fila', () => { garantirTocando(); abrirNP(); setTimeout(abrirFila, 200); }],
-  ['menu', 'Menu da música', () => { garantirBiblioteca(); if (telaAtual !== 'biblioteca') { S.libTab = 'musicas'; raiz('biblioteca'); } menuMusica('elistom-1'); }],
-  ['timer', 'Timer para dormir', () => { garantirTocando(); abrirNP(); setTimeout(abrirTimer, 200); }],
-  ['vazia', 'Biblioteca vazia', () => { garantirBiblioteca(); S.pastas = []; S.fila = []; S.tocando = false; raiz('biblioteca'); atualizarPainel('vazia'); }],
+const SHORTCUTS = [
+  ['welcome', 'Welcome', () => { reset(); }],
+  ['picker', 'Folder picker (Android)', () => { reset(); openPicker('onboarding', ''); }],
+  ['scan', 'Scan', () => { ensureLibrary(); root('scan'); }],
+  ['library-artists', 'Library · Artists', () => { ensureLibrary(); S.libTab = 'artists'; root('library'); }],
+  ['library-songs', 'Library · Songs', () => { ensureLibrary(); S.libTab = 'songs'; root('library'); }],
+  ['library-albums', 'Library · Albums', () => { ensureLibrary(); S.libTab = 'albums'; root('library'); }],
+  ['library-folders', 'Library · Folders', () => { ensureLibrary(); S.libTab = 'folders'; root('library'); }],
+  ['album', 'Album', () => { ensureLibrary(); S.libTab = 'albums'; root('library'); go('album', { id: 'clube' }); }],
+  ['artist', 'Artist', () => { ensureLibrary(); S.libTab = 'artists'; root('library'); go('artist', { name: 'Caetano Veloso' }); }],
+  ['folder', 'Folder', () => { ensureLibrary(); S.libTab = 'folders'; root('library'); go('folder', { path: 'Music/MPB' }); }],
+  ['search', 'Search', () => { ensureLibrary(); root('search'); }],
+  ['playlists', 'Playlists', () => { ensureLibrary(); root('playlists'); }],
+  ['playlist', 'Playlist', () => { ensureLibrary(); root('playlists'); go('playlist', { id: 'sunday' }); }],
+  ['settings', 'Settings', () => { ensureLibrary(); root('settings'); }],
+  ['now-playing', 'Now playing', () => { ensurePlaying(); openNowPlaying(); }],
+  ['queue', 'Queue', () => { ensurePlaying(); openNowPlaying(); setTimeout(openQueue, 200); }],
+  ['menu', 'Song menu', () => { ensureLibrary(); if (currentScreen !== 'library') { S.libTab = 'songs'; root('library'); } songMenu('elistom-1'); }],
+  ['timer', 'Sleep timer', () => { ensurePlaying(); openNowPlaying(); setTimeout(openTimer, 200); }],
+  ['empty', 'Empty library', () => { ensureLibrary(); S.folders = []; S.queue = []; S.playing = false; root('library'); updatePanel('empty'); }],
 ];
-$('#jump').innerHTML = ATALHOS.map(([k, n], i) => `<button data-jump="${k}"><span class="n">${i + 1}</span>${n}</button>`).join('');
+$('#jump').innerHTML = SHORTCUTS.map(([k, n], i) => `<button data-jump="${k}"><span class="n">${i + 1}</span>${n}</button>`).join('');
 $('#jump').addEventListener('click', e => {
   const b = e.target.closest('[data-jump]'); if (!b) return;
-  fecharSobreposicao(true); $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
-  if (npEl.classList.contains('aberto') && !['tocando', 'fila', 'timer'].includes(b.dataset.jump)) fecharNP();
-  ATALHOS.find(a => a[0] === b.dataset.jump)[2]();
-  $('#panel').classList.remove('aberto');
+  closeOverlay(true); $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
+  if (npEl.classList.contains('open') && !['now-playing', 'queue', 'timer'].includes(b.dataset.jump)) closeNowPlaying();
+  SHORTCUTS.find(a => a[0] === b.dataset.jump)[2]();
+  $('#panel').classList.remove('open');
 });
-function atualizarPainel(chave) {
-  $$('#jump button').forEach(b => b.setAttribute('aria-current', b.dataset.jump === chave));
-  $('#nota-texto').textContent = NOTAS[chave] || '';
+function updatePanel(key) {
+  $$('#jump button').forEach(b => b.setAttribute('aria-current', b.dataset.jump === key));
+  $('#screen-note').textContent = NOTES[key] || '';
 }
-function atualizarPainelAtual() {
-  const def = TELAS[telaAtual];
-  atualizarPainel(npEl.classList.contains('aberto') ? 'tocando' : def.chave ? def.chave(pilha[pilha.length - 1].params) : telaAtual);
+function updatePanelForCurrent() {
+  const def = SCREENS[currentScreen];
+  updatePanel(npEl.classList.contains('open') ? 'now-playing' : def.key ? def.key(stack[stack.length - 1].params) : currentScreen);
 }
 
-const SIMULACOES = {
-  notificacao: () => simularSistema('notificacao'),
-  bloqueio: () => simularSistema('bloqueio'),
-  reabrir: () => {
-    garantirBiblioteca();
-    fecharSobreposicao(true); $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
-    if (npEl.classList.contains('aberto')) fecharNP();
-    const tinha = atual();
-    if (S.tocando) { S.angulo = anguloAtual(); S.tocando = false; }
-    if (!S.retomar) { S.fila = []; }
-    S.libTab = 'artistas'; raiz('biblioteca');
-    if (tinha && S.retomar) aviso(`Continuando de onde parou: "${esc(tinha.titulo)}" em ${fmt(S.pos)}`, 'Tocar', () => play(true));
-    else aviso('App reaberto do zero');
+const SIMULATIONS = {
+  'notification': () => simulateSystem('notification'),
+  'lock-screen': () => simulateSystem('lock-screen'),
+  'reopen': () => {
+    ensureLibrary();
+    closeOverlay(true); $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
+    if (npEl.classList.contains('open')) closeNowPlaying();
+    const last = current();
+    if (S.playing) { S.angle = currentAngle(); S.playing = false; }
+    if (!S.resume) { S.queue = []; }
+    S.libTab = 'artists'; root('library');
+    if (last && S.resume) snackbar(`Picking up where you left off: "${esc(last.title)}" at ${fmt(S.pos)}`, 'Play', () => play(true));
+    else snackbar('App reopened from scratch');
   },
-  fone: () => {
-    if (!S.tocando) return aviso('Toque uma música primeiro para testar');
-    if (!S.pausarFone) return aviso('Fone desconectado · a música continua (opção desligada nos ajustes)');
-    play(false); aviso('Fone desconectado · música pausada', 'Continuar', () => play(true));
+  'headphones': () => {
+    if (!S.playing) return snackbar('Play a song first to try this');
+    if (!S.pauseOnUnplug) return snackbar('Headphones disconnected · music keeps playing (option off in Settings)');
+    play(false); snackbar('Headphones disconnected · music paused', 'Resume', () => play(true));
   },
-  erro: () => {
-    garantirBiblioteca();
-    const ms = biblioteca().map(m => m.id);
-    if (!atual()) tocarLista(ms, Math.max(0, ms.indexOf('diversos-3')), { tipo: 'Tocando de', nome: 'Todas as músicas' });
-    const m = atual();
-    proxima(); play(true);
-    aviso(`Não deu para tocar "${esc(m.arquivo)}". Pulamos para a próxima.`);
+  'broken-file': () => {
+    ensureLibrary();
+    const ms = library().map(m => m.id);
+    if (!current()) playList(ms, Math.max(0, ms.indexOf('misc-3')), { type: 'Playing from', name: 'All songs' });
+    const m = current();
+    next(); play(true);
+    snackbar(`Couldn't play "${esc(m.file)}". Skipped to the next one.`);
   },
-  permissao: () => {
-    garantirBiblioteca();
-    const p = S.pastas[0]; if (!p) return aviso('Nenhuma pasta escolhida');
-    if (S.tocando) play(false);
-    abrirDialogo(`${icone('folder_off', 'perigo')}<h4>Perdemos o acesso à pasta "${esc(p.nome)}"</h4>
-      <p>Isso acontece quando a pasta é movida ou renomeada, ou quando o acesso é removido nos ajustes do Android. Escolha a pasta de novo para continuar ouvindo.</p>
-      <div class="acts"><button class="btn btn-txt" data-a="fechar-sobreposicao">Agora não</button><button class="btn btn-pri" data-a="escolher-pasta" data-origem="ajustes">Escolher pasta</button></div>`);
+  'lost-access': () => {
+    ensureLibrary();
+    const p = S.folders[0]; if (!p) return snackbar('No folder chosen');
+    if (S.playing) play(false);
+    openDialog(`${iconHtml('folder_off', 'danger')}<h4>We lost access to the "${esc(p.name)}" folder</h4>
+      <p>This happens when the folder is moved or renamed, or when access is revoked in Android settings. Choose the folder again to keep listening.</p>
+      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Not now</button><button class="btn btn-primary" data-action="choose-folder" data-origin="settings">Choose folder</button></div>`);
   },
-  zerar: () => zerar(),
+  'reset': () => reset(),
 };
-$$('[data-sim]').forEach(b => b.addEventListener('click', () => { SIMULACOES[b.dataset.sim](); $('#panel').classList.remove('aberto'); }));
-$('#panel-fab').addEventListener('click', () => $('#panel').classList.toggle('aberto'));
+$$('[data-simulate]').forEach(b => b.addEventListener('click', () => { SIMULATIONS[b.dataset.simulate](); $('#panel').classList.remove('open'); }));
+$('#panel-fab').addEventListener('click', () => $('#panel').classList.toggle('open'));
 
-function garantirBiblioteca() {
-  if (!S.configurado || !S.pastas.length) { S.configurado = true; S.pastas = clone(D.pastasEscolhidas); }
+function ensureLibrary() {
+  if (!S.configured || !S.folders.length) { S.configured = true; S.folders = clone(D.chosenFolders); }
 }
-function garantirTocando() {
-  garantirBiblioteca();
-  if (telaAtual === 'boas-vindas' || telaAtual === 'escaneamento') { S.libTab = 'artistas'; raiz('biblioteca'); }
-  if (!atual()) { const a = biblioteca().filter(m => m.album === 'elistom'); tocarLista(a.map(m => m.id), 0, { tipo: 'Tocando do álbum', nome: 'Elis & Tom' }, false); S.pos = 47; }
+function ensurePlaying() {
+  ensureLibrary();
+  if (currentScreen === 'welcome' || currentScreen === 'scan') { S.libTab = 'artists'; root('library'); }
+  if (!current()) { const a = library().filter(m => m.album === 'elistom'); playList(a.map(m => m.id), 0, { type: 'Playing from album', name: 'Elis & Tom' }, false); S.pos = 47; }
 }
-function zerar() {
-  const tema = document.documentElement.dataset.theme;
-  S = ESTADO_INICIAL();
-  npEl.classList.remove('aberto');
+function reset() {
+  S = INITIAL_STATE();
+  npEl.classList.remove('open');
   overlayEl.innerHTML = ''; $('#snack-area').innerHTML = '';
   $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
-  raiz('boas-vindas');
+  root('welcome');
 }
 
 /* ============================================================
-   Início
+   Start
    ============================================================ */
-let temaSalvo = 'auto';
-try { temaSalvo = localStorage.getItem('vitrola-mockup-tema') || 'auto'; } catch (e) {}
-definirTema(temaSalvo);
-raiz('boas-vindas');
+let savedTheme = 'auto';
+try { savedTheme = localStorage.getItem('vitrola-mockup-theme') || 'auto'; } catch (e) {}
+setTheme(savedTheme);
+root('welcome');
 })();

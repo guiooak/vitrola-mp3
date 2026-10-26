@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,7 @@
 <style>
   :root {
     --bg: #FAF7F0; --surface: #FFFFFF; --text: #1B1714; --muted: #6B625A; --border: #E6DFD3;
-    --creme: #F3E9D2; --vinho: #7A1F2B; --mostarda: #E0A526; --vinil: #1B1714; --sulco: #3A322C; --metal: #CFC8B8;
+    --cream: #F3E9D2; --wine: #7A1F2B; --mustard: #E0A526; --vinyl: #1B1714; --groove: #3A322C; --metal: #CFC8B8;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { --bg: #161311; --surface: #1F1B18; --text: #F3EDE4; --muted: #A79D92; --border: #342D28; }
@@ -28,14 +28,14 @@
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
   .note { font-size: 14px; color: var(--muted); margin: 12px 0 0; }
 
-  /* Herói */
+  /* Hero */
   .hero { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; }
-  .hero-icon { width: 240px; height: 240px; border-radius: 54px; background: var(--creme); box-shadow: 0 12px 40px rgba(27,23,20,.18); overflow: hidden; }
+  .hero-icon { width: 240px; height: 240px; border-radius: 54px; background: var(--cream); box-shadow: 0 12px 40px rgba(27,23,20,.18); overflow: hidden; }
   .hero-icon svg { width: 100%; height: 100%; display: block; }
   .hero h3 { font-family: "Fraunces", serif; font-size: 28px; margin: 0 0 8px; }
   .hero ul { margin: 0 0 16px; padding-left: 18px; color: var(--muted); }
 
-  /* Animação do herói */
+  /* Hero animation */
   #hero .disc { transform-box: view-box; transform-origin: 92px 110px; }
   #hero .arm { transform-box: view-box; transform-origin: 166px 38px; transition: transform .7s cubic-bezier(.4,.1,.2,1); }
   #hero.paused .arm { transform: rotate(-26deg); }
@@ -43,22 +43,22 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { #hero.playing .disc { animation-duration: 6s; } }
 
-  /* Construção */
+  /* Construction */
   .build { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; align-items: center; }
-  .build svg { width: 100%; max-width: 360px; display: block; margin: 0 auto; background: var(--creme); border-radius: 16px; }
+  .build svg { width: 100%; max-width: 360px; display: block; margin: 0 auto; background: var(--cream); border-radius: 16px; }
   .build dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 15px; }
   .build dt { font-weight: 600; }
   .build dd { margin: 0; color: var(--muted); }
 
-  /* Tamanhos */
+  /* Sizes */
   .sizes { display: grid; grid-template-columns: 120px repeat(5, auto); gap: 18px 20px; align-items: end; overflow-x: auto; }
   .sizes .lbl { font-size: 14px; font-weight: 500; align-self: center; }
   .sizes figure { margin: 0; text-align: center; }
   .sizes figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .ic { background: var(--creme); overflow: hidden; display: block; }
+  .ic { background: var(--cream); overflow: hidden; display: block; }
   .ic svg { width: 100%; height: 100%; display: block; }
 
-  /* Máscaras adaptativas */
+  /* Adaptive masks */
   .masks { display: flex; gap: 28px; flex-wrap: wrap; }
   .masks figure { margin: 0; text-align: center; }
   .masks svg { width: 108px; height: 108px; display: block; }
@@ -69,12 +69,12 @@
   .m-tear { border-radius: 50% 50% 50% 14%; }
   .masks .wrapm { overflow: hidden; width: 108px; height: 108px; }
 
-  /* Ícone temático (Android 13+) */
+  /* Themed icon (Android 13+) */
   .themed { display: flex; gap: 28px; flex-wrap: wrap; }
   .themed .t { width: 108px; height: 108px; border-radius: 50%; display: grid; place-items: center; }
   .themed .t svg { width: 70%; height: 70%; }
 
-  /* Assinaturas (logo + nome) */
+  /* Lockups (symbol + name) */
   .lockups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
   .lk { border-radius: 18px; padding: 28px 24px; display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 140px; }
   .lk svg { width: 72px; height: 72px; flex: none; }
@@ -83,9 +83,9 @@
   .lk.v { flex-direction: column; gap: 8px; }
   .lk.v svg { width: 96px; height: 96px; }
   .lk.v .wm { font-size: 38px; }
-  .bg-creme { background: var(--creme); } .bg-vinil { background: var(--vinil); } .bg-vinho { background: var(--vinho); }
+  .bg-cream { background: var(--cream); } .bg-vinyl { background: var(--vinyl); } .bg-wine { background: var(--wine); }
 
-  /* Paleta */
+  /* Palette */
   .palette { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
   .sw { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
   .sw .c { height: 72px; }
@@ -93,7 +93,7 @@
   .sw .i b { display: block; font-weight: 600; }
   .sw .i span { color: var(--muted); font-family: ui-monospace, monospace; }
 
-  /* Área de respiro */
+  /* Clear space */
   .clear { display: flex; justify-content: center; }
   .clear svg { width: 100%; max-width: 520px; }
 
@@ -109,7 +109,7 @@
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <!-- Símbolo detalhado: para 64px ou mais -->
+    <!-- Detailed symbol: 64px and up -->
     <symbol id="s-full" viewBox="0 0 200 200">
       <g class="disc">
         <circle cx="92" cy="110" r="70" fill="#1B1714"/>
@@ -137,7 +137,7 @@
       </g>
     </symbol>
 
-    <!-- Símbolo simplificado: para 48px ou menos -->
+    <!-- Simplified symbol: 48px and below -->
     <symbol id="s-small" viewBox="0 0 200 200">
       <circle cx="92" cy="110" r="70" fill="#1B1714"/>
       <circle cx="92" cy="110" r="68.5" fill="none" stroke="#6A5B50" stroke-width="3"/>
@@ -152,7 +152,7 @@
       <circle cx="166" cy="40" r="5.5" fill="#1B1714"/>
     </symbol>
 
-    <!-- Monocromático: ícone temático do Android e usos de uma cor só -->
+    <!-- Monochrome: Android themed icon and single-color uses -->
     <symbol id="s-mono" viewBox="0 0 200 200">
       <mask id="m-arm" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
         <rect width="200" height="200" fill="#fff"/>
@@ -174,32 +174,32 @@
 <div class="wrap">
   <header>
     <h1>Vitrola Mp3 — logo</h1>
-    <p class="lead">Conceito A refinado: o vinil clássico. Esta página reúne o símbolo, as variações para cada tamanho, o ícone do Android, as assinaturas com o nome e a paleta base. É a referência para o style guide.</p>
+    <p class="lead">Concept A, refined: the classic vinyl record. This page brings together the symbol, its variations for each size, the Android icon, the lockups with the name, and the base palette. It is the reference for the style guide.</p>
     <div class="toggle">
-      <button data-t="light">Tema claro</button>
-      <button data-t="dark">Tema escuro</button>
+      <button data-t="light">Light theme</button>
+      <button data-t="dark">Dark theme</button>
     </div>
   </header>
 
-  <h2>Símbolo</h2>
+  <h2>Symbol</h2>
   <div class="card hero">
-    <div class="hero-icon"><svg id="hero" class="paused" viewBox="0 0 200 200" role="img" aria-label="Símbolo Vitrola"></svg></div>
+    <div class="hero-icon"><svg id="hero" class="paused" viewBox="0 0 200 200" role="img" aria-label="Vitrola symbol"></svg></div>
     <div>
-      <h3>Toca-discos, em uma olhada</h3>
+      <h3>A turntable at a glance</h3>
       <ul>
-        <li>Disco com sulcos alternados e dois reflexos, que dão volume sem gradiente.</li>
-        <li>Selo vinho com anel mostarda, a assinatura de cor da marca.</li>
-        <li>Braço com contrapeso, base e cápsula. A sombra leve descola o braço do disco.</li>
-        <li>Borda clara no disco, para ele não sumir em fundos escuros.</li>
+        <li>Record with alternating grooves and two highlights that add depth without gradients.</li>
+        <li>Wine label with a mustard ring, the brand's color signature.</li>
+        <li>Tonearm with counterweight, base and headshell. A soft shadow lifts the arm off the record.</li>
+        <li>A light rim keeps the record visible on dark backgrounds.</li>
       </ul>
-      <button id="play">▶ Tocar</button>
-      <p class="note">O botão mostra a animação prevista para o app: o braço desce e o disco gira.</p>
+      <button id="play">▶ Play</button>
+      <p class="note">The button previews the animation planned for the app: the arm drops and the record spins.</p>
     </div>
   </div>
 
-  <h2>Construção</h2>
+  <h2>Construction</h2>
   <div class="card build">
-    <svg viewBox="0 0 200 200" aria-label="Grade de construção">
+    <svg viewBox="0 0 200 200" aria-label="Construction grid">
       <use href="#s-full"/>
       <g fill="none" stroke="#E0457B" stroke-width=".6" stroke-dasharray="3 2">
         <circle cx="92" cy="110" r="70"/>
@@ -212,30 +212,30 @@
       <g fill="#E0457B" font-family="Outfit, sans-serif" font-size="7">
         <text x="8" y="106">R = 70</text>
         <text x="96" y="132">R = 25</text>
-        <text x="172" y="60">pivô</text>
+        <text x="172" y="60">pivot</text>
       </g>
     </svg>
     <dl>
-      <dt>Disco</dt><dd>Raio 70 numa grade de 200. Deslocado para a esquerda e para baixo, para abrir espaço ao braço.</dd>
-      <dt>Selo</dt><dd>Raio 25, cerca de 1/3 do disco, como num LP de verdade.</dd>
-      <dt>Braço</dt><dd>Vai do pivô (canto superior direito) até a agulha no terço externo do disco, onde a música começa.</dd>
-      <dt>Traço</dt><dd>Braço com espessura 7 no detalhado e 10 no simplificado.</dd>
+      <dt>Record</dt><dd>Radius 70 on a 200 grid. Shifted left and down to make room for the arm.</dd>
+      <dt>Label</dt><dd>Radius 25, about 1/3 of the record, like a real LP.</dd>
+      <dt>Tonearm</dt><dd>Runs from the pivot (top right corner) to the needle on the outer third of the record, where the music starts.</dd>
+      <dt>Stroke</dt><dd>Arm stroke is 7 in the detailed version and 10 in the simplified one.</dd>
     </dl>
   </div>
 
-  <h2>Tamanhos: detalhado × simplificado</h2>
+  <h2>Sizes: detailed × simplified</h2>
   <div class="card">
     <div class="sizes" id="sizes"></div>
-    <p class="note">Abaixo de 48px, o detalhado vira "ruído". O simplificado tem menos sulcos, traços mais grossos e selo maior, e é o que vai na barra de status, nas notificações e no favicon.</p>
+    <p class="note">Below 48px the detailed version turns into noise. The simplified one has fewer grooves, thicker strokes and a larger label. Use it in the status bar, notifications and favicon.</p>
   </div>
 
-  <h2>Ícone adaptativo do Android</h2>
+  <h2>Android adaptive icon</h2>
   <div class="card">
     <div class="masks" id="masks"></div>
-    <p class="note">Cada fabricante corta o ícone num formato diferente. O símbolo fica dentro da zona segura central (66 de 108 unidades) e aparece inteiro em todas as máscaras.</p>
+    <p class="note">Each manufacturer crops the icon into a different shape. The symbol sits inside the central safe zone (66 of 108 units) and stays whole in every mask.</p>
   </div>
 
-  <h2>Ícone temático (Android 13+)</h2>
+  <h2>Themed icon (Android 13+)</h2>
   <div class="card">
     <div class="themed">
       <div class="t" style="background:#DCE7D4;color:#2F4A2A"><svg><use href="#s-mono"/></svg></div>
@@ -243,58 +243,58 @@
       <div class="t" style="background:#F2DDD9;color:#5A2A26"><svg><use href="#s-mono"/></svg></div>
       <div class="t" style="background:#2A2A2E;color:#E4E1EA"><svg><use href="#s-mono"/></svg></div>
     </div>
-    <p class="note">Versão de uma cor só, que o Android pinta conforme o papel de parede do usuário. Ela também serve para a notificação da música.</p>
+    <p class="note">A single-color version that Android tints to match the user's wallpaper. It is also used for the playback notification.</p>
   </div>
 
-  <h2>Assinaturas</h2>
+  <h2>Lockups</h2>
   <div class="lockups">
-    <div class="lk bg-creme"><img src="export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3"></div>
-    <div class="lk bg-vinil"><img src="export/vitrola-mp3-horizontal-negativo.svg" alt="Vitrola Mp3"></div>
-    <div class="lk bg-vinho"><img src="export/vitrola-mp3-horizontal-negativo.svg" alt="Vitrola Mp3"></div>
-    <div class="lk v bg-creme"><img src="export/vitrola-mp3-vertical-positivo.svg" alt="Vitrola Mp3" style="height:200px"></div>
+    <div class="lk bg-cream"><img src="export/vitrola-mp3-horizontal-positive.svg" alt="Vitrola Mp3"></div>
+    <div class="lk bg-vinyl"><img src="export/vitrola-mp3-horizontal-negative.svg" alt="Vitrola Mp3"></div>
+    <div class="lk bg-wine"><img src="export/vitrola-mp3-horizontal-negative.svg" alt="Vitrola Mp3"></div>
+    <div class="lk v bg-cream"><img src="export/vitrola-mp3-vertical-positive.svg" alt="Vitrola Mp3" style="height:200px"></div>
   </div>
-  <p class="note">Nome: <b>Vitrola</b> em Fraunces ExtraBold e <b>Mp3</b> em Fraunces Medium, no mesmo tamanho. A diferença de peso dá hierarquia sem precisar de outra cor. Fraunces é uma serifa "macia", com cara de capa de disco dos anos 70, mas moderna, e é gratuita (Google Fonts). Nos arquivos exportados, o texto já está em contorno e não depende da fonte instalada.</p>
+  <p class="note">Name: <b>Vitrola</b> in Fraunces ExtraBold and <b>Mp3</b> in Fraunces Medium, at the same size. The weight contrast creates hierarchy without a second color. Fraunces is a "soft" serif that feels like a 1970s record sleeve while staying modern, and it is free (Google Fonts). In the exported files the text is already outlined and does not depend on installed fonts.</p>
 
-  <h2>Área de respiro</h2>
+  <h2>Clear space</h2>
   <div class="card clear">
-    <svg viewBox="0 0 560 180" aria-label="Área de respiro">
+    <svg viewBox="0 0 560 180" aria-label="Clear space">
       <rect x="0" y="0" width="560" height="180" rx="12" fill="#F3E9D2"/>
       <rect x="20" y="20" width="520" height="140" fill="none" stroke="#E0457B" stroke-width="1" stroke-dasharray="4 3"/>
-      <image href="export/vitrola-mp3-horizontal-positivo.svg" x="36" y="36" width="488" height="108"/>
+      <image href="export/vitrola-mp3-horizontal-positive.svg" x="36" y="36" width="488" height="108"/>
       <g fill="#E0457B" font-family="Outfit, sans-serif" font-size="11">
-        <text x="24" y="14">margem mínima = raio do selo</text>
+        <text x="24" y="14">minimum margin = label radius</text>
       </g>
     </svg>
   </div>
 
-  <h2>Paleta da marca</h2>
+  <h2>Brand palette</h2>
   <div class="palette">
-    <div class="sw"><div class="c" style="background:#F3E9D2"></div><div class="i"><b>Creme</b><span>#F3E9D2</span></div></div>
-    <div class="sw"><div class="c" style="background:#7A1F2B"></div><div class="i"><b>Vinho</b><span>#7A1F2B</span></div></div>
-    <div class="sw"><div class="c" style="background:#E0A526"></div><div class="i"><b>Mostarda</b><span>#E0A526</span></div></div>
-    <div class="sw"><div class="c" style="background:#1B1714"></div><div class="i"><b>Vinil</b><span>#1B1714</span></div></div>
-    <div class="sw"><div class="c" style="background:#3A322C"></div><div class="i"><b>Sulco</b><span>#3A322C</span></div></div>
+    <div class="sw"><div class="c" style="background:#F3E9D2"></div><div class="i"><b>Cream</b><span>#F3E9D2</span></div></div>
+    <div class="sw"><div class="c" style="background:#7A1F2B"></div><div class="i"><b>Wine</b><span>#7A1F2B</span></div></div>
+    <div class="sw"><div class="c" style="background:#E0A526"></div><div class="i"><b>Mustard</b><span>#E0A526</span></div></div>
+    <div class="sw"><div class="c" style="background:#1B1714"></div><div class="i"><b>Vinyl</b><span>#1B1714</span></div></div>
+    <div class="sw"><div class="c" style="background:#3A322C"></div><div class="i"><b>Groove</b><span>#3A322C</span></div></div>
     <div class="sw"><div class="c" style="background:#CFC8B8"></div><div class="i"><b>Metal</b><span>#CFC8B8</span></div></div>
   </div>
-  <p class="note">Esta é a paleta base da logo. O style guide vai expandi-la com tons de interface, estados e o tema escuro.</p>
+  <p class="note">This is the logo's base palette. The style guide expands it with interface tones, states and the dark theme.</p>
 </div>
 
 <script>
-  // Tema
+  // Theme
   document.querySelectorAll('[data-t]').forEach(b =>
     b.addEventListener('click', () => document.documentElement.dataset.theme = b.dataset.t));
 
-  // Herói: cópia inline do símbolo para poder animar braço e disco
+  // Hero: inline copy of the symbol so the arm and record can be animated
   const hero = document.getElementById('hero');
   hero.innerHTML = document.getElementById('s-full').innerHTML;
   const btn = document.getElementById('play');
   btn.addEventListener('click', () => {
     const playing = hero.classList.toggle('playing');
     hero.classList.toggle('paused', !playing);
-    btn.textContent = playing ? '⏸ Pausar' : '▶ Tocar';
+    btn.textContent = playing ? '⏸ Pause' : '▶ Play';
   });
 
-  // Tabela de tamanhos
+  // Size table
   const sizes = [96, 64, 48, 32, 24];
   const grid = document.getElementById('sizes');
   const row = (label, id) => {
@@ -302,11 +302,11 @@
     sizes.forEach(s => grid.insertAdjacentHTML('beforeend',
       `<figure><span class="ic" style="width:${s}px;height:${s}px;border-radius:${s*.22}px"><svg><use href="#${id}"/></svg></span><figcaption>${s}px</figcaption></figure>`));
   };
-  row('Detalhado', 's-full');
-  row('Simplificado', 's-small');
+  row('Detailed', 's-full');
+  row('Simplified', 's-small');
 
-  // Máscaras adaptativas: área visível de 72 dentro da tela de 108
-  const masks = [['m-circle','Círculo'],['m-squircle','Squircle'],['m-rounded','Arredondado'],['m-tear','Gota']];
+  // Adaptive masks: 72-unit visible area inside the 108-unit canvas
+  const masks = [['m-circle','Circle'],['m-squircle','Squircle'],['m-rounded','Rounded'],['m-tear','Teardrop']];
   document.getElementById('masks').innerHTML = masks.map(([c, n]) =>
     `<figure><div class="wrapm ${c}"><svg viewBox="18 18 72 72"><rect width="108" height="108" fill="#F3E9D2"/><use href="#s-full" x="23" y="24.2" width="62" height="62"/></svg></div><figcaption>${n}</figcaption></figure>`).join('');
 </script>

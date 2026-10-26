@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vitrola – Conceitos de Logo</title>
+<title>Vitrola – Logo Concepts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,700&family=Outfit:wght@400;500;600&family=Righteous&display=swap" rel="stylesheet">
@@ -15,18 +15,18 @@
     --muted: #6B625A;
     --border: #E6DFD3;
 
-    /* Paleta retrô */
-    --creme: #F3E9D2;
-    --vinho: #7A1F2B;
-    --mostarda: #E0A526;
-    --vinil: #1B1714;
-    --sulco: #3A322C;
+    /* Retro palette */
+    --cream: #F3E9D2;
+    --wine: #7A1F2B;
+    --mustard: #E0A526;
+    --vinyl: #1B1714;
+    --groove: #3A322C;
     --metal: #CFC8B8;
 
-    /* Paleta minimalista */
-    --grafite: #121212;
-    --off: #F5F5F0;
-    --laranja: #FF5A36;
+    /* Minimal palette */
+    --graphite: #121212;
+    --off-white: #F5F5F0;
+    --orange: #FF5A36;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -78,11 +78,11 @@
   .pc h3 { font-size: 13px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: .04em; }
   .pc ul { margin: 0; padding-left: 18px; color: var(--muted); }
 
-  .bg-creme { background: var(--creme); }
-  .bg-vinil { background: var(--vinil); }
-  .bg-grafite { background: var(--grafite); }
-  .bg-off { background: var(--off); }
-  .bg-vinho { background: var(--vinho); }
+  .bg-cream { background: var(--cream); }
+  .bg-vinyl { background: var(--vinyl); }
+  .bg-graphite { background: var(--graphite); }
+  .bg-off-white { background: var(--off-white); }
+  .bg-wine { background: var(--wine); }
 
   .wm-a { font-family: "Fraunces", serif; font-weight: 800; }
   .wm-b { font-family: "Outfit", sans-serif; font-weight: 600; letter-spacing: -.02em; text-transform: lowercase; }
@@ -93,7 +93,7 @@
   .next h2 { margin: 0 0 8px; font-family: "Fraunces", serif; }
   .next ol { margin: 0; padding-left: 20px; color: var(--muted); }
 
-  /* Animação de demonstração: disco girando ao passar o mouse */
+  /* Demo animation: record spins on hover */
   .spin-on-hover:hover .disc { animation: spin 1.8s linear infinite; }
   .disc { transform-box: fill-box; transform-origin: center; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -106,10 +106,10 @@
 </head>
 <body>
 
-<!-- Símbolos reutilizáveis (viewBox 200x200, sem fundo) -->
+<!-- Reusable symbols (200x200 viewBox, no background) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <!-- A: Vinil clássico com braço -->
+    <!-- A: Classic vinyl with tonearm -->
     <symbol id="mark-a" viewBox="0 0 200 200">
       <g class="disc">
         <circle cx="92" cy="110" r="70" fill="#1B1714"/>
@@ -128,7 +128,7 @@
       <circle cx="166" cy="38" r="4.5" fill="#1B1714"/>
     </symbol>
 
-    <!-- B: Disco + play, minimalista -->
+    <!-- B: Record + play, minimal -->
     <symbol id="mark-b" viewBox="0 0 200 200">
       <g class="disc">
         <circle cx="100" cy="100" r="66" fill="none" stroke="#F5F5F0" stroke-width="12"/>
@@ -136,7 +136,7 @@
       </g>
       <path d="M88 76 L128 100 L88 124 Z" fill="#FF5A36" stroke="#FF5A36" stroke-width="6" stroke-linejoin="round"/>
     </symbol>
-    <!-- B em fundo claro -->
+    <!-- B on a light background -->
     <symbol id="mark-b-dark" viewBox="0 0 200 200">
       <g class="disc">
         <circle cx="100" cy="100" r="66" fill="none" stroke="#121212" stroke-width="12"/>
@@ -145,7 +145,7 @@
       <path d="M88 76 L128 100 L88 124 Z" fill="#FF5A36" stroke="#FF5A36" stroke-width="6" stroke-linejoin="round"/>
     </symbol>
 
-    <!-- C: Gramofone formando um "V" -->
+    <!-- C: Gramophone forming a "V" -->
     <symbol id="mark-c" viewBox="0 0 200 200">
       <ellipse cx="100" cy="156" rx="72" ry="17" fill="#1B1714"/>
       <ellipse cx="100" cy="152" rx="72" ry="17" fill="#2A2420"/>
@@ -158,14 +158,14 @@
       <ellipse cx="100" cy="40" rx="64" ry="13" fill="none" stroke="#E0A526" stroke-width="3"/>
     </symbol>
 
-    <!-- D: Selo / emblema retrô -->
+    <!-- D: Retro badge / emblem -->
     <path id="ring-path" d="M100 100 m-62 0 a62 62 0 1 1 124 0 a62 62 0 1 1 -124 0"/>
     <symbol id="mark-d" viewBox="0 0 200 200">
       <circle cx="100" cy="100" r="88" fill="#7A1F2B"/>
       <circle cx="100" cy="100" r="80" fill="none" stroke="#E0A526" stroke-width="2"/>
       <circle cx="100" cy="100" r="46" fill="none" stroke="#E0A526" stroke-width="2"/>
       <text font-family="Fraunces, Georgia, serif" font-weight="800" font-size="19" fill="#F3E9D2">
-        <textPath href="#ring-path" startOffset="0" textLength="384" lengthAdjust="spacing">VITROLA ★ MÚSICA ★ MP3 ★</textPath>
+        <textPath href="#ring-path" startOffset="0" textLength="384" lengthAdjust="spacing">VITROLA ★ MUSIC ★ MP3 ★</textPath>
       </text>
       <g class="disc">
         <circle cx="100" cy="100" r="40" fill="#1B1714"/>
@@ -180,11 +180,11 @@
 
 <div class="wrap">
   <header>
-    <h1>Vitrola — conceitos de logo</h1>
-    <p>Quatro direções, da mais retrô à mais minimalista. Cada uma aparece como ícone de app, em tamanhos pequenos (teste de legibilidade), na máscara redonda do Android e com o nome ao lado. Passe o mouse sobre os ícones para ver o disco girar.</p>
+    <h1>Vitrola — logo concepts</h1>
+    <p>Four directions, from the most retro to the most minimal. Each one is shown as an app icon, at small sizes (legibility test), in Android's round mask and next to the name. Hover over the icons to see the record spin.</p>
     <div class="toggle">
-      <button data-t="light">Tema claro</button>
-      <button data-t="dark">Tema escuro</button>
+      <button data-t="light">Light theme</button>
+      <button data-t="dark">Dark theme</button>
     </div>
   </header>
 
@@ -192,108 +192,108 @@
 
     <!-- A -->
     <article class="card">
-      <span class="tag">Conceito A · Retrô</span>
-      <h2>Vinil clássico</h2>
-      <p class="desc">O disco com sulcos, selo vinho e o braço com a agulha tocando. É a "vitrola" mais literal e se conecta direto com a tela de "tocando agora" que gira.</p>
+      <span class="tag">Concept A · Retro</span>
+      <h2>Classic vinyl</h2>
+      <p class="desc">The grooved record, wine label and the tonearm with the needle playing. It is the most literal "turntable" and ties straight into the spinning "now playing" screen.</p>
       <div class="hero">
-        <div class="icon bg-creme spin-on-hover"><svg><use href="#mark-a"/></svg></div>
+        <div class="icon bg-cream spin-on-hover"><svg><use href="#mark-a"/></svg></div>
         <div class="sizes">
-          <figure><div class="icon s64 bg-creme"><svg><use href="#mark-a"/></svg></div><figcaption>64</figcaption></figure>
-          <figure><div class="icon s40 bg-creme"><svg><use href="#mark-a"/></svg></div><figcaption>40</figcaption></figure>
-          <figure><div class="icon s24 bg-creme"><svg><use href="#mark-a"/></svg></div><figcaption>24</figcaption></figure>
-          <figure><div class="icon circ bg-creme"><svg><use href="#mark-a"/></svg></div><figcaption>redondo</figcaption></figure>
+          <figure><div class="icon s64 bg-cream"><svg><use href="#mark-a"/></svg></div><figcaption>64</figcaption></figure>
+          <figure><div class="icon s40 bg-cream"><svg><use href="#mark-a"/></svg></div><figcaption>40</figcaption></figure>
+          <figure><div class="icon s24 bg-cream"><svg><use href="#mark-a"/></svg></div><figcaption>24</figcaption></figure>
+          <figure><div class="icon circ bg-cream"><svg><use href="#mark-a"/></svg></div><figcaption>round</figcaption></figure>
         </div>
       </div>
       <div class="lockups">
-        <div class="lockup bg-creme"><svg><use href="#mark-a"/></svg><span class="wm-a" style="color:#7A1F2B">Vitrola</span></div>
-        <div class="lockup bg-vinil"><svg><use href="#mark-a"/></svg><span class="wm-a" style="color:#F3E9D2">Vitrola</span></div>
+        <div class="lockup bg-cream"><svg><use href="#mark-a"/></svg><span class="wm-a" style="color:#7A1F2B">Vitrola</span></div>
+        <div class="lockup bg-vinyl"><svg><use href="#mark-a"/></svg><span class="wm-a" style="color:#F3E9D2">Vitrola</span></div>
       </div>
       <div class="pc">
-        <div><h3>A favor</h3><ul><li>Leitura imediata: "toca-discos"</li><li>Ótimo para animar</li></ul></div>
-        <div><h3>Contra</h3><ul><li>Detalhes somem em 24px</li><li>Conceito comum em players</li></ul></div>
+        <div><h3>Pros</h3><ul><li>Instantly reads as "turntable"</li><li>Great to animate</li></ul></div>
+        <div><h3>Cons</h3><ul><li>Details vanish at 24px</li><li>Common idea among players</li></ul></div>
       </div>
     </article>
 
     <!-- B -->
     <article class="card">
-      <span class="tag">Conceito B · Minimalista</span>
-      <h2>Disco play</h2>
-      <p class="desc">O disco vira um anel, e o selo vira o botão play. É geométrico, moderno e funciona bem em qualquer tamanho. O retrô fica só como sugestão.</p>
+      <span class="tag">Concept B · Minimal</span>
+      <h2>Play record</h2>
+      <p class="desc">The record becomes a ring and the label becomes the play button. Geometric, modern and works at any size. The retro feel is only a hint.</p>
       <div class="hero">
-        <div class="icon bg-grafite spin-on-hover"><svg><use href="#mark-b"/></svg></div>
+        <div class="icon bg-graphite spin-on-hover"><svg><use href="#mark-b"/></svg></div>
         <div class="sizes">
-          <figure><div class="icon s64 bg-grafite"><svg><use href="#mark-b"/></svg></div><figcaption>64</figcaption></figure>
-          <figure><div class="icon s40 bg-grafite"><svg><use href="#mark-b"/></svg></div><figcaption>40</figcaption></figure>
-          <figure><div class="icon s24 bg-grafite"><svg><use href="#mark-b"/></svg></div><figcaption>24</figcaption></figure>
-          <figure><div class="icon circ bg-off"><svg><use href="#mark-b-dark"/></svg></div><figcaption>redondo</figcaption></figure>
+          <figure><div class="icon s64 bg-graphite"><svg><use href="#mark-b"/></svg></div><figcaption>64</figcaption></figure>
+          <figure><div class="icon s40 bg-graphite"><svg><use href="#mark-b"/></svg></div><figcaption>40</figcaption></figure>
+          <figure><div class="icon s24 bg-graphite"><svg><use href="#mark-b"/></svg></div><figcaption>24</figcaption></figure>
+          <figure><div class="icon circ bg-off-white"><svg><use href="#mark-b-dark"/></svg></div><figcaption>round</figcaption></figure>
         </div>
       </div>
       <div class="lockups">
-        <div class="lockup bg-off"><svg><use href="#mark-b-dark"/></svg><span class="wm-b" style="color:#121212">vitrola</span></div>
-        <div class="lockup bg-grafite"><svg><use href="#mark-b"/></svg><span class="wm-b" style="color:#F5F5F0">vitrola</span></div>
+        <div class="lockup bg-off-white"><svg><use href="#mark-b-dark"/></svg><span class="wm-b" style="color:#121212">vitrola</span></div>
+        <div class="lockup bg-graphite"><svg><use href="#mark-b"/></svg><span class="wm-b" style="color:#F5F5F0">vitrola</span></div>
       </div>
       <div class="pc">
-        <div><h3>A favor</h3><ul><li>Nítido até em 24px</li><li>Fácil de virar ícone monocromático</li></ul></div>
-        <div><h3>Contra</h3><ul><li>Menos personalidade</li><li>"Play num círculo" é genérico</li></ul></div>
+        <div><h3>Pros</h3><ul><li>Crisp even at 24px</li><li>Easy to turn into a monochrome icon</li></ul></div>
+        <div><h3>Cons</h3><ul><li>Less personality</li><li>"Play in a circle" is generic</li></ul></div>
       </div>
     </article>
 
     <!-- C -->
     <article class="card">
-      <span class="tag">Conceito C · Retrô estilizado</span>
-      <h2>Gramofone em "V"</h2>
-      <p class="desc">A corneta do gramofone desenha a letra V de Vitrola sobre o disco. O símbolo é mais autoral, retrô sem ser literal.</p>
+      <span class="tag">Concept C · Stylized retro</span>
+      <h2>Gramophone "V"</h2>
+      <p class="desc">The gramophone horn draws the letter V of Vitrola above the record. A more original symbol, retro without being literal.</p>
       <div class="hero">
-        <div class="icon bg-creme"><svg><use href="#mark-c"/></svg></div>
+        <div class="icon bg-cream"><svg><use href="#mark-c"/></svg></div>
         <div class="sizes">
-          <figure><div class="icon s64 bg-creme"><svg><use href="#mark-c"/></svg></div><figcaption>64</figcaption></figure>
-          <figure><div class="icon s40 bg-creme"><svg><use href="#mark-c"/></svg></div><figcaption>40</figcaption></figure>
-          <figure><div class="icon s24 bg-creme"><svg><use href="#mark-c"/></svg></div><figcaption>24</figcaption></figure>
-          <figure><div class="icon circ bg-creme"><svg><use href="#mark-c"/></svg></div><figcaption>redondo</figcaption></figure>
+          <figure><div class="icon s64 bg-cream"><svg><use href="#mark-c"/></svg></div><figcaption>64</figcaption></figure>
+          <figure><div class="icon s40 bg-cream"><svg><use href="#mark-c"/></svg></div><figcaption>40</figcaption></figure>
+          <figure><div class="icon s24 bg-cream"><svg><use href="#mark-c"/></svg></div><figcaption>24</figcaption></figure>
+          <figure><div class="icon circ bg-cream"><svg><use href="#mark-c"/></svg></div><figcaption>round</figcaption></figure>
         </div>
       </div>
       <div class="lockups">
-        <div class="lockup bg-creme"><svg><use href="#mark-c"/></svg><span class="wm-c" style="color:#7A1F2B">Vitrola</span></div>
-        <div class="lockup bg-vinil"><svg><use href="#mark-c"/></svg><span class="wm-c" style="color:#E0A526">Vitrola</span></div>
+        <div class="lockup bg-cream"><svg><use href="#mark-c"/></svg><span class="wm-c" style="color:#7A1F2B">Vitrola</span></div>
+        <div class="lockup bg-vinyl"><svg><use href="#mark-c"/></svg><span class="wm-c" style="color:#E0A526">Vitrola</span></div>
       </div>
       <div class="pc">
-        <div><h3>A favor</h3><ul><li>Símbolo único (V + gramofone)</li><li>Forte como marca</li></ul></div>
-        <div><h3>Contra</h3><ul><li>Gramofone ≠ vitrola moderna</li><li>Mais difícil de animar</li></ul></div>
+        <div><h3>Pros</h3><ul><li>Unique symbol (V + gramophone)</li><li>Strong as a brand</li></ul></div>
+        <div><h3>Cons</h3><ul><li>Gramophone ≠ modern turntable</li><li>Harder to animate</li></ul></div>
       </div>
     </article>
 
     <!-- D -->
     <article class="card">
-      <span class="tag">Conceito D · Emblema</span>
-      <h2>Selo retrô</h2>
-      <p class="desc">Um selo de gravadora antiga, com o nome em volta e um disquinho no centro. Tem muito charme vintage, e o disco do centro pode ser usado sozinho como ícone pequeno.</p>
+      <span class="tag">Concept D · Emblem</span>
+      <h2>Retro badge</h2>
+      <p class="desc">An old record-label badge with the name around it and a small record in the middle. Lots of vintage charm, and the center record can be used alone as a small icon.</p>
       <div class="hero">
-        <div class="icon bg-creme spin-on-hover"><svg><use href="#mark-d"/></svg></div>
+        <div class="icon bg-cream spin-on-hover"><svg><use href="#mark-d"/></svg></div>
         <div class="sizes">
-          <figure><div class="icon s64 bg-creme"><svg><use href="#mark-d"/></svg></div><figcaption>64</figcaption></figure>
-          <figure><div class="icon s40 bg-creme"><svg><use href="#mark-d"/></svg></div><figcaption>40</figcaption></figure>
-          <figure><div class="icon s24 bg-creme"><svg><use href="#mark-d"/></svg></div><figcaption>24</figcaption></figure>
-          <figure><div class="icon circ bg-vinho"><svg><use href="#mark-d"/></svg></div><figcaption>redondo</figcaption></figure>
+          <figure><div class="icon s64 bg-cream"><svg><use href="#mark-d"/></svg></div><figcaption>64</figcaption></figure>
+          <figure><div class="icon s40 bg-cream"><svg><use href="#mark-d"/></svg></div><figcaption>40</figcaption></figure>
+          <figure><div class="icon s24 bg-cream"><svg><use href="#mark-d"/></svg></div><figcaption>24</figcaption></figure>
+          <figure><div class="icon circ bg-wine"><svg><use href="#mark-d"/></svg></div><figcaption>round</figcaption></figure>
         </div>
       </div>
       <div class="lockups">
-        <div class="lockup bg-creme"><svg><use href="#mark-d"/></svg><span class="wm-d" style="color:#7A1F2B">Vitrola</span></div>
-        <div class="lockup bg-vinil"><svg><use href="#mark-d"/></svg><span class="wm-d" style="color:#F3E9D2">Vitrola</span></div>
+        <div class="lockup bg-cream"><svg><use href="#mark-d"/></svg><span class="wm-d" style="color:#7A1F2B">Vitrola</span></div>
+        <div class="lockup bg-vinyl"><svg><use href="#mark-d"/></svg><span class="wm-d" style="color:#F3E9D2">Vitrola</span></div>
       </div>
       <div class="pc">
-        <div><h3>A favor</h3><ul><li>Muito caráter e nostalgia</li><li>Lindo em tela de abertura</li></ul></div>
-        <div><h3>Contra</h3><ul><li>Texto ilegível em tamanho pequeno</li><li>Pede uma versão simplificada</li></ul></div>
+        <div><h3>Pros</h3><ul><li>Lots of character and nostalgia</li><li>Beautiful on a splash screen</li></ul></div>
+        <div><h3>Cons</h3><ul><li>Text unreadable at small sizes</li><li>Needs a simplified version</li></ul></div>
       </div>
     </article>
 
   </div>
 
   <section class="next">
-    <h2>Como escolher</h2>
+    <h2>How to choose</h2>
     <ol>
-      <li>Escolha um conceito, ou combine partes (ex.: "símbolo do A com a fonte do C").</li>
-      <li>Diga o que ajustar: cores, espessuras, fonte, nível de detalhe.</li>
-      <li>Com a escolha feita, eu refino o desenho e gero os arquivos finais: SVG, ícone adaptativo do Android e versão monocromática.</li>
+      <li>Pick a concept, or combine parts (e.g. "symbol from A with the typeface from C").</li>
+      <li>Say what to adjust: colors, stroke weights, typeface, level of detail.</li>
+      <li>Once chosen, the drawing gets refined and the final files are generated: SVG, Android adaptive icon and monochrome version.</li>
     </ol>
   </section>
 </div>

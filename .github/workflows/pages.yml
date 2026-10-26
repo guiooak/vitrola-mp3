@@ -1,6 +1,6 @@
-# Publica a pasta design/ (landing page, logo, style guide e mockup) no GitHub Pages
-# a cada push na main que mexa no design ou neste workflow.
-name: Publicar site
+# Publishes the design/ folder (landing page, logo, style guide and mockup) to GitHub Pages
+# on every push to main that touches the design or this workflow.
+name: Publish site
 
 on:
   push:
@@ -15,7 +15,7 @@ permissions:
   pages: write
   id-token: write
 
-# Um deploy por vez; um novo push cancela o que ainda está na fila
+# One deploy at a time; a new push cancels whatever is still queued
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -27,24 +27,24 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Baixar o código
+      - name: Check out the code
         uses: actions/checkout@v4
 
-      - name: Montar o site
-        # Copia a pasta design/ sem os scripts de geração, que não precisam ir para o site
+      - name: Build the site
+        # Copies design/ without the generator scripts, which the site does not need
         run: |
           mkdir -p _site
-          rsync -a --exclude 'scripts/' --exclude '*.py' --exclude 'imagens/LEIA-ME.txt' design/ _site/
+          rsync -a --exclude 'scripts/' --exclude '*.py' --exclude 'images/README.txt' design/ _site/
           touch _site/.nojekyll
 
-      - name: Configurar o Pages
+      - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Enviar o site
+      - name: Upload the site
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
-      - name: Publicar
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

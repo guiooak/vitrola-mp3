@@ -1,2 +1,0 @@
-Coloque aqui imagens reais para testar o mockup (ex.: milton.jpg) e preencha `url` no artista ou álbum em ../dados.js.
-Esta pasta não vai para o app.

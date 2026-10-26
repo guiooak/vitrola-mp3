@@ -1,69 +1,70 @@
 <p align="center">
-  <img src="design/01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3" height="96">
+  <img src="design/01-logo/export/vitrola-mp3-horizontal-positive.svg" alt="Vitrola Mp3" height="96">
 </p>
 
 # Vitrola Mp3
 
-Player de música para Android que toca os MP3 guardados no próprio celular. Funciona offline, não pede conta e só lê as pastas que você escolher.
+An Android music player for the MP3s stored on your phone. It works offline, needs no account and only reads the folders you choose.
 
-> **Status:** em design. Logo ✅ · Style guide ✅ · Mockup HTML 🔍 em validação · App Android ⏳
+> **Status:** in design. Logo ✅ · Style guide ✅ · HTML mockup 🔍 in review · Android app ⏳
 
-## Veja online
+## See it online
 
-| | Página | O que tem |
+| | Page | What's inside |
 |:-:|---|---|
-| 🏠 | **[Site do app](https://guiooak.github.io/vitrola-mp3/)** | Apresentação do Vitrola Mp3 e acesso a todo o material |
-| 🎨 | **[Manual da logo](https://guiooak.github.io/vitrola-mp3/01-logo/logo-vinil.html)** | Símbolo, variações, ícone do Android, assinaturas e paleta |
-| 📐 | **[Style guide](https://guiooak.github.io/vitrola-mp3/02-style-guide/style-guide.html)** | Cores, tipografia, componentes e movimento |
-| 📱 | **[Mockup navegável](https://guiooak.github.io/vitrola-mp3/03-mockup/)** | O app inteiro para testar no navegador ou no celular |
+| 🏠 | **[App website](https://guiooak.github.io/vitrola-mp3/)** | Vitrola Mp3 overview and access to all the material |
+| 🎨 | **[Logo guidelines](https://guiooak.github.io/vitrola-mp3/01-logo/logo.html)** | Symbol, variations, Android icon, lockups and palette |
+| 📐 | **[Style guide](https://guiooak.github.io/vitrola-mp3/02-style-guide/style-guide.html)** | Colors, typography, components and motion |
+| 📱 | **[Clickable mockup](https://guiooak.github.io/vitrola-mp3/03-mockup/)** | The whole app to try in a browser or on a phone |
 
-## Ideia
+## The idea
 
-- **Só as suas pastas:** você escolhe as pastas de música e nada fora delas entra na biblioteca (áudios do WhatsApp, por exemplo).
-- **Toca em segundo plano:** a música continua com a tela apagada ou em outro app, com controles na notificação, na tela de bloqueio e no fone.
-- **Cara de vitrola:** no "tocando agora", a capa do álbum vira o selo de um disco de vinil que gira.
+- **Only your folders:** you choose the music folders and nothing outside them enters the library (WhatsApp audio, for example).
+- **Plays in the background:** music keeps going with the screen off or in another app, with controls in the notification, on the lock screen and on your headphones.
+- **Turntable soul:** on "now playing", the album cover becomes the label of a spinning vinyl record.
 
-## Como o projeto está sendo feito
+## How the project is being built
 
-O design vem antes do código. Cada etapa só começa depois que a anterior é aprovada:
+Design comes before code. Each step starts only after the previous one is approved:
 
-1. **Logo:** feita, em [`design/01-logo/`](design/01-logo/)
-2. **Style guide:** feito, em [`design/02-style-guide/`](design/02-style-guide/)
-3. **Mockup HTML:** pronto para validação, em [`design/03-mockup/`](design/03-mockup/)
-4. **App Android:** planejamento e construção, só depois do mockup aprovado
+1. **Logo:** done, in [`design/01-logo/`](design/01-logo/)
+2. **Style guide:** done, in [`design/02-style-guide/`](design/02-style-guide/)
+3. **HTML mockup:** ready for review, in [`design/03-mockup/`](design/03-mockup/)
+4. **Android app:** planning and building, only after the mockup is approved
 
-## Estrutura
+## Structure
 
 ```
 design/
-  01-logo/          páginas da logo, SVGs exportados e scripts de exportação
-  02-style-guide/   style guide, tokens de design e gerador
-  03-mockup/        app navegável para validar telas e interações
-  index.html        landing page do site
+  01-logo/          logo pages, exported SVGs and export scripts
+  02-style-guide/   style guide, design tokens and generator
+  03-mockup/        clickable app for validating screens and interactions
+  index.html        website landing page
 docs/
-  decisoes.md       registro das decisões de produto e técnica
-  design/           documentação de cada etapa de design
+  decisions.md      log of product and technical decisions
+  design/           documentation for each design step
+CLAUDE.md           repository rules (everything in US English)
 ```
 
-## Publicação do site
+## Website publishing
 
-A pasta `design/` é publicada no GitHub Pages pelo workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) a cada push na `main` que altere o design.
+The `design/` folder is published to GitHub Pages by the [`.github/workflows/pages.yml`](.github/workflows/pages.yml) workflow on every push to `main` that changes the design.
 
-## Ver o design no navegador (local)
+## View the design locally
 
 ```bash
 python3 -m http.server 8765 --directory design
 ```
 
-Depois abra:
+Then open:
 - Landing page: http://localhost:8765/
-- Logo: http://localhost:8765/01-logo/logo-vinil.html
+- Logo: http://localhost:8765/01-logo/logo.html
 - Style guide: http://localhost:8765/02-style-guide/style-guide.html
 - Mockup: http://localhost:8765/03-mockup/
 
-## Documentação
+## Documentation
 
-- [Decisões do projeto](docs/decisoes.md)
+- [Project decisions](docs/decisions.md)
 - [Design: logo](docs/design/01-logo.md)
 - [Design: style guide](docs/design/02-style-guide.md)
 - [Design: mockup](docs/design/03-mockup.md)

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,63 +11,63 @@
 <link rel="stylesheet" href="../02-style-guide/tokens.css">
 <link rel="stylesheet" href="mockup.css">
 <script src="../02-style-guide/tokens.js"></script>
-<script src="dados.js"></script>
+<script src="data.js"></script>
 </head>
 <body>
 
 <div class="stage">
-  <!-- Painel de validação (só no desktop) -->
-  <aside class="panel" id="panel" aria-label="Painel do mockup">
+  <!-- Validation panel (desktop only) -->
+  <aside class="panel" id="panel" aria-label="Mockup panel">
     <div class="panel-head">
-      <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3">
-      <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negativo.svg" alt="Vitrola Mp3">
-      <p>Mockup navegável. Use o celular ao lado como um app de verdade, ou pule direto para uma tela aqui.</p>
+      <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positive.svg" alt="Vitrola Mp3">
+      <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negative.svg" alt="Vitrola Mp3">
+      <p>Clickable mockup. Use the phone next to this panel like a real app, or jump straight to a screen here.</p>
     </div>
 
     <div class="panel-sec">
-      <h2>Telas</h2>
+      <h2>Screens</h2>
       <nav class="jump" id="jump"></nav>
     </div>
 
     <div class="panel-sec">
-      <h2>Simular</h2>
-      <div class="sim">
-        <button data-sim="notificacao"><span class="ms">notifications</span>Notificação de mídia</button>
-        <button data-sim="bloqueio"><span class="ms">lock</span>Tela de bloqueio</button>
-        <button data-sim="reabrir"><span class="ms">restart_alt</span>Fechar e reabrir o app</button>
-        <button data-sim="fone"><span class="ms">headset_off</span>Desconectar o fone</button>
-        <button data-sim="erro"><span class="ms">error</span>Arquivo com problema</button>
-        <button data-sim="permissao"><span class="ms">folder_off</span>Perder acesso à pasta</button>
-        <button data-sim="zerar"><span class="ms">refresh</span>Começar do zero</button>
+      <h2>Simulate</h2>
+      <div class="simulate">
+        <button data-simulate="notification"><span class="ms">notifications</span>Media notification</button>
+        <button data-simulate="lock-screen"><span class="ms">lock</span>Lock screen</button>
+        <button data-simulate="reopen"><span class="ms">restart_alt</span>Close and reopen the app</button>
+        <button data-simulate="headphones"><span class="ms">headset_off</span>Disconnect headphones</button>
+        <button data-simulate="broken-file"><span class="ms">error</span>Broken file</button>
+        <button data-simulate="lost-access"><span class="ms">folder_off</span>Lose folder access</button>
+        <button data-simulate="reset"><span class="ms">refresh</span>Start over</button>
       </div>
     </div>
 
     <div class="panel-sec">
-      <h2>Tema</h2>
-      <div class="seg" id="panel-theme" role="group" aria-label="Tema">
-        <button data-tema="auto">Automático</button><button data-tema="light">Claro</button><button data-tema="dark">Escuro</button>
+      <h2>Theme</h2>
+      <div class="seg" id="panel-theme" role="group" aria-label="Theme">
+        <button data-theme-choice="auto">Automatic</button><button data-theme-choice="light">Light</button><button data-theme-choice="dark">Dark</button>
       </div>
     </div>
 
-    <div class="panel-sec" id="nota-tela">
-      <h2>Sobre esta tela</h2>
-      <p id="nota-texto"></p>
+    <div class="panel-sec">
+      <h2>About this screen</h2>
+      <p id="screen-note"></p>
     </div>
   </aside>
 
-  <!-- Celular -->
+  <!-- Phone -->
   <div class="phone-wrap">
     <div class="phone" id="phone">
       <div class="app" id="app">
-        <div class="statusbar"><span id="relogio">9:41</span><span class="sb-icons"><span class="ms">signal_cellular_alt</span><span class="ms">wifi</span><span class="ms">battery_5_bar</span></span></div>
+        <div class="statusbar"><span id="clock">9:41</span><span class="sb-icons"><span class="ms">signal_cellular_alt</span><span class="ms">wifi</span><span class="ms">battery_5_bar</span></span></div>
         <div class="screens" id="screens"></div>
         <div class="bottom" id="bottom">
           <div class="mini" id="mini" hidden></div>
-          <nav class="bnav" id="bnav" aria-label="Navegação principal">
-            <button data-tab="biblioteca"><span class="pill"><span class="ms">library_music</span></span>Biblioteca</button>
+          <nav class="bnav" id="bnav" aria-label="Main navigation">
+            <button data-tab="library"><span class="pill"><span class="ms">library_music</span></span>Library</button>
             <button data-tab="playlists"><span class="pill"><span class="ms">queue_music</span></span>Playlists</button>
-            <button data-tab="busca"><span class="pill"><span class="ms">search</span></span>Buscar</button>
-            <button data-tab="ajustes"><span class="pill"><span class="ms">settings</span></span>Ajustes</button>
+            <button data-tab="search"><span class="pill"><span class="ms">search</span></span>Search</button>
+            <button data-tab="settings"><span class="pill"><span class="ms">settings</span></span>Settings</button>
           </nav>
         </div>
         <div class="np" id="np" aria-hidden="true"></div>
@@ -79,7 +79,7 @@
   </div>
 </div>
 
-<button class="panel-fab" id="panel-fab" aria-label="Abrir painel do mockup"><span class="ms">chevron_right</span></button>
+<button class="panel-fab" id="panel-fab" aria-label="Open the mockup panel"><span class="ms">chevron_right</span></button>
 
 <script src="mockup.js"></script>
 </body>

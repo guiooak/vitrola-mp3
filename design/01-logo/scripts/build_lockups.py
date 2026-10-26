@@ -1,5 +1,5 @@
-# Monta as assinaturas "Vitrola Mp3" (símbolo + nome em contorno).
-# Uso: python3 montar_assinaturas.py nome.json logo-vinil.html export
+# Builds the "Vitrola Mp3" lockups (symbol + outlined name).
+# Usage: python3 build_lockups.py wordmark.json logo.html export
 import json, re, sys, pathlib
 wm = json.load(open(sys.argv[1]))
 src = pathlib.Path(sys.argv[2]).read_text()
@@ -20,23 +20,23 @@ def text(x, base, color):
 def svg(vb, inner, title):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" aria-label="{title}">\n<title>{title}</title>\n{inner}\n</svg>\n'
 
-COLORS = {"positivo": "#7A1F2B", "negativo": "#F3E9D2"}
+COLORS = {"positive": "#7A1F2B", "negative": "#F3E9D2"}
 files = {}
 for name, color in COLORS.items():
-    # Horizontal: símbolo à esquerda, nome centralizado na altura do disco
+    # Horizontal: symbol on the left, name vertically centered on the record
     base = 110 + cap / 2
     tx = 212
     W = tx + text_w + 8
     files[f"vitrola-mp3-horizontal-{name}.svg"] = svg(f"16 8 {W - 16:.0f} 178",
         f"<g>{sym}</g>\n" + text(tx, base, color), "Vitrola Mp3")
-    # Vertical: símbolo em cima, nome embaixo
+    # Vertical: symbol on top, name below
     VW = text_w + 24
-    sx = (VW - 200) / 2 - 9   # compensa o disco deslocado para a esquerda
+    sx = (VW - 200) / 2 - 9   # compensates for the record being shifted left
     vbase = 200 + 14 + cap
     files[f"vitrola-mp3-vertical-{name}.svg"] = svg(f"0 6 {VW:.0f} {vbase + 30 - 6:.0f}",
         f'<g transform="translate({sx:.2f} 0)">{sym}</g>\n' + text(12, vbase, color), "Vitrola Mp3")
-    # Só o nome
-    files[f"vitrola-mp3-nome-{name}.svg"] = svg(f"0 0 {text_w + 8:.0f} {cap + 36:.0f}",
+    # Name only
+    files[f"vitrola-mp3-wordmark-{name}.svg"] = svg(f"0 0 {text_w + 8:.0f} {cap + 36:.0f}",
         text(4, cap + 6, color), "Vitrola Mp3")
 
 for n, c in files.items():

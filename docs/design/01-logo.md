@@ -1,85 +1,85 @@
-# Etapa 1 · Logo
+# Step 1 · Logo
 
-**Status:** aprovada em 25/10/2026 · arquivos em [`design/01-logo/`](../../design/01-logo/)
+**Status:** approved on 2026-10-25 · files in [`design/01-logo/`](../../design/01-logo/)
 
 <p>
-  <img src="../../design/01-logo/export/vitrola-icone-app.svg" alt="Ícone do app" height="96">
+  <img src="../../design/01-logo/export/vitrola-app-icon.svg" alt="App icon" height="96">
   &nbsp;&nbsp;
-  <img src="../../design/01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3" height="96">
+  <img src="../../design/01-logo/export/vitrola-mp3-horizontal-positive.svg" alt="Vitrola Mp3" height="96">
 </p>
 
-## Como chegamos aqui
+## How we got here
 
-Quatro conceitos foram explorados em [`conceitos.html`](../../design/01-logo/conceitos.html):
+Four concepts were explored in [`concepts.html`](../../design/01-logo/concepts.html):
 
-| | Conceito | Estilo | Resultado |
+| | Concept | Style | Outcome |
 |---|---|---|---|
-| **A** | Vinil clássico: disco, selo vinho, braço com agulha | Retrô literal | ✅ Escolhido |
-| B | Disco play: anel com botão play no centro | Minimalista | Genérico demais |
-| C | Gramofone em "V": a corneta forma a letra V | Retrô autoral | Lembrava uma taça |
-| D | Selo retrô: emblema com o nome em volta | Vintage | Ilegível em tamanho pequeno |
+| **A** | Classic vinyl: record, wine label, tonearm with needle | Literal retro | ✅ Chosen |
+| B | Play record: ring with a play button in the center | Minimal | Too generic |
+| C | Gramophone "V": the horn forms the letter V | Original retro | Looked like a cocktail glass |
+| D | Retro badge: emblem with the name around it | Vintage | Unreadable at small sizes |
 
-**Por que o A:** é lido na hora como "toca-discos", combina com o nome e se conecta direto com a animação do app (o braço desce e o disco gira).
+**Why A:** it instantly reads as "turntable", fits the name and ties directly into the app's animation (the arm drops and the record spins).
 
-## O símbolo
+## The symbol
 
-Desenhado numa grade de 200×200:
+Drawn on a 200×200 grid:
 
-- **Disco:** raio 70, deslocado para a esquerda e para baixo para abrir espaço ao braço. Sulcos com tons alternados e dois reflexos dão volume sem gradiente. A borda clara (`#6A5B50`) evita que o disco suma em fundos escuros.
-- **Selo:** raio 25 (cerca de 1/3 do disco, como num LP), vinho, com anel mostarda e furo creme.
-- **Braço:** do pivô (canto superior direito) até a agulha no terço externo do disco. Tem contrapeso, base mostarda, cápsula mostarda e sombra leve.
+- **Record:** radius 70, shifted left and down to make room for the arm. Alternating groove tones and two highlights add depth without gradients. A light rim (`#6A5B50`) keeps the record from disappearing on dark backgrounds.
+- **Label:** radius 25 (about 1/3 of the record, like an LP), wine, with a mustard ring and a cream spindle hole.
+- **Tonearm:** from the pivot (top right corner) to the needle on the outer third of the record. It has a counterweight, a mustard base, a mustard headshell and a soft shadow.
 
-## Variações
+## Variations
 
-| Variação | Quando usar | Arquivo |
+| Variation | When to use | File |
 |---|---|---|
-| Detalhado | 64px ou mais | `export/vitrola-simbolo.svg` |
-| Simplificado | 48px ou menos (menos sulcos, traços mais grossos, selo maior) | `export/vitrola-simbolo-pequeno.svg` |
-| Monocromático | Ícone temático do Android 13+, usos de uma cor só | `export/vitrola-simbolo-mono.svg` |
-| Ícone do app | Lojas, materiais (fundo creme arredondado) | `export/vitrola-icone-app.svg` |
-| Ícone adaptativo | Android: camadas de frente, fundo e monocromática (108×108) | `export/android/ic_launcher_*.svg` |
-| Notificação | Barra de status (branco) | `export/android/ic_notification.svg` |
+| Detailed | 64px and up | `export/vitrola-symbol.svg` |
+| Simplified | 48px and below (fewer grooves, thicker strokes, larger label) | `export/vitrola-symbol-small.svg` |
+| Monochrome | Android 13+ themed icon, single-color uses | `export/vitrola-symbol-mono.svg` |
+| App icon | Stores, marketing (rounded cream background) | `export/vitrola-app-icon.svg` |
+| Adaptive icon | Android: foreground, background and monochrome layers (108×108) | `export/android/ic_launcher_*.svg` |
+| Notification | Status bar (white) | `export/android/ic_notification.svg` |
 
-No ícone adaptativo, o símbolo fica dentro da zona segura central (66 de 108 unidades) e foi testado nas máscaras círculo, squircle, arredondado e gota.
+In the adaptive icon, the symbol sits inside the central safe zone (66 of 108 units) and was tested with the circle, squircle, rounded square and teardrop masks.
 
-## Nome
+## Name
 
-O app se chama **Vitrola Mp3**.
+The app is called **Vitrola Mp3**.
 
-- **Vitrola** em Fraunces ExtraBold (800), **Mp3** em Fraunces Medium (500), no mesmo tamanho, com eixo óptico 144. A diferença de peso cria hierarquia sem precisar de outra cor.
-- Nos arquivos exportados, o texto está em contorno e não depende da fonte instalada.
+- **Vitrola** in Fraunces ExtraBold (800), **Mp3** in Fraunces Medium (500), at the same size, optical size 144. The weight contrast creates hierarchy without a second color.
+- In the exported files the text is outlined and does not depend on installed fonts.
 
-| Assinatura | Arquivos |
+| Lockup | Files |
 |---|---|
-| Horizontal | `export/vitrola-mp3-horizontal-{positivo,negativo}.svg` |
-| Vertical | `export/vitrola-mp3-vertical-{positivo,negativo}.svg` |
-| Só o nome | `export/vitrola-mp3-nome-{positivo,negativo}.svg` |
+| Horizontal | `export/vitrola-mp3-horizontal-{positive,negative}.svg` |
+| Vertical | `export/vitrola-mp3-vertical-{positive,negative}.svg` |
+| Name only | `export/vitrola-mp3-wordmark-{positive,negative}.svg` |
 
-**Positivo** é para fundos claros (nome em vinho) e **negativo** para fundos escuros (nome em creme).
+**Positive** is for light backgrounds (name in wine) and **negative** for dark backgrounds (name in cream).
 
-## Regras de uso
+## Usage rules
 
-- **Área de respiro:** margem mínima em volta da logo igual ao raio do selo.
-- **Fundos recomendados:** creme `#F3E9D2`, vinil `#1B1714` e vinho `#7A1F2B`.
-- **Não fazer:** esticar ou girar a logo, trocar as cores do disco, usar a versão detalhada abaixo de 48px, ou pôr a assinatura positiva em fundo escuro.
+- **Clear space:** minimum margin around the logo equal to the label radius.
+- **Recommended backgrounds:** cream `#F3E9D2`, vinyl `#1B1714` and wine `#7A1F2B`.
+- **Don't:** stretch or rotate the logo, change the record colors, use the detailed version below 48px, or place the positive lockup on a dark background.
 
-## Paleta base
+## Base palette
 
-| Cor | Hex |
+| Color | Hex |
 |---|---|
-| Creme | `#F3E9D2` |
-| Vinho | `#7A1F2B` |
-| Mostarda | `#E0A526` |
-| Vinil | `#1B1714` |
-| Sulco | `#3A322C` |
+| Cream | `#F3E9D2` |
+| Wine | `#7A1F2B` |
+| Mustard | `#E0A526` |
+| Vinyl | `#1B1714` |
+| Groove | `#3A322C` |
 | Metal | `#CFC8B8` |
 
-## Como editar
+## How to edit
 
-Os desenhos ficam nos `<symbol>` de [`logo-vinil.html`](../../design/01-logo/logo-vinil.html), que é a fonte da verdade. Para mudar a logo, edite o HTML e regere os SVGs:
+The drawings live in the `<symbol>` elements of [`logo.html`](../../design/01-logo/logo.html), the source of truth. To change the logo, edit the HTML and regenerate the SVGs:
 
 ```bash
-design/01-logo/scripts/exportar.sh
+design/01-logo/scripts/export.sh
 ```
 
-O script precisa de `python3`, `uv` e `curl`. Ele baixa a fonte Fraunces (licença OFL) do repositório do Google Fonts e converte o nome em contorno com `fonttools` + `uharfbuzz`.
+The script needs `python3`, `uv` and `curl`. It downloads the Fraunces font (OFL license) from the Google Fonts repository and outlines the name with `fonttools` + `uharfbuzz`.

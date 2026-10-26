@@ -1,151 +1,154 @@
-# Etapa 3 · Mockup HTML
+# Step 3 · HTML mockup
 
-**Status:** pronto para validação (25/10/2026) · arquivos em [`design/03-mockup/`](../../design/03-mockup/)
+**Status:** ready for review (2026-10-25) · files in [`design/03-mockup/`](../../design/03-mockup/)
 
-Um app navegável no navegador para validar telas, fluxos e interações antes de escrever código Android. É "seco": HTML, CSS e um pouco de JavaScript para navegação, animações e um player simulado (o tempo passa, mas não sai som).
+A clickable app in the browser for validating screens, flows and interactions before writing Android code. It is "dry": HTML, CSS and a little JavaScript for navigation, animations and a simulated player (time passes, but there is no sound).
 
-## Como abrir
+## How to open it
 
 ```bash
 python3 -m http.server 8765 --directory design
 ```
 
-Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mockup/index.html` direto no navegador.
+Open http://localhost:8765/03-mockup/. Opening `design/03-mockup/index.html` directly in a browser also works.
 
-- **No computador:** o app aparece num quadro de celular, com um **painel** ao lado para pular para qualquer tela, simular situações, trocar o tema e ler uma nota sobre a tela atual.
-- **No celular:** o app ocupa a tela toda. O painel abre pela aba na borda esquerda.
+- **On a computer:** the app sits in a phone frame, with a **panel** next to it to jump to any screen, simulate situations, switch the theme and read a note about the current screen.
+- **On a phone:** the app fills the screen. The panel opens from the tab on the left edge.
 
-## Telas
+## Screens
 
-| # | Tela | O que validar |
+| # | Screen | What to validate |
 |---|---|---|
-| 1 | **Boas-vindas** | As três promessas (só as pastas escolhidas, toca com a tela apagada, nada sai do celular) e o botão "Escolher pasta de músicas". |
-| 2 | **Seletor de pasta** | É a tela do **Android** (SAF), não do app, e tem estilo de sistema de propósito. A raiz e "Download" são bloqueadas, como no Android real. Depois vem o pedido "Permitir acesso". |
-| 3 | **Escaneamento** | Progresso arquivo por arquivo e resumo final ("50 músicas em 9 álbuns"). Escolhendo "WhatsApp", aparece o caso sem músicas. |
-| 4 | **Biblioteca** | Filtros **Artistas** / Músicas / Álbuns / Pastas. **Artistas** vem primeiro e já fica selecionado quando o app abre (grade de fotos). Em Músicas: Tocar, Aleatório e ordenação A–Z, recentes e mais tocadas. "Artista desconhecido" fica sempre no fim. |
-| 5 | **Álbum** | Capa grande, faixas numeradas, pasta de origem no rodapé. O álbum "Sem álbum" mostra como ficam arquivos sem metadados. |
-| 6 | **Artista** | Foto grande do artista no topo, com o nome por cima, e depois álbuns e músicas. Sem foto, a capa do álbum vira um fundo desfocado. |
-| 7 | **Pasta** | Navegação pela estrutura de pastas. Pastas de artista mostram a foto, pastas de álbum mostram a capa, e as imagens reconhecidas aparecem destacadas. |
-| 8 | **Busca** | Resultados sempre em três seções separadas: **Artistas**, **Álbuns** e **Músicas**. Cada camada traz o que bate com o texto e o que está ligado a isso (ver [regras da busca](#regras-da-busca)). Ignora acentos ("aguas" acha "Águas de Março"). Mostra buscas recentes e artistas para explorar. |
-| 9 | **Playlists** | Automáticas (Músicas favoritas, Álbuns favoritos, Mais tocadas, Adicionadas recentemente) e as do usuário, com capa em mosaico. |
-| 10 | **Playlist** | Tocar, Aleatório, renomear e excluir (com desfazer). |
-| 11 | **Ajustes** | Adicionar e remover pastas (com desfazer), incluir subpastas, procurar músicas novas, timer, retomar de onde parou, pausar ao tirar o fone, dica de bateria e tema. |
-| 12 | **Tocando agora** | A capa vira o selo do disco. O braço desce ao tocar e sobe ao pausar, e o disco desacelera. O fundo ganha um toque da cor da capa. Favoritar, aleatório, repetir (todas / uma) e barra de progresso arrastável. |
-| 13 | **Fila** | O que já tocou, o que toca agora e o que vem a seguir. Pular para uma música ou tirá-la da fila. |
-| 14 | **Menu da música** | Tocar a seguir, adicionar à fila, adicionar à playlist, favoritar, ir para álbum ou artista, e detalhes do arquivo. |
-| 15 | **Timer para dormir** | 15 / 30 / 45 / 60 min ou "no fim desta música", com contagem no player e nos ajustes. |
-| 16 | **Biblioteca vazia** | Estado sem nenhuma pasta escolhida. |
+| 1 | **Welcome** | The three promises (only chosen folders, plays with the screen off, nothing leaves the phone) and the "Choose music folder" button. |
+| 2 | **Folder picker** | This is **Android's** screen (SAF), not the app's, and is styled like the system on purpose. The root and "Download" are blocked, as on real Android. Then comes the "Allow access" prompt. |
+| 3 | **Scan** | File-by-file progress and a final summary ("54 songs in 10 albums"). Choosing "WhatsApp" shows the no-music case. |
+| 4 | **Library** | **Artists** / Songs / Albums / Folders filters. **Artists** comes first and is selected when the app opens (photo grid). In Songs: Play, Shuffle and sorting by A–Z, recently added and most played. "Unknown artist" always goes last. |
+| 5 | **Album** | Large cover, numbered tracks, source folder at the bottom. The "Unknown album" shows how files without metadata look. |
+| 6 | **Artist** | Large artist photo at the top with the name over it, then albums and songs. Without a photo, the album cover becomes a blurred background. |
+| 7 | **Folder** | Browsing the folder structure. Artist folders show the photo, album folders show the cover, and recognized images are highlighted. |
+| 8 | **Search** | Results always in three separate sections: **Artists**, **Albums** and **Songs**. Each layer brings what matches the text and what is linked to it (see [search rules](#search-rules)). Ignores accents ("aguas" finds "Águas de Março"). Shows recent searches and artists to explore. |
+| 9 | **Playlists** | Automatic ones (Favorite songs, Favorite albums, Most played, Recently added) and the user's own, with a mosaic cover. |
+| 10 | **Playlist** | Play, Shuffle, rename and delete (with undo). |
+| 11 | **Settings** | Add and remove folders (with undo), include subfolders, use folder images, look for new songs, sleep timer, resume where you left off, pause when headphones disconnect, battery tip and theme. |
+| 12 | **Now playing** | The cover becomes the record label. The arm drops when playing and lifts when paused, and the record slows down. The background takes a hint of the cover color. Favorite, shuffle, repeat (all / one) and a draggable seek bar. |
+| 13 | **Queue** | What already played, what's playing and what's up next. Jump to a song or remove it from the queue. |
+| 14 | **Song menu** | Play next, add to queue, add to playlist, favorite, go to album or artist, and file details. |
+| 15 | **Sleep timer** | 15 / 30 / 45 / 60 min or "at the end of this song", with a countdown in the player and in Settings. |
+| 16 | **Empty library** | State with no folder chosen. |
 
-## Fotos de artista e capas de álbum
+## Artist photos and album covers
 
-O usuário organiza as músicas assim, com uma imagem em cada pasta:
+The user organizes music like this, with one image per folder:
 
 ```
 Music/
   MPB/
     Gilberto Gil/
-      artista.jpg              ← foto do artista
+      artist.jpg               ← artist photo
       Refavela (1977)/
-        capa.jpg               ← capa do álbum
+        cover.jpg              ← album cover
         01 - Ilê Ayê.mp3
 ```
 
-**Nomes reconhecidos** (sem diferenciar maiúsculas; `.jpg`, `.jpeg`, `.png` ou `.webp`):
+**Recognized names** (case-insensitive; `.jpg`, `.jpeg`, `.png` or `.webp`):
 
-| Imagem | Nomes aceitos, em ordem de preferência |
+| Image | Accepted names, in order of preference |
 |---|---|
-| Foto do artista (na pasta do artista) | `artista`, `artist`, `foto`, `photo` |
-| Capa do álbum (na pasta do álbum) | `capa`, `cover`, `folder`, `front`, `album` |
+| Artist photo (in the artist folder) | `artist`, `photo`, `artista`, `foto` |
+| Album cover (in the album folder) | `cover`, `folder`, `front`, `album`, `capa` |
 
-**Quando não há imagem** (o visual atual vira o substituto):
+The Portuguese names (`artista`, `foto`, `capa`) are accepted too, since folders are named by the user.
 
-| | 1º | 2º | 3º |
+**When there is no image** (the earlier look becomes the fallback):
+
+| | 1st | 2nd | 3rd |
 |---|---|---|---|
-| **Capa do álbum** | imagem na pasta do álbum | capa embutida no MP3 | capa gerada pelo app (cor da paleta + iniciais) |
-| **Foto do artista** | imagem na pasta do artista | capa do primeiro álbum do artista, em círculo | capa gerada |
+| **Album cover** | image in the album folder | cover embedded in the MP3 | app-generated cover (palette color + initials) |
+| **Artist photo** | image in the artist folder | the artist's first album cover, in a circle | generated cover |
 
-**Onde as imagens aparecem:**
+**Where the images appear:**
 
-| Lugar | Foto do artista | Capa do álbum |
+| Place | Artist photo | Album cover |
 |---|---|---|
-| Biblioteca › Artistas | Grade de círculos (3 por linha) | — |
-| Biblioteca › Álbuns, listas, fila, menus | — | Quadrada, cantos arredondados |
-| Página do artista | Grande no topo (largura total, 320dp de altura), com o nome por cima e degradê para o fundo. Sem foto, a capa vira fundo desfocado | Álbuns em rolagem lateral |
-| Página do álbum | Chip com foto pequena (28dp) e nome | Grande (220dp) |
-| Tocando agora | Foto pequena (24dp) ao lado do nome | Selo do disco e cor de fundo |
-| Busca | Círculos na seção Artistas | Seção Álbuns |
-| Pastas | Pasta de artista com foto redonda | Pasta de álbum com capa |
-| Notificação e tela de bloqueio | — | Miniatura |
+| Library › Artists | Grid of circles (3 per row) | — |
+| Library › Albums, lists, queue, menus | — | Square, rounded corners |
+| Artist page | Large at the top (full width, 320dp tall), with the name over it and a gradient into the background. Without a photo, the cover becomes a blurred background | Albums in a horizontal scroller |
+| Album page | Chip with a small photo (28dp) and name | Large (220dp) |
+| Now playing | Small photo (24dp) next to the name | Record label and background tint |
+| Search | Circles in the Artists section | Albums section |
+| Folders | Artist folder with a round photo | Album folder with the cover |
+| Notification and lock screen | — | Thumbnail |
 
-**Recorte:** a capa é sempre quadrada, com recorte central. A foto do artista aparece em círculo e em faixa larga, e o recorte privilegia a parte de cima, onde costuma estar o rosto. Tamanho recomendado: capas com pelo menos 600×600px e fotos com pelo menos 1000px de largura.
+**Cropping:** the cover is always square with a center crop. The artist photo appears as a circle and as a wide banner, and the crop favors the top, where the face usually is. Recommended size: covers at least 600×600px and photos at least 1000px wide.
 
-**Ajuste:** em Ajustes, "Usar fotos e capas das pastas" liga e desliga o uso dessas imagens. Desligado, o app usa as capas embutidas ou as geradas.
+**Setting:** in Settings, "Use folder photos and covers" turns these images on and off. When off, the app uses embedded or generated covers.
 
-**No mockup** as imagens são simuladas. Fotos e capas "fotográficas" indicam que há imagem na pasta, e o visual antigo indica o substituto. Titãs e "Cabeça Dinossauro" estão sem imagem para mostrar o substituto. Para testar com imagens reais, coloque os arquivos em `design/03-mockup/imagens/` e preencha `url` no artista ou álbum em `dados.js`.
+**In the mockup** the images are simulated. "Photographic" photos and covers mean there is an image in the folder, and the earlier look means the fallback. Titãs and "Cabeça Dinossauro" have no image, to show the fallback. To try real images, put the files in `design/03-mockup/images/` and set `url` on the artist or album in `data.js`.
 
-## Favoritos
+## Favorites
 
-Músicas e álbuns podem ser favoritados com o **coração**.
+Songs and albums can be favorited with the **heart**.
 
-| | Música | Álbum |
+| | Song | Album |
 |---|---|---|
-| **Onde favoritar** | Coração no "tocando agora", menu ⋮ da música, notificação | Coração ao lado de Tocar/Aleatório na página do álbum, menu ⋮ do álbum |
-| **Indicador** | Coraçãozinho vinho ao lado da duração, nas listas | Selo com coração no canto da capa, nos cartões de álbum |
-| **Onde aparecem** | Playlists › Músicas favoritas | Playlists › Álbuns favoritos (grade de capas) |
-| **Aviso** | "Adicionada às músicas favoritas", com Desfazer | "Álbum adicionado aos favoritos", com Desfazer |
+| **Where to favorite** | Heart on "now playing", song ⋮ menu, notification | Heart next to Play/Shuffle on the album page, album ⋮ menu |
+| **Indicator** | Small wine heart next to the duration, in lists | Heart badge in the corner of the cover, on album cards |
+| **Where they show up** | Playlists › Favorite songs | Playlists › Favorite albums (cover grid) |
+| **Snackbar** | "Added to favorite songs", with Undo | "Album added to favorites", with Undo |
 
-Favoritar um álbum **não** favorita as músicas dele: são duas listas independentes. O álbum "Sem álbum" (arquivos sem metadados) não pode ser favoritado.
+Favoriting an album does **not** favorite its songs: they are two independent lists. The "Unknown album" (files without metadata) cannot be favorited.
 
-## Regras da busca
+## Search rules
 
-A busca sempre mostra as três camadas, cada uma na sua seção e nesta ordem: **Artistas → Álbuns → Músicas**.
+Search always shows the three layers, each in its own section and in this order: **Artists → Albums → Songs**.
 
-1. **Resultado direto:** artistas pelo nome, álbuns pelo título, músicas pelo título ou nome do arquivo. Ignora acentos e maiúsculas. O que **começa** com o texto vem antes do que só **contém**.
-2. **Resultados ligados:** cada camada também traz o que está ligado aos resultados diretos das outras:
-   - Artistas: os dos álbuns e músicas encontrados.
-   - Álbuns: os dos artistas e músicas encontrados.
-   - Músicas: as dos artistas e álbuns encontrados.
-3. **Ordem:** os resultados diretos aparecem antes dos ligados.
-4. **Músicas:** mostra as 6 primeiras e um botão "Ver todas as N músicas". O botão volta ao padrão quando o texto muda.
-5. **Contagem:** cada seção mostra quantos itens tem.
-6. **Nada encontrado:** só aparece quando nenhuma camada tem resultado direto.
+1. **Direct matches:** artists by name, albums by title, songs by title or file name. Ignores accents and case. Results that **start** with the text rank above those that only **contain** it.
+2. **Linked results:** each layer also brings what is linked to the other layers' direct matches:
+   - Artists: those of the albums and songs found.
+   - Albums: those of the artists and songs found.
+   - Songs: those of the artists and albums found.
+3. **Order:** direct matches come before linked ones.
+4. **Songs:** shows the first 6 and a "See all N songs" button. The button resets when the text changes.
+5. **Counts:** each section shows how many items it has.
+6. **Nothing found:** only shown when no layer has a direct match.
 
-Exemplo: buscar "águas" traz Elis Regina (artista), Elis & Tom (álbum) e Águas de Março (música).
+Example: searching "águas" brings Elis Regina (artist), Elis & Tom (album) and Águas de Março (song).
 
-## Simulações (painel)
+## Simulations (panel)
 
-| Simulação | O que mostra |
+| Simulation | What it shows |
 |---|---|
-| Notificação de mídia | Controles na notificação do Android, sincronizados com o player |
-| Tela de bloqueio | Controles com o celular bloqueado |
-| Fechar e reabrir o app | "Retomar de onde parou": a última música fica pronta, com aviso e botão "Tocar" |
-| Desconectar o fone | Pausa automática (ou não, se a opção estiver desligada) |
-| Arquivo com problema | Pula para a próxima com o aviso "Não deu para tocar…" |
-| Perder acesso à pasta | Diálogo pedindo para escolher a pasta de novo |
-| Começar do zero | Volta às boas-vindas |
+| Media notification | Controls in the Android notification, in sync with the player |
+| Lock screen | Controls with the phone locked |
+| Close and reopen the app | "Resume where you left off": the last song is ready, with a snackbar and a "Play" button |
+| Disconnect headphones | Automatic pause (or not, if the option is off) |
+| Broken file | Skips to the next song with the "Couldn't play…" snackbar |
+| Lose folder access | Dialog asking to choose the folder again |
+| Start over | Back to the welcome screen |
 
-## Decisões tomadas no mockup
+## Decisions made in the mockup
 
-- **Navegação:** 4 abas (Biblioteca, Playlists, Buscar, Ajustes), com o mini player fixo acima delas.
-- **Biblioteca:** uma aba só, com filtros em chips (Artistas, Músicas, Álbuns, Pastas), no lugar de quatro abas separadas. Abre em **Artistas**.
-- **Gestão de pastas fica em Ajustes:** a aba "Pastas" da biblioteca é só para navegar.
-- **Busca em camadas:** artistas, álbuns e músicas sempre em seções separadas, com os itens ligados entre si.
-- **Ações destrutivas** (remover pasta, excluir playlist, tirar da fila) pedem confirmação quando não dá para desfazer, ou mostram "Desfazer" no aviso.
-- **Arquivos sem metadados** aparecem pelo nome do arquivo, agrupados em "Sem álbum" e "Artista desconhecido".
-- **Transparência:** o app sempre deixa visível de onde vem cada música (pasta no rodapé do álbum, "Detalhes do arquivo").
+- **Navigation:** 4 tabs (Library, Playlists, Search, Settings), with the mini player pinned above them.
+- **Library:** a single tab with chip filters (Artists, Songs, Albums, Folders) instead of four separate tabs. Opens on **Artists**.
+- **Folder management lives in Settings:** the library's "Folders" filter is for browsing only.
+- **Layered search:** artists, albums and songs always in separate sections, with linked items.
+- **Destructive actions** (remove folder, delete playlist, remove from queue) ask for confirmation when they can't be undone, or show "Undo" in the snackbar.
+- **Files without metadata** show up by file name, grouped under "Unknown album" and "Unknown artist".
+- **Transparency:** the app always shows where each song comes from (folder at the bottom of the album, "File details").
+- **Language:** the app's UI copy is written in English. Other languages can come later as Android translations (see D15 in [decisions.md](../decisions.md)).
 
-## Fora do mockup (fica para o app)
+## Left for the app
 
-- Arrastar para reordenar a fila (o ícone aparece, mas não funciona)
-- Som de verdade, leitura real de metadados e capas embutidas
-- Gestos de deslizar (fechar o player arrastando para baixo, por exemplo)
-- Android Auto, widget e equalizador
+- Drag to reorder the queue (the handle is shown but does not work)
+- Real sound, real metadata reading and embedded covers
+- Swipe gestures (e.g. dragging the player down to close it)
+- Android Auto, widget and equalizer
 
-## Arquivos
+## Files
 
-| Arquivo | O que é |
+| File | What it is |
 |---|---|
-| `index.html` | Estrutura: painel, quadro do celular, barras e áreas de sobreposição |
-| `mockup.css` | Estilos, usando só os tokens do style guide (`../02-style-guide/tokens.css`) |
-| `mockup.js` | Navegação, telas, player simulado, folhas, diálogos, avisos e simulações |
-| `dados.js` | Biblioteca de exemplo (9 álbuns, 50 músicas), pastas e playlists |
+| `index.html` | Structure: panel, phone frame, bars and overlay areas |
+| `mockup.css` | Styles, using only the style guide tokens (`../02-style-guide/tokens.css`) |
+| `mockup.js` | Navigation, screens, simulated player, sheets, dialogs, snackbars and simulations |
+| `data.js` | Sample library (10 albums, 54 songs), folders and playlists |
