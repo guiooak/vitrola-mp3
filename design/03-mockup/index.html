@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vitrola Mp3 – Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../02-style-guide/tokens.css">
+<link rel="stylesheet" href="mockup.css">
+<script src="../02-style-guide/tokens.js"></script>
+<script src="dados.js"></script>
+</head>
+<body>
+
+<div class="stage">
+  <!-- Painel de validação (só no desktop) -->
+  <aside class="panel" id="panel" aria-label="Painel do mockup">
+    <div class="panel-head">
+      <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3">
+      <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negativo.svg" alt="Vitrola Mp3">
+      <p>Mockup navegável. Use o celular ao lado como um app de verdade, ou pule direto para uma tela aqui.</p>
+    </div>
+
+    <div class="panel-sec">
+      <h2>Telas</h2>
+      <nav class="jump" id="jump"></nav>
+    </div>
+
+    <div class="panel-sec">
+      <h2>Simular</h2>
+      <div class="sim">
+        <button data-sim="notificacao"><span class="ms">notifications</span>Notificação de mídia</button>
+        <button data-sim="bloqueio"><span class="ms">lock</span>Tela de bloqueio</button>
+        <button data-sim="reabrir"><span class="ms">restart_alt</span>Fechar e reabrir o app</button>
+        <button data-sim="fone"><span class="ms">headset_off</span>Desconectar o fone</button>
+        <button data-sim="erro"><span class="ms">error</span>Arquivo com problema</button>
+        <button data-sim="permissao"><span class="ms">folder_off</span>Perder acesso à pasta</button>
+        <button data-sim="zerar"><span class="ms">refresh</span>Começar do zero</button>
+      </div>
+    </div>
+
+    <div class="panel-sec">
+      <h2>Tema</h2>
+      <div class="seg" id="panel-theme" role="group" aria-label="Tema">
+        <button data-tema="auto">Automático</button><button data-tema="light">Claro</button><button data-tema="dark">Escuro</button>
+      </div>
+    </div>
+
+    <div class="panel-sec" id="nota-tela">
+      <h2>Sobre esta tela</h2>
+      <p id="nota-texto"></p>
+    </div>
+  </aside>
+
+  <!-- Celular -->
+  <div class="phone-wrap">
+    <div class="phone" id="phone">
+      <div class="app" id="app">
+        <div class="statusbar"><span id="relogio">9:41</span><span class="sb-icons"><span class="ms">signal_cellular_alt</span><span class="ms">wifi</span><span class="ms">battery_5_bar</span></span></div>
+        <div class="screens" id="screens"></div>
+        <div class="bottom" id="bottom">
+          <div class="mini" id="mini" hidden></div>
+          <nav class="bnav" id="bnav" aria-label="Navegação principal">
+            <button data-tab="biblioteca"><span class="pill"><span class="ms">library_music</span></span>Biblioteca</button>
+            <button data-tab="playlists"><span class="pill"><span class="ms">queue_music</span></span>Playlists</button>
+            <button data-tab="busca"><span class="pill"><span class="ms">search</span></span>Buscar</button>
+            <button data-tab="ajustes"><span class="pill"><span class="ms">settings</span></span>Ajustes</button>
+          </nav>
+        </div>
+        <div class="np" id="np" aria-hidden="true"></div>
+        <div class="overlay" id="overlay"></div>
+        <div class="snack-area" id="snack-area"></div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="panel-fab" id="panel-fab" aria-label="Abrir painel do mockup"><span class="ms">chevron_right</span></button>
+
+<script src="mockup.js"></script>
+</body>
+</html>

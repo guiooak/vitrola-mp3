@@ -65,3 +65,14 @@ O app usa a paleta da marca (creme, vinho, mostarda) nos temas claro e escuro, s
 **25/10/2026**
 
 Projeto pessoal: commits e push direto na `main`, sem branches nem pull requests.
+
+### D11 · Estrutura de navegação do app
+**25/10/2026**
+
+Definida no mockup ([03-mockup.md](design/03-mockup.md)):
+- 4 abas (Biblioteca, Playlists, Buscar, Ajustes), com o mini player fixo acima delas;
+- a biblioteca é uma tela só, com filtros Músicas / Álbuns / Artistas / Pastas;
+- a gestão de pastas (adicionar e remover) fica em Ajustes;
+- ações destrutivas sempre têm confirmação ou "Desfazer".
+
+**Status:** aguardando validação do mockup.

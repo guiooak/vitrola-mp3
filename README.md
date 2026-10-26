@@ -6,7 +6,7 @@
 
 Player de música para Android que toca os MP3 guardados no próprio celular. Funciona offline, não pede conta e só lê as pastas que você escolher.
 
-> **Status:** em design. Logo ✅ · Style guide ✅ · Mockup HTML ⏳ · App Android ⏳
+> **Status:** em design. Logo ✅ · Style guide ✅ · Mockup HTML 🔍 em validação · App Android ⏳
 
 ## Ideia
 
@@ -20,7 +20,7 @@ O design vem antes do código. Cada etapa só começa depois que a anterior é a
 
 1. **Logo:** feita, em [`design/01-logo/`](design/01-logo/)
 2. **Style guide:** feito, em [`design/02-style-guide/`](design/02-style-guide/)
-3. **Mockup HTML:** telas navegáveis no navegador para validar o fluxo e as interações
+3. **Mockup HTML:** pronto para validação, em [`design/03-mockup/`](design/03-mockup/)
 4. **App Android:** planejamento e construção, só depois do mockup aprovado
 
 ## Estrutura
@@ -29,6 +29,7 @@ O design vem antes do código. Cada etapa só começa depois que a anterior é a
 design/
   01-logo/          páginas da logo, SVGs exportados e scripts de exportação
   02-style-guide/   style guide, tokens de design e gerador
+  03-mockup/        app navegável para validar telas e interações
 docs/
   decisoes.md       registro das decisões de produto e técnica
   design/           documentação de cada etapa de design
@@ -43,9 +44,11 @@ python3 -m http.server 8765 --directory design
 Depois abra:
 - Logo: http://localhost:8765/01-logo/logo-vinil.html
 - Style guide: http://localhost:8765/02-style-guide/style-guide.html
+- Mockup: http://localhost:8765/03-mockup/
 
 ## Documentação
 
 - [Decisões do projeto](docs/decisoes.md)
 - [Design: logo](docs/design/01-logo.md)
 - [Design: style guide](docs/design/02-style-guide.md)
+- [Design: mockup](docs/design/03-mockup.md)
