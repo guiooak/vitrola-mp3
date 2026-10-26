@@ -22,4 +22,6 @@ Paleta base: Creme `#F3E9D2` · Vinho `#7A1F2B` · Mostarda `#E0A526` · Vinil `
 
 Nome: **Vitrola** em Fraunces ExtraBold (800) e **Mp3** em Fraunces Medium (500), com eixo óptico 144. Nas assinaturas exportadas o texto já está em contorno e não depende da fonte instalada.
 
-Os SVGs em `export/` são gerados a partir dos `<symbol>` de `logo-vinil.html`. Edite lá e exporte de novo.
+Os SVGs em `export/` são gerados a partir dos `<symbol>` de `logo-vinil.html`. Edite lá e rode `scripts/exportar.sh`.
+
+Documentação completa: [docs/design/01-logo.md](../../docs/design/01-logo.md).

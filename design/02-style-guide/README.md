@@ -20,3 +20,5 @@ python3 -m http.server 8765 --directory design
 ```
 
 Depois abra http://localhost:8765/02-style-guide/style-guide.html.
+
+Documentação completa: [docs/design/02-style-guide.md](../../docs/design/02-style-guide.md).
