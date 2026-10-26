@@ -1,6 +1,6 @@
 # .ai — Handoff for the implementing agent
 
-This folder is the starting point for any AI agent that builds the **Vitrola Mp3** Android app. It collects every relevant decision made during discovery and design, written so you can implement without re-reading the whole design history.
+This folder is the starting point for any AI agent that builds the **Vitrola Mp3** Android app. The implementing agent works on a different machine than the design phase did: this repository is the only shared context. It collects every relevant decision made during discovery and design, written so you can implement without re-reading the whole design history.
 
 ## Reading order
 
@@ -14,6 +14,7 @@ This folder is the starting point for any AI agent that builds the **Vitrola Mp3
 | 6 | [06-copy.md](06-copy.md) | UI string catalog (US English) for `strings.xml`. |
 | 7 | [07-edge-cases-and-qa.md](07-edge-cases-and-qa.md) | Edge cases, error handling and a manual test plan. |
 | 8 | [08-open-questions.md](08-open-questions.md) | What is still undecided and needs the maintainer. |
+| 9 | [plans/](plans/README.md) | Implementation plans. **Start with [plans/001-android-app-v1.md](plans/001-android-app-v1.md).** |
 
 ## Sources of truth (in priority order)
 

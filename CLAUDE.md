@@ -17,7 +17,9 @@ Exceptions:
 
 ## Implementing the app
 
-Start with [`.ai/README.md`](.ai/README.md): it is the handoff for the agent that builds the Android app (context, requirements, architecture, design system, screens, copy, QA and open questions). Keep it in sync with `docs/decisions.md`.
+Start with [`.ai/README.md`](.ai/README.md): it is the handoff for the agent that builds the Android app (context, requirements, architecture, design system, screens, copy, QA and open questions). Keep it in sync with `docs/decisions.md`. The current implementation plan is [`.ai/plans/001-android-app-v1.md`](.ai/plans/001-android-app-v1.md).
+
+The maintainer converses in Brazilian Portuguese: reply in Brazilian Portuguese in chat, and keep everything committed in US English.
 
 ## Workflow
 

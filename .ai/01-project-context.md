@@ -41,8 +41,9 @@ Personal use first, **Play Store–ready** from day one:
 
 ## Maintainer preferences observed so far
 
+- **Converses in Brazilian Portuguese — answer in Brazilian Portuguese in chat**; the repository stays in US English.
+
 - Prefers simple, elegant results; will ask for changes directly.
-- Communicates in Brazilian Portuguese; expects the repository in English.
 - Likes the record-label animation and the heart (favorites) interaction.
 - Wants the library to open on **Artists**.
 - Organizes music as `Music/<Genre>/<Artist>/<Album>/`, with one image per artist and album folder; the naming rule is D19 (`folder.jpg`, else the only image).
