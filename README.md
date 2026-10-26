@@ -1,4 +1,9 @@
 <p align="center">
+  <a href="https://guiooak.github.io/vitrola-mp3/"><strong>🌐 guiooak.github.io/vitrola-mp3</strong></a><br>
+  <sub><a href="https://guiooak.github.io/vitrola-mp3/01-logo/logo-vinil.html">Manual da logo</a> · <a href="https://guiooak.github.io/vitrola-mp3/02-style-guide/style-guide.html">Style guide</a> · <a href="https://guiooak.github.io/vitrola-mp3/03-mockup/">Mockup</a></sub>
+</p>
+
+<p align="center">
   <img src="design/01-logo/export/vitrola-mp3-horizontal-positivo.svg" alt="Vitrola Mp3" height="96">
 </p>
 
@@ -7,8 +12,6 @@
 Player de música para Android que toca os MP3 guardados no próprio celular. Funciona offline, não pede conta e só lê as pastas que você escolher.
 
 > **Status:** em design. Logo ✅ · Style guide ✅ · Mockup HTML 🔍 em validação · App Android ⏳
-
-🌐 **Site:** https://guiooak.github.io/vitrola-mp3/ (landing page, manual da logo, style guide e mockup)
 
 ## Ideia
 
