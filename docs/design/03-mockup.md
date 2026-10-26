@@ -26,7 +26,7 @@ Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mocku
 | 5 | **Álbum** | Capa grande, faixas numeradas, pasta de origem no rodapé. O álbum "Sem álbum" mostra como ficam arquivos sem metadados. |
 | 6 | **Artista** | Álbuns em rolagem lateral e todas as músicas. |
 | 7 | **Pasta** | Navegação pela estrutura de pastas, com o nome real dos arquivos. |
-| 8 | **Busca** | Busca instantânea ignorando acentos ("aguas" acha "Águas de Março"), buscas recentes e artistas para explorar. |
+| 8 | **Busca** | Resultados sempre em três seções separadas: **Artistas**, **Álbuns** e **Músicas**. Cada camada traz o que bate com o texto e o que está ligado a isso (ver [regras da busca](#regras-da-busca)). Ignora acentos ("aguas" acha "Águas de Março"). Mostra buscas recentes e artistas para explorar. |
 | 9 | **Playlists** | Automáticas (Favoritas, Mais tocadas, Adicionadas recentemente) e as do usuário, com capa em mosaico. |
 | 10 | **Playlist** | Tocar, Aleatório, renomear e excluir (com desfazer). |
 | 11 | **Ajustes** | Adicionar e remover pastas (com desfazer), incluir subpastas, procurar músicas novas, timer, retomar de onde parou, pausar ao tirar o fone, dica de bateria e tema. |
@@ -35,6 +35,22 @@ Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mocku
 | 14 | **Menu da música** | Tocar a seguir, adicionar à fila, adicionar à playlist, favoritar, ir para álbum ou artista, e detalhes do arquivo. |
 | 15 | **Timer para dormir** | 15 / 30 / 45 / 60 min ou "no fim desta música", com contagem no player e nos ajustes. |
 | 16 | **Biblioteca vazia** | Estado sem nenhuma pasta escolhida. |
+
+## Regras da busca
+
+A busca sempre mostra as três camadas, cada uma na sua seção e nesta ordem: **Artistas → Álbuns → Músicas**.
+
+1. **Resultado direto:** artistas pelo nome, álbuns pelo título, músicas pelo título ou nome do arquivo. Ignora acentos e maiúsculas. O que **começa** com o texto vem antes do que só **contém**.
+2. **Resultados ligados:** cada camada também traz o que está ligado aos resultados diretos das outras:
+   - Artistas: os dos álbuns e músicas encontrados.
+   - Álbuns: os dos artistas e músicas encontrados.
+   - Músicas: as dos artistas e álbuns encontrados.
+3. **Ordem:** os resultados diretos aparecem antes dos ligados.
+4. **Músicas:** mostra as 6 primeiras e um botão "Ver todas as N músicas". O botão volta ao padrão quando o texto muda.
+5. **Contagem:** cada seção mostra quantos itens tem.
+6. **Nada encontrado:** só aparece quando nenhuma camada tem resultado direto.
+
+Exemplo: buscar "águas" traz Elis Regina (artista), Elis & Tom (álbum) e Águas de Março (música).
 
 ## Simulações (painel)
 
@@ -53,6 +69,7 @@ Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mocku
 - **Navegação:** 4 abas (Biblioteca, Playlists, Buscar, Ajustes), com o mini player fixo acima delas.
 - **Biblioteca:** uma aba só, com filtros em chips, no lugar de quatro abas separadas.
 - **Gestão de pastas fica em Ajustes:** a aba "Pastas" da biblioteca é só para navegar.
+- **Busca em camadas:** artistas, álbuns e músicas sempre em seções separadas, com os itens ligados entre si.
 - **Ações destrutivas** (remover pasta, excluir playlist, tirar da fila) pedem confirmação quando não dá para desfazer, ou mostram "Desfazer" no aviso.
 - **Arquivos sem metadados** aparecem pelo nome do arquivo, agrupados em "Sem álbum" e "Artista desconhecido".
 - **Transparência:** o app sempre deixa visível de onde vem cada música (pasta no rodapé do álbum, "Detalhes do arquivo").

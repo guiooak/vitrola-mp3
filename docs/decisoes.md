@@ -74,5 +74,6 @@ Definida no mockup ([03-mockup.md](design/03-mockup.md)):
 - a biblioteca é uma tela só, com filtros Músicas / Álbuns / Artistas / Pastas;
 - a gestão de pastas (adicionar e remover) fica em Ajustes;
 - ações destrutivas sempre têm confirmação ou "Desfazer".
+- a busca mostra sempre três seções (Artistas, Álbuns, Músicas), incluindo os itens ligados aos resultados diretos (pedido do usuário).
 
 **Status:** aguardando validação do mockup.

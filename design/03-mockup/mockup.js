@@ -476,6 +476,7 @@ const TELAS = {
       const input = $('#q', el);
       const pintar = () => {
         const q = input.value.trim();
+        if (norm(input.value.trim()) !== norm((params.q || '').trim())) S.buscaTodas = false;
         params.q = input.value;
         $('[data-a="limpar-busca"]', el).style.visibility = q ? 'visible' : 'hidden';
         $('#resultados', el).innerHTML = resultadosBusca(q);
@@ -579,17 +580,41 @@ function resultadosBusca(q) {
       <div class="sec-title">Artistas</div>
       <div class="hscroll">${artistas().map(a => `<div class="album" data-a="artista" data-nome="${esc(a.nome)}" style="width:96px;text-align:center"><div class="art" style="border-radius:50%">${capa(album([...a.albuns][0]))}</div><div class="ti">${esc(a.nome)}</div></div>`).join('')}</div>`;
   }
+  // 1) O que bate direto com o texto
   const n = norm(q);
-  const ms = biblioteca().filter(m => norm(m.titulo).includes(n) || norm(m.artista).includes(n) || norm(album(m.album).titulo).includes(n) || norm(m.arquivo).includes(n));
-  const as = albunsVisiveis().filter(a => norm(a.titulo).includes(n) || norm(a.artista).includes(n));
-  const ar = artistas().filter(a => norm(a.nome).includes(n));
-  if (!ms.length && !as.length && !ar.length) {
+  const peso = t => norm(t).startsWith(n) ? 0 : 1; // começa com o texto vem antes de só conter
+  const porPeso = campo => (a, b) => peso(campo(a)) - peso(campo(b));
+  const lib = biblioteca();
+  const msDiretas = lib.filter(m => norm(m.titulo).includes(n) || norm(m.arquivo).includes(n)).sort(porPeso(m => m.titulo));
+  const asDiretos = albunsVisiveis().filter(a => norm(a.titulo).includes(n)).sort(porPeso(a => a.titulo));
+  const arDiretos = artistas().filter(a => norm(a.nome).includes(n)).sort(porPeso(a => a.nome));
+  if (!msDiretas.length && !asDiretos.length && !arDiretos.length) {
     return `<div class="empty"><span class="ms big">search_off</span><h3>Nada encontrado</h3><p>Nenhuma música, álbum ou artista com "${esc(q)}". Confira a grafia ou tente outra palavra.</p></div>`;
   }
+  // 2) Cada camada também traz o que está ligado aos resultados das outras
+  const nomesArtistas = new Set([...arDiretos.map(a => a.nome), ...asDiretos.map(a => a.artista), ...msDiretas.map(m => m.artista)]);
+  const idsAlbuns = new Set([...asDiretos.map(a => a.id), ...msDiretas.map(m => m.album)]);
+  albunsVisiveis().forEach(a => { if (arDiretos.some(x => x.nome === a.artista)) idsAlbuns.add(a.id); });
+  const ar = [...arDiretos, ...artistas().filter(a => nomesArtistas.has(a.nome) && !arDiretos.some(x => x.nome === a.nome))];
+  const as = [...asDiretos, ...[...idsAlbuns].map(album).filter(a => !asDiretos.includes(a))];
+  const relacionadas = lib.filter(m => !msDiretas.includes(m) && (asDiretos.some(a => a.id === m.album) || arDiretos.some(a => a.nome === m.artista)));
+  const ms = [...msDiretas, ...relacionadas];
+
+  const LIMITE = 6;
+  const mostrar = S.buscaTodas ? ms : ms.slice(0, LIMITE);
   const k = ctx(ms.map(m => m.id), { tipo: 'Tocando da busca', nome: `"${q}"` });
-  return `${ar.length ? `<div class="sec-title">Artistas</div>${ar.map(a => `<div class="row-i" data-a="artista" data-nome="${esc(a.nome)}"><div class="ic round">${capa(album([...a.albuns][0]))}</div><div><div class="ti">${realcar(a.nome, q)}</div><div class="sb">Artista</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}` : ''}
-    ${as.length ? `<div class="sec-title">Álbuns</div><div class="hscroll">${as.map(cartaoAlbum).join('')}</div>` : ''}
-    ${ms.length ? `<div class="sec-title">Músicas <span style="font:var(--tipo-legenda);color:var(--cor-texto-3)">${ms.length}</span></div>${ms.map((m, i) => linhaMusica(m, k, i, { q })).join('')}` : ''}`;
+  const titulo = (nome, qtd) => `<div class="sec-title">${nome} <span class="qtd">${qtd}</span></div>`;
+  return `<section aria-label="Artistas">${titulo('Artistas', ar.length)}
+      ${ar.map(a => `<div class="row-i" data-a="artista" data-nome="${esc(a.nome)}"><div class="ic round">${capa(album([...a.albuns][0]))}</div>
+        <div style="min-width:0"><div class="ti">${realcar(a.nome, q)}</div><div class="sb">${plural(a.albuns.size, 'álbum', 'álbuns')} · ${plural(a.musicas.length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}
+    </section>
+    <section aria-label="Álbuns">${titulo('Álbuns', as.length)}
+      <div class="hscroll">${as.map(a => cartaoAlbum(a).replace(`<div class="ti">${esc(a.titulo)}</div>`, `<div class="ti">${realcar(a.titulo, q)}</div>`)).join('')}</div>
+    </section>
+    <section aria-label="Músicas">${titulo('Músicas', ms.length)}
+      ${mostrar.map((m, i) => linhaMusica(m, k, i, { q })).join('')}
+      ${ms.length > LIMITE && !S.buscaTodas ? `<div style="padding:4px 16px"><button class="btn btn-cont" style="width:100%" data-a="ver-todas-musicas">Ver todas as ${ms.length} músicas</button></div>` : ''}
+    </section>`;
 }
 
 function mosaico(ids, grande = false) {
@@ -1057,6 +1082,7 @@ const ACOES = {
   'reescanear': () => { aviso('Procurando músicas novas…'); setTimeout(() => aviso(`Biblioteca em dia · ${plural(biblioteca().length, 'música', 'músicas')}, nenhuma novidade`), 1600); },
   'bateria': () => aviso('No app, isto abre a tela de bateria do Android'),
   'tema': b => definirTema(b.dataset.tema),
+  'ver-todas-musicas': () => { S.buscaTodas = true; $('#q').dispatchEvent(new Event('input')); },
   'limpar-busca': () => { const i = $('#q'); i.value = ''; i.dispatchEvent(new Event('input')); i.focus(); },
   'recente': b => { const i = $('#q'); i.value = b.dataset.q; i.dispatchEvent(new Event('input')); },
   'limpar-recentes': () => { S.recentes = []; $('#q').dispatchEvent(new Event('input')); },

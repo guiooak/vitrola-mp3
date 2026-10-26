@@ -401,3 +401,4 @@ svg.demo.baixo .gira { animation: spin var(--duracao-volta-disco) linear infinit
   .statusbar, .gesture, .sys-tag { display: none; }
   .sys-top { padding-top: 8px; }
 }
+.sec-title .qtd { font: var(--tipo-legenda); color: var(--cor-texto-3); margin-left: 6px; margin-right: auto; }
