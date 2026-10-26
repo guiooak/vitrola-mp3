@@ -102,6 +102,15 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - Appearance: Automatic / Light / Dark theme.
 - About: logo, version, "No ads. Nothing leaves your phone."
 
-## 10. Later (do not build without asking)
+## 10. Languages (D18) — P0
 
-Android Auto, home-screen widget, equalizer, lyrics (.lrc), crossfade, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), other UI languages.
+- The app ships in **US English (default), Brazilian Portuguese and Spanish**: `values/`, `values-pt-rBR/`, `values-es/`.
+- It follows the device language and supports Android 13+ **per-app language** (`res/xml/locales_config.xml` + `android:localeConfig`), so users can choose any of the three in system settings. An in-app language picker is not required.
+- Every string, plural, content description and notification text goes through resources; nothing hardcoded.
+- Formatting follows the locale: numbers ("1,032" / "1.032"), dates on the lock screen, plurals.
+- Generated-cover initials and proper names (artists, albums, songs, folder and file names) are never translated.
+- "Unknown artist" / "Unknown album" are translated labels, but grouping must not depend on the label text (use a flag/key).
+
+## 11. Later (do not build without asking)
+
+Android Auto, home-screen widget, equalizer, lyrics (.lrc), crossfade, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.

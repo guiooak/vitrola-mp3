@@ -1,6 +1,8 @@
 # 06 · UI copy (US English)
 
-All UI text comes from `design/03-mockup/mockup.js` and the style guide's voice rules. Put it in `res/values/strings.xml` (use `<plurals>` for counts). Other languages can be added later as translations (D15); do not hardcode strings in Compose.
+All UI text comes from `design/03-mockup/mockup.js` and the style guide's voice rules. The tables below are the **source strings (US English)** for `res/values/strings.xml` (use `<plurals>` for counts); do not hardcode strings in Compose.
+
+**Translations (D18):** ship the same keys in `res/values-pt-rBR/strings.xml` (Brazilian Portuguese) and `res/values-es/strings.xml` (Spanish). Translate the meaning and the tone, not word by word: short, friendly, the voice of a friend who knows music. Keep the turntable metaphor in the welcome and empty states ("No record on the turntable" → pt-BR "Nenhum disco na vitrola"; es "No hay ningún disco en el tocadiscos"). Plurals must use each language's rules. Ask the maintainer (a native Brazilian Portuguese speaker) to review the pt-BR file.
 
 **Voice:** short sentences, the tone of a friend who knows music. The turntable metaphor only in special moments (welcome, empty states), never on buttons. See the voice table in `docs/design/02-style-guide.md`.
 

@@ -6,7 +6,7 @@
 
 An Android music player for the MP3s stored on your phone. It works offline, needs no account and only reads the folders you choose.
 
-> **Status:** in design. Logo ✅ · Style guide ✅ · HTML mockup 🔍 in review · Android app ⏳
+> **Status:** design done. Logo ✅ · Style guide ✅ · HTML mockup ✅ · Android app ⏳
 
 ## See it online
 
@@ -29,7 +29,7 @@ Design comes before code. Each step starts only after the previous one is approv
 
 1. **Logo:** done, in [`design/01-logo/`](design/01-logo/)
 2. **Style guide:** done, in [`design/02-style-guide/`](design/02-style-guide/)
-3. **HTML mockup:** ready for review, in [`design/03-mockup/`](design/03-mockup/)
+3. **HTML mockup:** approved, in [`design/03-mockup/`](design/03-mockup/)
 4. **Android app:** to be built by another agent, starting from [`.ai/`](.ai/README.md)
 
 ## Structure

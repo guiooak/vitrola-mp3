@@ -17,7 +17,7 @@
 |---|---|---|
 | Logo | ✅ Approved | `design/01-logo/`, `docs/design/01-logo.md` |
 | Style guide | ✅ Approved | `design/02-style-guide/`, `docs/design/02-style-guide.md` |
-| HTML mockup | 🔍 Built and iterated with the maintainer; see [open questions](08-open-questions.md) about formal approval | `design/03-mockup/`, `docs/design/03-mockup.md` |
+| HTML mockup | ✅ Approved (D17) — the reference for the app | `design/03-mockup/`, `docs/design/03-mockup.md` |
 | Android app | ⏳ Not started — **your job** | — |
 
 The repository currently has **no Android code**. There is a GitHub Pages site built from `design/` (https://guiooak.github.io/vitrola-mp3/).
@@ -32,7 +32,8 @@ Personal use first, **Play Store–ready** from day one:
 
 ## Repository rules (from `CLAUDE.md`)
 
-- **US English only** in everything committed: code, identifiers, comments, file names, resources, UI strings, docs, commit messages — even when the maintainer writes in Brazilian Portuguese. Proper names and real titles (artists, albums, songs) are not translated. (D15)
+- **US English only** in everything committed: code, identifiers, comments, file names, docs, commit messages, and the source (default) UI strings — even when the maintainer writes in Brazilian Portuguese. Proper names and real titles (artists, albums, songs) are not translated. (D15)
+- The **app ships in three languages** — US English (default), Brazilian Portuguese and Spanish — via Android string resources only (D18).
 - **Commit and push directly to `main`.** No branches, no pull requests. (D10)
 - **Log decisions** in `docs/decisions.md` and keep `.ai/` in sync.
 - **Design before code** (D6). The design is done; when the app needs UI that the mockup does not cover, follow the style guide and record the decision.
@@ -60,7 +61,7 @@ design/
   03-mockup/         index.html, mockup.css, mockup.js, data.js
   index.html         landing page
 docs/
-  decisions.md       D1–D16
+  decisions.md       D1–D18
   design/            01-logo.md, 02-style-guide.md, 03-mockup.md
 ```
 

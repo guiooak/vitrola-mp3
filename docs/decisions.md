@@ -76,7 +76,7 @@ Defined in the mockup ([03-mockup.md](design/03-mockup.md)):
 - destructive actions always have a confirmation or "Undo";
 - search always shows three sections (Artists, Albums, Songs), including items linked to the direct matches (maintainer's request).
 
-**Status:** waiting for mockup approval.
+**Status:** approved by the maintainer on 2026-10-25 together with the mockup (D17).
 
 ### D12 · Artist photos and album covers from the folders
 **2026-10-25**
@@ -102,9 +102,23 @@ The `design/` folder becomes a GitHub Pages site (https://guiooak.github.io/vitr
 
 All documentation, code (identifiers, comments, file names, design tokens), user-facing text in the design pages and the mockup, and commit messages are written in US English, even when the conversation with the maintainer happens in Brazilian Portuguese. The rule lives in [`CLAUDE.md`](../CLAUDE.md).
 - Proper names and real titles (artists, albums, songs) are not translated.
-- The app's UI copy is written in English. Other languages (such as Brazilian Portuguese) can be added later as Android string translations.
+- The app's UI copy is written in English first; the shipped languages are defined in D18.
 
 ### D16 · Implementation handoff in `.ai/`
 **2026-10-25**
 
 The Android app will be implemented by another AI agent. Every relevant decision, requirement and spec for that work is consolidated in [`.ai/`](../.ai/README.md) (context, product requirements, architecture, design system, screens, UI copy, edge cases/QA and open questions). This log stays the source of truth: new decisions go here first and `.ai/` is updated to match.
+
+### D17 · HTML mockup approved
+**2026-10-25**
+
+The maintainer approved the HTML mockup (`design/03-mockup/`). It is the reference for the Android app's screens, flows and behavior.
+
+### D18 · Three languages: English (US), Portuguese (Brazil), Spanish
+**2026-10-25**
+
+The app ships in **three languages** from the first version: US English, Brazilian Portuguese and Spanish.
+- English is the default/fallback (`values/`), with `values-pt-rBR/` and `values-es/` translations.
+- The app follows the device language. Per-app language selection (Android 13+ `locales_config`) is supported so users can pick one of the three in system settings.
+- The repository rule (D15) still applies: code, docs and the source strings stay in English; the translations live only in the Android string resources.
+- No text is hardcoded in the UI; every string, plural and content description goes through resources.

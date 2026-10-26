@@ -1,6 +1,6 @@
 # Step 3 · HTML mockup
 
-**Status:** ready for review (2026-10-25) · files in [`design/03-mockup/`](../../design/03-mockup/)
+**Status:** approved on 2026-10-25 (D17) · files in [`design/03-mockup/`](../../design/03-mockup/)
 
 A clickable app in the browser for validating screens, flows and interactions before writing Android code. It is "dry": HTML, CSS and a little JavaScript for navigation, animations and a simulated player (time passes, but there is no sound).
 
@@ -135,7 +135,7 @@ Example: searching "águas" brings Elis Regina (artist), Elis & Tom (album) and 
 - **Destructive actions** (remove folder, delete playlist, remove from queue) ask for confirmation when they can't be undone, or show "Undo" in the snackbar.
 - **Files without metadata** show up by file name, grouped under "Unknown album" and "Unknown artist".
 - **Transparency:** the app always shows where each song comes from (folder at the bottom of the album, "File details").
-- **Language:** the app's UI copy is written in English. Other languages can come later as Android translations (see D15 in [decisions.md](../decisions.md)).
+- **Language:** the mockup copy is in English; the app ships in English, Brazilian Portuguese and Spanish (D18 in [decisions.md](../decisions.md)).
 
 ## Left for the app
 

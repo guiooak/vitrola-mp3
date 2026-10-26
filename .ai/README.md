@@ -19,7 +19,7 @@ This folder is the starting point for any AI agent that builds the **Vitrola Mp3
 
 1. **The maintainer's latest instruction** in the conversation.
 2. [`CLAUDE.md`](../CLAUDE.md) — repository rules.
-3. [`docs/decisions.md`](../docs/decisions.md) — the decision log (D1–D16). This folder expands on it; if they ever disagree, the decision log wins and this folder must be fixed.
+3. [`docs/decisions.md`](../docs/decisions.md) — the decision log (D1–D18). This folder expands on it; if they ever disagree, the decision log wins and this folder must be fixed.
 4. [`design/02-style-guide/tokens.json`](../design/02-style-guide/tokens.json) — colors, type, spacing, motion.
 5. The mockup ([`design/03-mockup/`](../design/03-mockup/), live at https://guiooak.github.io/vitrola-mp3/03-mockup/) — the reference for layout, flows and behavior. `mockup.js` contains the exact behavior of search, queue, favorites and the record animation.
 6. Design docs: [`docs/design/`](../docs/design/).

@@ -28,7 +28,8 @@
 - **Reduce motion** on → no disc spin, no equalizer animation.
 
 ### UI
-- 200% font scale, very long titles (ellipsize), RTL is not required for v1 (English only).
+- 200% font scale, very long titles (ellipsize); RTL is not required (the three languages are LTR).
+- Switch the device (or per-app) language to Portuguese (Brazil) and Spanish: every screen, dialog, snackbar, notification and plural is translated; longer Spanish/Portuguese strings still fit.
 - Dark theme on all screens, including the system picker hand-off and dialogs.
 - Edge-to-edge insets on gesture and 3-button navigation.
 - POST_NOTIFICATIONS denied → playback still works; show nothing intrusive.
@@ -50,4 +51,5 @@
 13. Force-stop the app while paused → reopen → mini player shows the last song at the saved position, snackbar offers Play.
 14. Revoke folder access (Settings → Apps → Vitrola Mp3 → Storage/Files, or move the folder) → lost-access dialog.
 15. Put a corrupt `.mp3` in a folder → it is skipped with the snackbar.
-16. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).
+16. Change the app language to Português (Brasil) and Español in system settings → all text switches, numbers and plurals are correct.
+17. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).
