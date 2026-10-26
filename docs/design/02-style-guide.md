@@ -119,6 +119,7 @@ Todos estão interativos no guia.
 | **Filtros** | Chips Músicas / Álbuns / Artistas / Pastas. O selecionado fica vinho e ganha ✓. |
 | **Item de música** | Capa 48dp, título, artista, duração e menu. A música atual tem título vinho e equalizador animado sobre a capa. |
 | **Capa padrão** | Para MP3 sem capa: gerada a partir do nome do álbum, com cor da paleta, sulcos e iniciais em Fraunces. Determinística: o mesmo álbum sempre recebe a mesma capa. |
+| **Foto do artista** | Imagem da pasta do artista, em círculo (listas, busca) ou em faixa larga (página do artista). Sem foto, usa a capa do primeiro álbum. Detalhes em [03-mockup.md](03-mockup.md#fotos-de-artista-e-capas-de-álbum). |
 | **Mini player** | Fixo acima da navegação, com disco girando, título, play e próxima, e progresso em linha fina no topo. |
 | **Navegação inferior** | 4 abas com indicador em pílula. As abas são provisórias e serão definidas no mockup. |
 | **Busca, pastas, ajustes** | Campo em pílula. Linhas de 64dp com ícone em quadrado. Switch para opções. |

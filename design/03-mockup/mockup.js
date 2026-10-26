@@ -43,6 +43,7 @@ const ESTADO_INICIAL = () => ({
   subpastas: true,
   retomar: true,
   pausarFone: true,
+  usarImagens: true,
   playlists: clone(D.playlists),
   favoritas: new Set(D.favoritas),
   recentes: ['Milton', 'Águas de Março', 'Caetano'],
@@ -91,8 +92,29 @@ const COMBOS = [
 ];
 const hash = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
 const iniciais = s => s.split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]/.test(w)).slice(0, 2).map(w => w[0]).join('').toUpperCase();
-const corDoAlbum = a => a.semMetadados ? P.neutro[500] : COMBOS[hash(a.titulo) % COMBOS.length][0];
+const corDoAlbum = a => a.semMetadados ? P.neutro[500] : (S.usarImagens && a.capa) ? CORES_FOTO[hash(a.titulo + '#') % CORES_FOTO.length][0] : COMBOS[hash(a.titulo) % COMBOS.length][0];
+// Capa: imagem da pasta do álbum (simulada) → capa gerada (fallback)
+const CORES_FOTO = [['#1F3A5F', '#E8B04B'], ['#0F5257', '#F2C57C'], ['#5B2333', '#F7B267'], ['#2D3A2E', '#D9C5A0'],
+  ['#3B1F4A', '#F28C8C'], ['#7A3E1D', '#F4D35E'], ['#24476B', '#9AD1D4'], ['#4A3B2A', '#E07A5F']];
+const usaImagem = x => S.usarImagens && !!(x.url || x.capa || x.foto);
+function capaDaPasta(a) {
+  // Simula uma capa "fotográfica" de verdade: cores e formas variadas, com o título pequeno
+  const h = hash(a.titulo + '#'); const [c1, c2] = CORES_FOTO[h % CORES_FOTO.length];
+  const formas = [
+    `<circle cx="${120 + h % 40}" cy="${70 + h % 30}" r="58" fill="${c2}"/><rect y="132" width="200" height="68" fill="#000" fill-opacity=".28"/><rect y="148" width="200" height="6" fill="${c2}" fill-opacity=".5"/>`,
+    [0, 1, 2, 3, 4].map(i => `<polygon points="${-40 + i * 56},200 ${i * 56},200 ${100 + i * 56},0 ${60 + i * 56},0" fill="${c2}" fill-opacity="${0.15 + (i % 2) * 0.35}"/>`).join(''),
+    [80, 60, 40, 20].map((r, i) => `<rect x="${100 - r}" y="${100 - r}" width="${r * 2}" height="${r * 2}" fill="${i % 2 ? c1 : c2}" transform="rotate(${12 + h % 30} 100 100)"/>`).join(''),
+  ][h % 3];
+  return `<rect width="200" height="200" fill="${c1}"/>${formas}
+    <text x="14" y="26" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="15" fill="#FFFDF8" fill-opacity=".92">${esc(a.titulo)}</text>`;
+}
 function capaInterna(a) {
+  if (S.usarImagens && a.url) return `<image href="${esc(a.url)}" width="200" height="200" preserveAspectRatio="xMidYMid slice"/>`;
+  if (S.usarImagens && a.capa) return capaDaPasta(a);
+  return capaGerada(a);
+}
+// Capa gerada pelo app (sem imagem na pasta): mesma regra do style guide
+function capaGerada(a) {
   if (a.semMetadados) {
     return `<rect width="200" height="200" fill="${P.neutro[300]}"/>
       ${[80, 60, 40].map(r => `<circle cx="100" cy="100" r="${r}" fill="none" stroke="${P.neutro[500]}" stroke-opacity=".35" stroke-width="8"/>`).join('')}
@@ -107,6 +129,40 @@ function capaInterna(a) {
 }
 const capa = a => `<svg viewBox="0 0 200 200" aria-hidden="true">${capaInterna(a)}</svg>`;
 const capaMusica = m => capa(album(m.album));
+
+// Foto do artista: imagem da pasta do artista (simulada) → capa do primeiro álbum (fallback)
+const artistaInfo = nome => D.artistas.find(a => a.nome === nome) || { nome, foto: null };
+function fotoDaPasta(info) {
+  // Simula um retrato: fundo colorido, luz e silhueta
+  const h = hash(info.nome + '@'); const [c1, c2] = CORES_FOTO[h % CORES_FOTO.length];
+  return `<rect width="200" height="200" fill="${c1}"/>
+    <circle cx="${130 + h % 40}" cy="${40 + h % 30}" r="80" fill="${c2}" fill-opacity=".35"/>
+    <circle cx="100" cy="86" r="36" fill="#000" fill-opacity=".42"/>
+    <path d="M24 210 C30 146 66 128 100 128 C134 128 170 146 176 210 Z" fill="#000" fill-opacity=".42"/>`;
+}
+function fotoInterna(nome) {
+  const info = artistaInfo(nome);
+  if (S.usarImagens && info.url) return `<image href="${esc(info.url)}" width="200" height="200" preserveAspectRatio="xMidYMin slice"/>`;
+  if (S.usarImagens && info.foto) return fotoDaPasta(info);
+  const primeiro = D.albuns.find(a => a.artistaNome === nome && biblioteca().some(m => m.album === a.id)) || D.albuns.find(a => a.artistaNome === nome);
+  return primeiro ? capaInterna(primeiro) : capaGerada({ titulo: nome });
+}
+const foto = (nome, ajuste = 'xMidYMid slice') => `<svg viewBox="0 0 200 200" preserveAspectRatio="${ajuste}" aria-hidden="true">${fotoInterna(nome)}</svg>`;
+
+// Pastas de artista e de álbum (para mostrar a imagem certa na navegação por pasta)
+const artistaDaPasta = c => D.artistas.find(a => a.pasta === c);
+const albumDaPasta = c => D.albuns.find(a => a.pasta === c && !a.semMetadados);
+function miniaturaPasta(c, icon = 'folder') {
+  const ar = artistaDaPasta(c); if (ar) return `<div class="ic round">${foto(ar.nome)}</div>`;
+  const al = albumDaPasta(c); if (al) return `<div class="ic">${capa(al)}</div>`;
+  return `<div class="ic">${icone(icon)}</div>`;
+}
+function imagensDaPasta(c) {
+  const ar = artistaDaPasta(c), al = albumDaPasta(c), out = [];
+  if (ar && ar.foto) out.push({ arquivo: ar.foto, uso: 'foto do artista' });
+  if (al && al.capa) out.push({ arquivo: al.capa, uso: 'capa do álbum' });
+  return out;
+}
 
 /* ============================================================
    Disco com braço (player, boas-vindas, escaneamento)
@@ -237,8 +293,8 @@ function ctx(ids, origem) { const k = 'c' + uid(); contextos[k] = { ids, origem 
    Peças de interface
    ============================================================ */
 const icone = (n, extra = '') => `<span class="ms ${extra}">${n}</span>`;
-const topbar = (titulo, { voltar: v = true, acoes = '', pequeno = false } = {}) => `
-  <header class="topbar">
+const topbar = (titulo, { voltar: v = true, acoes = '', pequeno = false, sobreFoto = false } = {}) => `
+  <header class="topbar ${sobreFoto ? 'sobre-foto' : ''}">
     ${v ? `<button class="icon-btn" data-a="voltar" aria-label="Voltar">${icone('arrow_back')}</button>` : ''}
     <h1 class="${pequeno ? 'small' : ''}">${titulo}</h1>${acoes}
   </header>`;
@@ -264,7 +320,7 @@ function cartaoAlbum(a) {
   return `<div class="album" data-a="album" data-id="${a.id}" tabindex="0">
     <div class="art">${capa(a)}</div>
     <div class="ti">${esc(a.titulo)}</div>
-    <div class="ar">${esc(a.artista)}${a.ano ? ' · ' + a.ano : ''}</div>
+    <div class="ar">${esc(a.artistaNome)}${a.ano ? ' · ' + a.ano : ''}</div>
   </div>`;
 }
 function vazioDisco(titulo, texto, botao = true) {
@@ -339,7 +395,8 @@ const TELAS = {
           i++;
           $('#scan-count', el).textContent = `${plural(i, 'música', 'músicas')}`;
           $('#scan-bar', el).style.width = (i / total * 100) + '%';
-          $('#scan-file', el).textContent = lista[i - 1].pasta + '/' + lista[i - 1].arquivo;
+          const m = lista[i - 1]; const im = imagensDaPasta(m.pasta)[0];
+          $('#scan-file', el).textContent = m.numero === 1 && im && S.usarImagens ? `${m.pasta}/${im.arquivo}` : `${m.pasta}/${m.arquivo}`;
           return;
         }
         clearInterval(t);
@@ -353,6 +410,7 @@ const TELAS = {
         scan.innerHTML = `${disco({ demo: true })}<div class="done">
           <h2>Pronto!</h2>
           <div class="count">${plural(total, 'música', 'músicas')} em ${plural(nAlb, 'álbum', 'álbuns')}</div>
+          ${S.usarImagens ? `<div class="file" style="height:auto">${plural(albunsVisiveis().filter(a => a.capa).length, 'capa', 'capas')} e ${plural(artistas().filter(a => artistaInfo(a.nome).foto).length, 'foto', 'fotos')} de artista encontradas</div>` : ''}
           <button class="btn btn-pri" data-a="ir-biblioteca">${icone('library_music')}Abrir a biblioteca</button>
         </div>`;
         $('svg', scan).classList.add('baixo');
@@ -383,17 +441,16 @@ const TELAS = {
         corpo = `<div class="list-head"><span class="count">${plural(as.length, 'álbum', 'álbuns')}</span></div><div class="albums">${as.map(cartaoAlbum).join('')}</div>`;
       } else if (S.libTab === 'artistas') {
         const ar = artistas();
-        corpo = `<div class="list-head"><span class="count">${plural(ar.length, 'artista', 'artistas')}</span></div>` + ar.map(a => `
-          <div class="row-i" data-a="artista" data-nome="${esc(a.nome)}" tabindex="0">
-            <div class="ic round">${capa(album([...a.albuns][0]))}</div>
-            <div style="min-width:0"><div class="ti">${esc(a.nome)}</div><div class="sb">${plural(a.albuns.size, 'álbum', 'álbuns')} · ${plural(a.musicas.length, 'música', 'músicas')}</div></div>
-            ${icone('chevron_right', 'chev')}
-          </div>`).join('');
+        corpo = `<div class="list-head"><span class="count">${plural(ar.length, 'artista', 'artistas')}</span></div><div class="artists-grid">` + ar.map(a => `
+          <div class="artist-card" data-a="artista" data-nome="${esc(a.nome)}" tabindex="0">
+            <div class="foto">${foto(a.nome)}</div>
+            <div class="ti">${esc(a.nome)}</div><div class="sb">${plural(a.albuns.size, 'álbum', 'álbuns')}</div>
+          </div>`).join('') + '</div>';
       } else {
         corpo = S.pastas.map(p => `<div class="group-title">${esc(p.local)}</div><div class="group">
           <div class="row-i" data-a="pasta" data-caminho="${esc(p.caminho)}"><div class="ic">${icone('folder_special')}</div>
             <div><div class="ti">${esc(p.nome)}</div><div class="sb">Pasta escolhida · ${plural(musicasDaPasta(p.caminho, S.subpastas).length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>
-          ${subpastasDe(p.caminho).map(sp => `<div class="row-i" data-a="pasta" data-caminho="${esc(p.caminho + '/' + sp)}"><div class="ic">${icone('folder')}</div>
+          ${subpastasDe(p.caminho).map(sp => `<div class="row-i" data-a="pasta" data-caminho="${esc(p.caminho + '/' + sp)}">${miniaturaPasta(p.caminho + '/' + sp)}
             <div><div class="ti">${esc(sp)}</div><div class="sb">${plural(musicasDaPasta(p.caminho + '/' + sp, true).length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}
         </div>`).join('');
       }
@@ -413,7 +470,7 @@ const TELAS = {
         <div class="detail-head">
           <div class="art">${capa(a)}</div>
           <h2>${esc(a.titulo)}</h2>
-          <button class="by" data-a="artista" data-nome="${esc(a.artista)}">${esc(a.artista)}</button>
+          ${a.semMetadados ? `<span class="by">${esc(a.artistaNome)}</span>` : `<button class="artist-chip" data-a="artista" data-nome="${esc(a.artistaNome)}"><span class="av">${foto(a.artistaNome)}</span>${esc(a.artistaNome)}</button>`}
           <div class="meta">${a.ano ? a.ano + ' · ' : ''}${plural(ms.length, 'música', 'músicas')} · ${duracaoTotal(total)}</div>
         </div>
         ${acoesTocar(k)}
@@ -429,11 +486,13 @@ const TELAS = {
       const ms = biblioteca().filter(m => m.artista === nome);
       const as = [...new Set(ms.map(m => m.album))].map(album);
       const k = ctx(ms.map(m => m.id), { tipo: 'Tocando do artista', nome });
-      return `${topbar('')}
-        <div class="detail-head">
-          <div class="art round">${capa(as[0])}</div>
-          <h2>${esc(nome)}</h2>
-          <div class="meta">${plural(as.length, 'álbum', 'álbuns')} · ${plural(ms.length, 'música', 'músicas')}</div>
+      const temFoto = usaImagem(artistaInfo(nome));
+      return `${topbar('', { sobreFoto: true })}
+        <div class="artist-hero ${temFoto ? '' : 'sem-foto'}">
+          <div class="bg">${foto(nome, 'xMidYMin slice')}</div>
+          <div class="grad"></div>
+          <div class="info"><h2>${esc(nome)}</h2>
+            <div class="meta">${plural(as.length, 'álbum', 'álbuns')} · ${plural(ms.length, 'música', 'músicas')}</div></div>
         </div>
         ${acoesTocar(k)}
         <div class="sec-title">Álbuns</div>
@@ -455,7 +514,8 @@ const TELAS = {
       return `${topbar(esc(partes[partes.length - 1]))}
         <div class="crumbs">${icone('smartphone')} Memória interna ${partes.map(p => `${icone('chevron_right')} ${esc(p)}`).join(' ')}</div>
         ${todas.length ? acoesTocar(k) : ''}
-        ${subs.length ? `<div class="group">${subs.map(sp => `<div class="row-i" data-a="pasta" data-caminho="${esc(caminho + '/' + sp)}"><div class="ic">${icone('folder')}</div>
+        ${imagensDaPasta(caminho).map(im => `<div class="img-file">${icone('image')}<span><b>${esc(im.arquivo)}</b> · usada como ${im.uso}</span></div>`).join('')}
+        ${subs.length ? `<div class="group">${subs.map(sp => `<div class="row-i" data-a="pasta" data-caminho="${esc(caminho + '/' + sp)}">${miniaturaPasta(caminho + '/' + sp)}
           <div><div class="ti">${esc(sp)}</div><div class="sb">${plural(musicasDaPasta(caminho + '/' + sp, true).length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}</div>` : ''}
         ${diretas.map((m, i) => `<div class="track" data-mid="${m.id}" data-a="tocar" data-ctx="${k2}" data-i="${i}" tabindex="0">
             <div class="cover">${capa(album(m.album))}${eq}</div>
@@ -548,6 +608,7 @@ const TELAS = {
             <button class="icon-btn" data-a="remover-pasta" data-id="${p.id}" aria-label="Remover pasta ${esc(p.nome)}">${icone('remove_circle_outline')}</button></div>`).join('')}
           <div class="row-i" data-a="escolher-pasta" data-origem="ajustes" tabindex="0"><div class="ic pri">${icone('create_new_folder')}</div><div><div class="ti">Adicionar pasta</div><div class="sb">Só as pastas escolhidas entram na biblioteca</div></div><span></span></div>
           <div class="row-i" data-a="toggle" data-k="subpastas"><div class="ic pri">${icone('subdirectory_arrow_right')}</div><div><div class="ti">Incluir subpastas</div><div class="sb">Procurar músicas dentro das pastas escolhidas</div></div><button class="switch" role="switch" aria-checked="${S.subpastas}" aria-label="Incluir subpastas"></button></div>
+          <div class="row-i" data-a="toggle" data-k="usarImagens"><div class="ic pri">${icone('photo_library')}</div><div><div class="ti">Usar fotos e capas das pastas</div><div class="sb">artista.jpg na pasta do artista e capa.jpg na do álbum</div></div><button class="switch" role="switch" aria-checked="${S.usarImagens}" aria-label="Usar fotos e capas das pastas"></button></div>
           <div class="row-i" data-a="reescanear" tabindex="0"><div class="ic pri">${icone('refresh')}</div><div><div class="ti">Procurar músicas novas</div><div class="sb">Também acontece sozinho quando você abre o app</div></div><span></span></div>
         </div>
         <div class="group-title">Reprodução</div>
@@ -578,7 +639,7 @@ function resultadosBusca(q) {
     return `${S.recentes.length ? `<div class="sec-title">Buscas recentes<button data-a="limpar-recentes">Limpar</button></div>
       <div class="recentes">${S.recentes.map(r => `<button class="chip-f" data-a="recente" data-q="${esc(r)}">${icone('history')}${esc(r)}</button>`).join('')}</div>` : ''}
       <div class="sec-title">Artistas</div>
-      <div class="hscroll">${artistas().map(a => `<div class="album" data-a="artista" data-nome="${esc(a.nome)}" style="width:96px;text-align:center"><div class="art" style="border-radius:50%">${capa(album([...a.albuns][0]))}</div><div class="ti">${esc(a.nome)}</div></div>`).join('')}</div>`;
+      <div class="hscroll">${artistas().map(a => `<div class="album" data-a="artista" data-nome="${esc(a.nome)}" style="width:96px;text-align:center"><div class="art" style="border-radius:50%">${foto(a.nome)}</div><div class="ti">${esc(a.nome)}</div></div>`).join('')}</div>`;
   }
   // 1) O que bate direto com o texto
   const n = norm(q);
@@ -592,9 +653,9 @@ function resultadosBusca(q) {
     return `<div class="empty"><span class="ms big">search_off</span><h3>Nada encontrado</h3><p>Nenhuma música, álbum ou artista com "${esc(q)}". Confira a grafia ou tente outra palavra.</p></div>`;
   }
   // 2) Cada camada também traz o que está ligado aos resultados das outras
-  const nomesArtistas = new Set([...arDiretos.map(a => a.nome), ...asDiretos.map(a => a.artista), ...msDiretas.map(m => m.artista)]);
+  const nomesArtistas = new Set([...arDiretos.map(a => a.nome), ...asDiretos.map(a => a.artistaNome), ...msDiretas.map(m => m.artista)]);
   const idsAlbuns = new Set([...asDiretos.map(a => a.id), ...msDiretas.map(m => m.album)]);
-  albunsVisiveis().forEach(a => { if (arDiretos.some(x => x.nome === a.artista)) idsAlbuns.add(a.id); });
+  albunsVisiveis().forEach(a => { if (arDiretos.some(x => x.nome === a.artistaNome)) idsAlbuns.add(a.id); });
   const ar = [...arDiretos, ...artistas().filter(a => nomesArtistas.has(a.nome) && !arDiretos.some(x => x.nome === a.nome))];
   const as = [...asDiretos, ...[...idsAlbuns].map(album).filter(a => !asDiretos.includes(a))];
   const relacionadas = lib.filter(m => !msDiretas.includes(m) && (asDiretos.some(a => a.id === m.album) || arDiretos.some(a => a.nome === m.artista)));
@@ -605,7 +666,7 @@ function resultadosBusca(q) {
   const k = ctx(ms.map(m => m.id), { tipo: 'Tocando da busca', nome: `"${q}"` });
   const titulo = (nome, qtd) => `<div class="sec-title">${nome} <span class="qtd">${qtd}</span></div>`;
   return `<section aria-label="Artistas">${titulo('Artistas', ar.length)}
-      ${ar.map(a => `<div class="row-i" data-a="artista" data-nome="${esc(a.nome)}"><div class="ic round">${capa(album([...a.albuns][0]))}</div>
+      ${ar.map(a => `<div class="row-i" data-a="artista" data-nome="${esc(a.nome)}"><div class="ic round">${foto(a.nome)}</div>
         <div style="min-width:0"><div class="ti">${realcar(a.nome, q)}</div><div class="sb">${plural(a.albuns.size, 'álbum', 'álbuns')} · ${plural(a.musicas.length, 'música', 'músicas')}</div></div>${icone('chevron_right', 'chev')}</div>`).join('')}
     </section>
     <section aria-label="Álbuns">${titulo('Álbuns', as.length)}
@@ -765,7 +826,7 @@ function renderNP() {
     </div>
     <div class="np-disc">${disco({ a, braco: true, player: true })}</div>
     <div class="np-info">
-      <div style="min-width:0"><h2>${esc(m.titulo)}</h2><button class="ar" data-a="artista-np" data-nome="${esc(m.artista)}">${esc(m.artista)}${a.semMetadados ? '' : ' · ' + esc(a.titulo)}</button></div>
+      <div style="min-width:0"><h2>${esc(m.titulo)}</h2><button class="ar" data-a="artista-np" data-nome="${esc(m.artista)}">${a.semMetadados ? '' : `<span class="av">${foto(m.artista)}</span>`}${esc(m.artista)}${a.semMetadados ? '' : ' · ' + esc(a.titulo)}</button></div>
       <button class="icon-btn ${fav ? 'fav-on' : ''}" data-a="favoritar" data-mid="${m.id}" aria-label="${fav ? 'Remover das favoritas' : 'Adicionar às favoritas'}" aria-pressed="${fav}">${icone('favorite', fav ? 'fill' : '')}</button>
     </div>
     <div class="np-seek">
@@ -856,6 +917,7 @@ function infoArquivo(id) {
       <b>Pasta</b><span>${esc(m.pasta)}</span>
       <b>Duração</b><span>${fmt(m.duracao)}</span>
       <b>Formato</b><span>MP3 · 320 kbps · 44,1 kHz</span>
+      <b>Capa</b><span>${S.usarImagens && album(m.album).capa ? esc(album(m.album).capa) + ' (pasta do álbum)' : 'Gerada pelo app'}</span>
     </p>
     <div class="acts"><button class="btn btn-txt" data-a="fechar-sobreposicao">Fechar</button></div>`);
 }
@@ -899,8 +961,9 @@ function abrirSeletor(origem = 'onboarding', caminho = '') {
   seletorOrigem = origem;
   $$('.sys, .sys-dialog, .sys-tag', app).forEach(e => e.remove());
   const nomes = caminho ? caminho.split('/') : [];
-  const pastas = D.armazenamento[caminho] || [];
-  const arquivos = D.musicas.filter(m => m.pasta === caminho).map(m => m.arquivo);
+  const pastas = D.pastasSistema.filter(x => caminho ? x.startsWith(caminho + '/') && !x.slice(caminho.length + 1).includes('/') : !x.includes('/'))
+    .map(x => x.split('/').pop()).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const arquivos = [...imagensDaPasta(caminho).map(i => i.arquivo), ...D.musicas.filter(m => m.pasta === caminho).map(m => m.arquivo)];
   const bloqueada = !caminho || caminho === 'Download' || caminho === 'Android';
   const div = document.createElement('div');
   div.className = 'sys';
@@ -909,7 +972,7 @@ function abrirSeletor(origem = 'onboarding', caminho = '') {
     <div class="sys-crumb"><button data-sys-ir="">Memória interna</button>${nomes.map((n, i) => ` ${icone('chevron_right')} <button data-sys-ir="${esc(nomes.slice(0, i + 1).join('/'))}">${esc(n)}</button>`).join('')}</div>
     <div class="sys-list">
       ${pastas.map(p => `<div class="sys-item" data-sys-ir="${esc((caminho ? caminho + '/' : '') + p)}">${icone('folder', 'fill')}${esc(p)}</div>`).join('')}
-      ${arquivos.map(f => `<div class="sys-item file">${icone('audio_file')}${esc(f)}</div>`).join('')}
+      ${arquivos.map(f => `<div class="sys-item file">${icone(/\.(jpe?g|png|webp)$/i.test(f) ? 'image' : 'audio_file')}${esc(f)}</div>`).join('')}
       ${!pastas.length && !arquivos.length ? '<div class="sys-empty">Nenhum item</div>' : ''}
       ${bloqueada ? `<div class="sys-empty">${!caminho ? 'Abra uma pasta para escolher.' : 'Para proteger sua privacidade, escolha outra pasta.'}</div>` : ''}
     </div>
@@ -1023,10 +1086,10 @@ const ACOES = {
   'aleatorio-tudo': b => { const c = contextos[b.dataset.ctx]; tocarLista(c.ids, Math.floor(Math.random() * c.ids.length), c.origem, true); abrirNP(); },
   'menu': b => menuMusica(b.dataset.mid),
   'menu-album': b => { const a = album(b.dataset.id); const ids = biblioteca().filter(m => m.album === a.id).map(m => m.id);
-    abrirFolha(`<div class="s-head"><div class="cover">${capa(a)}</div><div><div class="ti">${esc(a.titulo)}</div><div class="ar">${esc(a.artista)}</div></div></div><div class="s-body">
+    abrirFolha(`<div class="s-head"><div class="cover">${capa(a)}</div><div><div class="ti">${esc(a.titulo)}</div><div class="ar">${esc(a.artistaNome)}</div></div></div><div class="s-body">
       <button class="menu-i" data-a="seguir-varias" data-ids="${ids.join(',')}">${icone('playlist_play')}Tocar a seguir</button>
       <button class="menu-i" data-a="fila-varias" data-ids="${ids.join(',')}">${icone('add_to_queue')}Adicionar ao fim da fila</button>
-      ${a.semMetadados ? '' : `<button class="menu-i" data-a="artista" data-nome="${esc(a.artista)}">${icone('mic')}Ir para o artista</button>`}</div>`); },
+      ${a.semMetadados ? '' : `<button class="menu-i" data-a="artista" data-nome="${esc(a.artistaNome)}">${icone('mic')}Ir para o artista</button>`}</div>`); },
   'seguir-varias': b => { const ids = b.dataset.ids.split(','); if (!atual()) return tocarLista(ids, 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.splice(S.idx + 1, 0, ...ids); S.filaOriginal.push(...ids); fecharSobreposicao(); aviso(`${plural(ids.length, 'música', 'músicas')} vão tocar a seguir`); },
   'fila-varias': b => { const ids = b.dataset.ids.split(','); if (!atual()) return tocarLista(ids, 0, { tipo: 'Tocando', nome: 'Fila' }); S.fila.push(...ids); S.filaOriginal.push(...ids); fecharSobreposicao(); aviso(`${plural(ids.length, 'música adicionada', 'músicas adicionadas')} à fila`); },
   'menu-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
@@ -1072,6 +1135,7 @@ const ACOES = {
     else { S.timer = { fim: Date.now() + v * 60000 }; aviso(`A música vai parar em ${v} min`); }
     if (npEl.classList.contains('aberto')) renderNP(); if (telaAtual === 'ajustes') render('none'); },
   'toggle': (b, e) => { const k = b.dataset.k; S[k] = !S[k]; const sw = $('.switch', b); sw && sw.setAttribute('aria-checked', S[k]);
+    if (k === 'usarImagens') { setTimeout(() => { render('none'); renderMini(); }, 250); aviso(S[k] ? 'Usando fotos e capas das pastas' : 'Usando capas geradas pelo app'); }
     if (k === 'subpastas') { setTimeout(() => render('none'), 250); aviso(S[k] ? 'Subpastas incluídas' : `Só arquivos direto nas pastas escolhidas · ${plural(biblioteca().length, 'música', 'músicas')}`); } },
   'remover-pasta': b => { const p = S.pastas.find(x => x.id === b.dataset.id); const n = musicasDaPasta(p.caminho, true).length;
     abrirDialogo(`${icone('folder_off', 'perigo')}<h4>Remover "${esc(p.nome)}"?</h4><p>${plural(n, 'música sai', 'músicas saem')} da biblioteca. Os arquivos continuam no seu celular.</p>
@@ -1124,11 +1188,11 @@ const NOTAS = {
   'escaneamento': 'Lê só a pasta escolhida e mostra o progresso real, arquivo por arquivo. No fim, resume o que encontrou.',
   'biblioteca-musicas': 'Tela principal. Filtros no topo, "Tocar" e "Aleatório", e ordenação (A–Z, recentes, mais tocadas). Toque numa música para tocar; ⋮ abre o menu.',
   'biblioteca-albuns': 'Grade de álbuns com capas. Os MP3 sem capa ganham uma gerada a partir do nome do álbum.',
-  'biblioteca-artistas': 'Artistas com a contagem de álbuns e músicas.',
+  'biblioteca-artistas': 'Artistas em grade, com a foto da pasta do artista (artista.jpg). Sem foto, aparece a capa do primeiro álbum dele.',
   'biblioteca-pastas': 'A biblioteca vista pelas pastas. Útil para quem organiza tudo em pastas, e mostra exatamente o que foi lido.',
   'album': 'Detalhe do álbum: capa grande, faixas numeradas e a pasta de origem no rodapé.',
-  'artista': 'Álbuns em rolagem lateral e todas as músicas do artista.',
-  'pasta': 'Navegação por pasta, com o caminho no topo e o nome real dos arquivos.',
+  'artista': 'Foto grande do artista no topo, com o nome por cima. Sem foto (ex.: Titãs), a capa do álbum vira um fundo desfocado. Depois vêm os álbuns e as músicas.',
+  'pasta': 'Navegação por pasta: pastas de artista mostram a foto e pastas de álbum mostram a capa. As imagens reconhecidas (artista.jpg, capa.jpg) aparecem destacadas.',
   'busca': 'Busca instantânea em músicas, álbuns e artistas, ignorando acentos ("aguas" acha "Águas"). As buscas recentes ficam salvas.',
   'playlists': 'Playlists automáticas (favoritas, mais tocadas, recentes) e as suas.',
   'playlist': 'Detalhe da playlist. Pelo ⋮ do topo dá para renomear ou excluir.',

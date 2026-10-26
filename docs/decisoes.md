@@ -77,3 +77,12 @@ Definida no mockup ([03-mockup.md](design/03-mockup.md)):
 - a busca mostra sempre três seções (Artistas, Álbuns, Músicas), incluindo os itens ligados aos resultados diretos (pedido do usuário).
 
 **Status:** aguardando validação do mockup.
+
+### D12 · Fotos de artista e capas de álbum vindas das pastas
+**25/10/2026**
+
+Cada pasta de artista tem uma foto (`artista.jpg`) e cada pasta de álbum tem a capa (`capa.jpg`). O app usa essas imagens em todas as telas.
+- **Capa:** imagem da pasta → capa embutida no MP3 → capa gerada.
+- **Foto do artista:** imagem da pasta → capa do primeiro álbum em círculo.
+- O visual anterior (capa gerada, capa em círculo) passa a ser o substituto quando não há imagem, como pedido pelo usuário.
+- Detalhes, nomes de arquivo aceitos e onde cada imagem aparece: [03-mockup.md](design/03-mockup.md#fotos-de-artista-e-capas-de-álbum).

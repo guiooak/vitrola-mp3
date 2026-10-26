@@ -24,8 +24,8 @@ Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mocku
 | 3 | **Escaneamento** | Progresso arquivo por arquivo e resumo final ("50 músicas em 9 álbuns"). Escolhendo "WhatsApp", aparece o caso sem músicas. |
 | 4 | **Biblioteca** | Filtros Músicas / Álbuns / Artistas / Pastas. Tocar e Aleatório. Ordenação A–Z, recentes e mais tocadas. |
 | 5 | **Álbum** | Capa grande, faixas numeradas, pasta de origem no rodapé. O álbum "Sem álbum" mostra como ficam arquivos sem metadados. |
-| 6 | **Artista** | Álbuns em rolagem lateral e todas as músicas. |
-| 7 | **Pasta** | Navegação pela estrutura de pastas, com o nome real dos arquivos. |
+| 6 | **Artista** | Foto grande do artista no topo, com o nome por cima, e depois álbuns e músicas. Sem foto, a capa do álbum vira um fundo desfocado. |
+| 7 | **Pasta** | Navegação pela estrutura de pastas. Pastas de artista mostram a foto, pastas de álbum mostram a capa, e as imagens reconhecidas aparecem destacadas. |
 | 8 | **Busca** | Resultados sempre em três seções separadas: **Artistas**, **Álbuns** e **Músicas**. Cada camada traz o que bate com o texto e o que está ligado a isso (ver [regras da busca](#regras-da-busca)). Ignora acentos ("aguas" acha "Águas de Março"). Mostra buscas recentes e artistas para explorar. |
 | 9 | **Playlists** | Automáticas (Favoritas, Mais tocadas, Adicionadas recentemente) e as do usuário, com capa em mosaico. |
 | 10 | **Playlist** | Tocar, Aleatório, renomear e excluir (com desfazer). |
@@ -35,6 +35,53 @@ Abra http://localhost:8765/03-mockup/. Também funciona abrindo `design/03-mocku
 | 14 | **Menu da música** | Tocar a seguir, adicionar à fila, adicionar à playlist, favoritar, ir para álbum ou artista, e detalhes do arquivo. |
 | 15 | **Timer para dormir** | 15 / 30 / 45 / 60 min ou "no fim desta música", com contagem no player e nos ajustes. |
 | 16 | **Biblioteca vazia** | Estado sem nenhuma pasta escolhida. |
+
+## Fotos de artista e capas de álbum
+
+O usuário organiza as músicas assim, com uma imagem em cada pasta:
+
+```
+Music/
+  MPB/
+    Gilberto Gil/
+      artista.jpg              ← foto do artista
+      Refavela (1977)/
+        capa.jpg               ← capa do álbum
+        01 - Ilê Ayê.mp3
+```
+
+**Nomes reconhecidos** (sem diferenciar maiúsculas; `.jpg`, `.jpeg`, `.png` ou `.webp`):
+
+| Imagem | Nomes aceitos, em ordem de preferência |
+|---|---|
+| Foto do artista (na pasta do artista) | `artista`, `artist`, `foto`, `photo` |
+| Capa do álbum (na pasta do álbum) | `capa`, `cover`, `folder`, `front`, `album` |
+
+**Quando não há imagem** (o visual atual vira o substituto):
+
+| | 1º | 2º | 3º |
+|---|---|---|---|
+| **Capa do álbum** | imagem na pasta do álbum | capa embutida no MP3 | capa gerada pelo app (cor da paleta + iniciais) |
+| **Foto do artista** | imagem na pasta do artista | capa do primeiro álbum do artista, em círculo | capa gerada |
+
+**Onde as imagens aparecem:**
+
+| Lugar | Foto do artista | Capa do álbum |
+|---|---|---|
+| Biblioteca › Artistas | Grade de círculos (3 por linha) | — |
+| Biblioteca › Álbuns, listas, fila, menus | — | Quadrada, cantos arredondados |
+| Página do artista | Grande no topo (largura total, 320dp de altura), com o nome por cima e degradê para o fundo. Sem foto, a capa vira fundo desfocado | Álbuns em rolagem lateral |
+| Página do álbum | Chip com foto pequena (28dp) e nome | Grande (220dp) |
+| Tocando agora | Foto pequena (24dp) ao lado do nome | Selo do disco e cor de fundo |
+| Busca | Círculos na seção Artistas | Seção Álbuns |
+| Pastas | Pasta de artista com foto redonda | Pasta de álbum com capa |
+| Notificação e tela de bloqueio | — | Miniatura |
+
+**Recorte:** a capa é sempre quadrada, com recorte central. A foto do artista aparece em círculo e em faixa larga, e o recorte privilegia a parte de cima, onde costuma estar o rosto. Tamanho recomendado: capas com pelo menos 600×600px e fotos com pelo menos 1000px de largura.
+
+**Ajuste:** em Ajustes, "Usar fotos e capas das pastas" liga e desliga o uso dessas imagens. Desligado, o app usa as capas embutidas ou as geradas.
+
+**No mockup** as imagens são simuladas. Fotos e capas "fotográficas" indicam que há imagem na pasta, e o visual antigo indica o substituto. Titãs e "Cabeça Dinossauro" estão sem imagem para mostrar o substituto. Para testar com imagens reais, coloque os arquivos em `design/03-mockup/imagens/` e preencha `url` no artista ou álbum em `dados.js`.
 
 ## Regras da busca
 
