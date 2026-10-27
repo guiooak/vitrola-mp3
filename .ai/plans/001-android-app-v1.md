@@ -10,10 +10,10 @@ The implementing agent runs on **a different machine** from the one used during 
 
 Setup:
 - Clone `https://github.com/guiooak/vitrola-mp3` (`main`). You need your own GitHub credentials with push access to `main`; the Pages workflow keeps publishing `design/` on its own.
-- Install JDK 17 and the Android SDK (command-line tools or Android Studio), plus `python3`. `uv` and `curl` are only needed to re-export logo SVGs (`design/01-logo/scripts/export.sh`).
+- Install JDK 17 and the Android SDK (command-line tools or Android Studio), plus `python3` and `ffmpeg` (test library script). `uv` and `curl` are only needed to re-export logo SVGs (`design/01-logo/scripts/export.sh`).
 - Preview the design locally with `python3 -m http.server 8765 --directory design` (also defined in `.claude/launch.json`), or use the live site https://guiooak.github.io/vitrola-mp3/.
-- You don't have the maintainer's music library. Build a small test folder that mirrors `design/03-mockup/data.js`: `Music/<Genre>/<Artist>/<Album (Year)>/NN - Title.mp3`, with `folder.jpg` in some folders, an "only image" case, an ambiguous two-image case, files without tags and a corrupt `.mp3`. Push it to an emulator with `adb push` and pick it through the system picker. Do not commit audio files.
-- Real-device checks (Samsung/Xiaomi battery behavior, Bluetooth headsets, the maintainer's own folders) are done by the maintainer with the debug APKs you hand over at the checkpoints.
+- You don't have the maintainer's music library. Phase 0 adds a script that **generates** a test library mirroring `design/03-mockup/data.js` (see Phase 0). Push its output to an emulator with `adb push` and pick it through the system picker. Never commit audio or image files from it.
+- Real-device checks (Samsung/Xiaomi battery behavior, Bluetooth headsets, the maintainer's own folders) are done by the maintainer with the APKs that CI builds at the checkpoints (see "Delivering builds" in Phase 0).
 
 ## Talking to the maintainer
 
@@ -51,6 +51,8 @@ Setup:
 
 Phases 4–6 can be reordered if the maintainer prefers; 0 → 1 → 2 → 3 is a hard sequence.
 
+**Translations run in parallel.** Phase 7 is where languages get enabled, but drafting starts right after Phase 2 (when most copy is in place) so the maintainer can review while Phases 3–6 are built. Strings added later go through the same CSV as they appear. Feature work never waits for a review: until a language is fully approved, the app runs in English (D20).
+
 ---
 
 ## Phase 0 · Project setup and foundations
@@ -68,6 +70,12 @@ Tasks:
 - [ ] Navigation shell: bottom navigation (Library, Playlists, Search, Settings) with per-tab back stacks, placeholder screens, mini player slot.
 - [ ] Strings infrastructure: `strings.xml` with the catalog from `.ai/06-copy.md`; create `i18n/translations.csv` in the D20 format (columns incl. `quantity` and `en_hash_*`, English filled, pt-BR/es empty) and the generator: it validates keys, placeholders and plural quantities, escapes XML, detects stale rows by hash, and writes `values-pt-rBR`/`values-es` plus `locales_config` **only for languages whose rows are all approved** (D20). At this point it writes none.
 - [ ] CI per Q8 (proposed: GitHub Actions running `./gradlew lint testDebugUnitTest assembleDebug` on pushes that touch the app).
+- [ ] **Delivering builds** (proposed; log it as a decision with Q8). APKs for the maintainer always come from CI, never from a local machine:
+  - CI signs them with one **shared debug keystore** kept as a GitHub Actions secret (base64), not in the repository. Every build then has the same signature, so a new APK installs over the old one and the maintainer keeps their library, favorites and playlists. A locally built APK has a different debug key and would force an uninstall.
+  - Checkpoint builds are published as a **GitHub pre-release** (tag `v0.N-debug`) with the APK attached and a short "what to try" list, so the maintainer can download it straight on the phone.
+  - `versionCode` increases on every build (e.g. from the CI run number) so Android accepts the update.
+  - The release key (Phase 8, Q9) is separate and never used for these builds.
+- [ ] **Test library generator:** `tools/make_test_library.py` (python3 + ffmpeg, no other dependencies) writes a library mirroring `design/03-mockup/data.js` into a folder given as an argument (default `build/test-library/`, ignored by git): `Music/<Genre>/<Artist>/<Album (Year)>/NN - Title.mp3` as short tagged MP3s (a few seconds of tone, title/artist/album/track/year tags, some with embedded art), plus `folder.jpg`, a `Folder.PNG` case, an "only image" case, an ambiguous two-image case, untagged files and a corrupt `.mp3`. Same input → same output, so tests are repeatable on any machine. Document it in `README.md` with the `adb push` command.
 - [ ] Update `README.md` (how to build) and log the layout/CI decisions.
 
 Done when: `./gradlew assembleDebug` succeeds, the app opens to a themed shell in light and dark, and CI is green.
@@ -109,6 +117,8 @@ Tasks:
 
 Done when: the whole library can be browsed on a device with the maintainer's folder layout, matching the mockup in light and dark. Send screenshots to the maintainer.
 
+After this phase: add every string to `i18n/translations.csv` and propose pt-BR/es drafts so the review can start (see "Translations run in parallel").
+
 ---
 
 ## Phase 3 · Playback core → first installable build
@@ -124,7 +134,7 @@ Tasks:
 - [ ] Queue sheet (jump, remove + Undo; drag handle visual only until Q5 is answered).
 - [ ] Media notification and lock screen with artwork; custom heart command (wired in Phase 4).
 - [ ] Broken file: skip + snackbar.
-- [ ] Build a **debug APK** and hand it to the maintainer with a short "what to try" list.
+- [ ] Publish the first **debug APK** through CI as a GitHub pre-release (see "Delivering builds" in Phase 0) with a short "what to try" list.
 
 Tests: unit tests for queue/shuffle/repeat/previous logic; manual checks from `.ai/07-edge-cases-and-qa.md` items 4–6, 11, 12, 15.
 
@@ -166,16 +176,16 @@ Tasks:
 - [ ] Motion pass: screen transitions, Now playing open/close, play-button morph, heart pulse, reduce motion everywhere.
 - [ ] Accessibility pass: content descriptions, 48dp targets, 200% font scale, TalkBack walkthrough, contrast check in both themes.
 - [ ] Gestures per Q6 (e.g. swipe down to close Now playing).
-- [ ] Second build to the maintainer.
+- [ ] Second build to the maintainer (CI pre-release).
 
-Done when: QA items 10, 14, 16-equivalent for English pass and the maintainer's feedback from the first build is addressed.
+Done when: QA items 10 and 14 pass, every screen works in English at 200% font scale and in dark theme, and the maintainer's feedback from the first build is addressed. (QA item 16, languages, belongs to Phase 7.)
 
 ---
 
 ## Phase 7 · Localization (D18, D20)
 
 Tasks:
-- [ ] Fill `i18n/translations.csv` with **draft** pt-BR and es proposals for every key (meaning and tone, not word by word; plurals per language).
+- [ ] Make sure `i18n/translations.csv` has **draft** pt-BR and es proposals for every key, including strings added after Phase 2 (meaning and tone, not word by word; plurals per language).
 - [ ] Ask the maintainer to review (and Q11 for Spanish). Iterate on rows marked `changes` until every row is `approved`. Never approve on the maintainer's behalf. Other work may continue meanwhile; the app stays in English.
 - [ ] Run the generator: each language appears (resources + `locales_config`) only once all its rows are approved and up to date — never a partial file. Verify locale formatting (numbers, dates, plurals incl. `many`).
 - [ ] Check layouts with the longer Portuguese/Spanish strings.
@@ -204,8 +214,9 @@ Done when: the maintainer approves the release candidate.
 | SAF scanning is slow on large libraries | `DocumentsContract` queries instead of `DocumentFile`, incremental scans, background work with progress |
 | OEM battery killers stop playback | Proper foreground service, battery tip card, test on Samsung/Xiaomi |
 | Embedded-art extraction is expensive | Extract lazily through a Coil fetcher with disk cache; never store bitmaps in Room |
+| A new APK will not install over the old one | All maintainer builds come from CI with the shared debug key and an increasing `versionCode` |
 | Record animation jank | Single global angle, `graphicsLayer` rotation, no recomposition per frame |
-| Translations block release | Start Phase 7 drafts early (after Phase 2 copy stabilizes) so review runs in parallel |
+| Translations block release | Drafts start after Phase 2 and are reviewed in parallel; if a language is not approved in time, ship without it (English fallback) |
 | Lost folder permissions | Check on every launch, clear dialog, never crash on missing documents |
 
 ## Progress log
@@ -215,3 +226,4 @@ Add one line per completed phase: date, commit, notes.
 | Date | Phase | Commit | Notes |
 |---|---|---|---|
 | 2026-10-26 | — | — | Plan edited: D20 revised (all-or-nothing languages, stale-row hashes, validation, plural rows); Phase 0 generator and Phase 7 updated; Q11 added. |
+| 2026-10-26 | — | — | Plan edited: builds delivered through CI pre-releases with a shared debug key; test library generator script; translations drafted after Phase 2 in parallel; Phase 6 done criteria clarified. |

@@ -8,7 +8,7 @@ Ask the maintainer before deciding these. Record the answer in `docs/decisions.m
 | Q5 | **Drag to reorder the queue** in v1? | Shown as a handle in the mockup but not implemented there. Proposed P1. |
 | Q6 | **Swipe down to close "Now playing"** and other gestures. | Not in the mockup; proposed as a natural Android behavior. |
 | Q7 | **Android project layout** in the repository. | Proposed: Gradle project at the repository root with an `:app` module, `design/` untouched. |
-| Q8 | **CI for the app** (lint, tests, debug build on push). | Optional; would be a new workflow next to `pages.yml`. |
+| Q8 | **CI for the app** (lint, tests, debug build on push). | Optional; would be a new workflow next to `pages.yml`. Includes how test builds reach the maintainer — proposed: CI pre-releases signed with a shared debug key kept as a GitHub secret (plan 001, Phase 0). |
 | Q9 | **Signing and release process** (keystore location, Play App Signing, versioning scheme). | D1 requires a backed-up key; nothing else decided. Never commit keys. |
 | Q10 | **Minimum feature set for the first build the maintainer installs.** | Suggested order: SAF + scan + library browsing → playback service + mini player/Now playing → queue/shuffle/repeat → favorites/playlists → search → settings, timer, resume → images and polish. |
 | Q11 | **Who reviews the Spanish strings, and which Spanish?** | D20 requires the maintainer to approve every string; the maintainer is a native Brazilian Portuguese speaker. Undecided: reviewer (maintainer or a trusted Spanish speaker) and variant (neutral Latin American is the usual default; tú vs. usted; "tocadiscos" vs. "tornamesa"). Until answered, Spanish stays disabled. |

@@ -42,7 +42,6 @@ Personal use first, **Play Store–ready** from day one:
 ## Maintainer preferences observed so far
 
 - **Converses in Brazilian Portuguese — answer in Brazilian Portuguese in chat**; the repository stays in US English.
-
 - Prefers simple, elegant results; will ask for changes directly.
 - Likes the record-label animation and the heart (favorites) interaction.
 - Wants the library to open on **Artists**.
