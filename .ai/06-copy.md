@@ -2,14 +2,15 @@
 
 All UI text comes from `design/03-mockup/mockup.js` and the style guide's voice rules. The tables below are the **source strings (US English)** for `res/values/strings.xml` (use `<plurals>` for counts); do not hardcode strings in Compose.
 
-**Translations (D18, D20) — review workflow:**
+**Translations (D18, D20) — review workflow.** D20 in `docs/decisions.md` has the full file format and generator rules.
 
-1. Every English string gets a row in `i18n/translations.csv` (`key, en, pt-BR, es, status_pt, status_es, notes`).
-2. You may propose pt-BR and es drafts, always with status `draft`. Translate the meaning and the tone, not word by word: short, friendly, the voice of a friend who knows music. Keep the turntable metaphor in the welcome and empty states (e.g. "No record on the turntable" → pt-BR draft "Nenhum disco na vitrola"). Plurals follow each language's rules (keep `one`/`other` variants as separate rows or a `|`-separated cell, and document the format at the top of the file).
-3. **Stop and ask the maintainer to review.** Only the maintainer sets `approved` (or `changes` with notes). Never mark your own drafts as approved, and never ship unreviewed text.
-4. Generate `res/values-pt-rBR/strings.xml` and `res/values-es/strings.xml` from approved rows only. Unapproved keys are omitted, so Android falls back to English.
-5. Enable a language in `res/xml/locales_config.xml` only when all of its rows are approved.
-6. When an English string changes, reset its pt-BR/es status to `draft` and mention the keys in the commit message.
+1. Every English string gets rows in `i18n/translations.csv` (UTF-8, RFC 4180 quoting). Columns: `key, quantity, en, pt-BR, es, status_pt-BR, status_es, en_hash_pt-BR, en_hash_es, notes`.
+2. **Plurals:** one row per quantity (`one`, `many`, `other`) with the same `key`; `quantity` is empty for plain strings. pt-BR and es need all three; the English cell of the `many` row repeats the `other` text as a reference.
+3. You may propose pt-BR and es drafts, always with status `draft`. Translate the meaning and the tone, not word by word: short, friendly, the voice of a friend who knows music. Keep the turntable metaphor in the welcome and empty states. Write drafts only in the CSV, never in other files (CLAUDE.md).
+4. **Ask the maintainer to review, and keep building.** Feature work does not wait for translations: until a language is fully approved, the app runs in English. Only the maintainer sets `approved` (or `changes` with notes). Never mark your own drafts as approved.
+5. The generator writes `res/values-pt-rBR/strings.xml` / `res/values-es/strings.xml` **only when every row of that language is approved and up to date**, and lists exactly those languages in `res/xml/locales_config.xml`. A partial file is never written: Android would use it from the device language and show a mix of languages.
+6. **Stale rows:** on approval the generator stores a hash of the English text in `en_hash_<lang>`. When the English text changes, the hash stops matching, the status goes back to `draft` and the language leaves the build until it is reviewed again. List the changed keys in the commit message.
+7. **Validation fails the build:** missing or extra keys, placeholders that differ from English (`%s`, `%d`, `%1$s`…), missing plural quantities, invalid UTF-8. The CSV holds plain text; the generator escapes it for Android XML (`'`, `"`, `\`, leading `@`/`?`, `<`, `&`).
 
 **Voice:** short sentences, the tone of a friend who knows music. The turntable metaphor only in special moments (welcome, empty states), never on buttons. See the voice table in `docs/design/02-style-guide.md`.
 

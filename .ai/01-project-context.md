@@ -11,7 +11,7 @@
 
 "Vitrola" is Brazilian Portuguese for "record player / turntable". Keep the name as is.
 
-## Status (2026-10-25)
+## Status (2026-10-26)
 
 | Step | Status | Where |
 |---|---|---|

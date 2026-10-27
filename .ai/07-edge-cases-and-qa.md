@@ -51,5 +51,5 @@
 13. Force-stop the app while paused → reopen → mini player shows the last song at the saved position, snackbar offers Play.
 14. Revoke folder access (Settings → Apps → Vitrola Mp3 → Storage/Files, or move the folder) → lost-access dialog.
 15. Put a corrupt `.mp3` in a folder → it is skipped with the snackbar.
-16. Change the app language to Português (Brasil) and Español in system settings → all text switches, numbers and plurals are correct. Before release, confirm every row in `i18n/translations.csv` is `approved` for the enabled languages (D20).
+16. Change the app language to Português (Brasil) and Español in system settings → all text switches, numbers and plurals are correct. A language appears only if the generator wrote its file, which means every row in `i18n/translations.csv` is `approved` and up to date (D20). Also check that a device set to a not-yet-approved language shows the app fully in English, with no mixed strings.
 17. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).

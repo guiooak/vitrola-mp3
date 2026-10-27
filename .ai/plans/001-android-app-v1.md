@@ -46,7 +46,7 @@ Setup:
 | 4 | Personal features | Resume, sleep timer, play counts, favorites, playlists | Answer Q4 (play count), Q5 (drag reorder) |
 | 5 | Search | Three-section linked search | — |
 | 6 | Settings and polish | Settings screen, theme, battery tip, motion, accessibility, gestures | Answer Q6 (gestures); second build |
-| 7 | Localization | pt-BR and es drafts → maintainer review → approved resources → languages enabled | **Review every translation (D20)** |
+| 7 | Localization | pt-BR and es drafts → maintainer review → approved resources → languages enabled | **Review every translation (D20)**; answer Q11 (Spanish reviewer and variant) |
 | 8 | QA and release prep | Full test pass, performance, signing and Play Store readiness | Answer Q9; release-candidate build |
 
 Phases 4–6 can be reordered if the maintainer prefers; 0 → 1 → 2 → 3 is a hard sequence.
@@ -66,7 +66,7 @@ Tasks:
 - [ ] Icons: vector drawables for the Material Symbols Rounded set listed in 04-design-system.
 - [ ] Launcher icon from `design/01-logo/export/android/` (adaptive + monochrome), notification icon.
 - [ ] Navigation shell: bottom navigation (Library, Playlists, Search, Settings) with per-tab back stacks, placeholder screens, mini player slot.
-- [ ] Strings infrastructure: `strings.xml` with the catalog from `.ai/06-copy.md`; create `i18n/translations.csv` (header + format notes, English column filled, pt-BR/es empty) and the generator script that writes `values-pt-rBR`/`values-es` **from approved rows only** (D20). Do not add `locales_config` entries yet.
+- [ ] Strings infrastructure: `strings.xml` with the catalog from `.ai/06-copy.md`; create `i18n/translations.csv` in the D20 format (columns incl. `quantity` and `en_hash_*`, English filled, pt-BR/es empty) and the generator: it validates keys, placeholders and plural quantities, escapes XML, detects stale rows by hash, and writes `values-pt-rBR`/`values-es` plus `locales_config` **only for languages whose rows are all approved** (D20). At this point it writes none.
 - [ ] CI per Q8 (proposed: GitHub Actions running `./gradlew lint testDebugUnitTest assembleDebug` on pushes that touch the app).
 - [ ] Update `README.md` (how to build) and log the layout/CI decisions.
 
@@ -176,11 +176,11 @@ Done when: QA items 10, 14, 16-equivalent for English pass and the maintainer's 
 
 Tasks:
 - [ ] Fill `i18n/translations.csv` with **draft** pt-BR and es proposals for every key (meaning and tone, not word by word; plurals per language).
-- [ ] **Stop and ask the maintainer to review.** Iterate on rows marked `changes` until every row is `approved`. Never approve on the maintainer's behalf.
-- [ ] Generate `values-pt-rBR` and `values-es` from approved rows; add `locales_config.xml` entries only for fully approved languages; verify locale formatting (numbers, dates, plurals).
+- [ ] Ask the maintainer to review (and Q11 for Spanish). Iterate on rows marked `changes` until every row is `approved`. Never approve on the maintainer's behalf. Other work may continue meanwhile; the app stays in English.
+- [ ] Run the generator: each language appears (resources + `locales_config`) only once all its rows are approved and up to date — never a partial file. Verify locale formatting (numbers, dates, plurals incl. `many`).
 - [ ] Check layouts with the longer Portuguese/Spanish strings.
 
-Done when: both languages are 100% approved and enabled, and QA item 16 passes.
+Done when: both languages are 100% approved and enabled, and QA item 16 passes. If Q11 leaves Spanish without a reviewer, ship pt-BR alone and log it as a decision.
 
 ---
 
@@ -214,4 +214,4 @@ Add one line per completed phase: date, commit, notes.
 
 | Date | Phase | Commit | Notes |
 |---|---|---|---|
-| | | | |
+| 2026-10-26 | — | — | Plan edited: D20 revised (all-or-nothing languages, stale-row hashes, validation, plural rows); Phase 0 generator and Phase 7 updated; Q11 added. |
