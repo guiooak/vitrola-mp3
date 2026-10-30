@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-30
-- **Revised:** 2026-10-30: lyrics embedded in the audio file added as the third source.
+- **Revised:** 2026-10-30: lyrics embedded in the audio file added as the third source. 2026-10-30: example uses placeholder lines (real lyrics are copyrighted); offset direction stated; the lyrics view is in the mockup; auto-scroll toggle added at the maintainer's request, as a global saved setting.
 - **Related:** [D6](0006-design-before-code.md), [D19](0019-folder-image-rule.md)
 
 ## Context
@@ -28,7 +28,7 @@ Example: `Elis Regina & Tom Jobim - 01 - Águas de Março.mp3` → `Elis Regina 
 
 **`.lrc` format (LRC).**
 - Lines start with one or more timestamps `[mm:ss.xx]` (also `[mm:ss]` and `[mm:ss.xxx]`); a line with several timestamps is repeated at each time. Lines are shown in time order.
-- Header tags `[ar:]`, `[ti:]`, `[al:]`, `[by:]`, `[length:]` are ignored; `[offset:±ms]` shifts all timestamps.
+- Header tags `[ar:]`, `[ti:]`, `[al:]`, `[by:]`, `[length:]` are ignored; `[offset:±ms]` shifts all timestamps (a positive value shows the lyrics earlier, as in the LRC convention).
 - Word-level timestamps (`<mm:ss.xx>`, "enhanced LRC") are removed and the line is shown whole.
 - A timestamped line with no text is an instrumental gap (shown as a short pause mark).
 - A `.lrc` file with no valid timestamp is shown as plain lyrics.
@@ -37,8 +37,8 @@ Example: `Elis Regina & Tom Jobim - 01 - Águas de Março.mp3` → `Elis Regina 
 [ar:Elis Regina & Tom Jobim]
 [ti:Águas de Março]
 [offset:+200]
-[00:12.40]É pau, é pedra, é o fim do caminho
-[00:15.80]É um resto de toco, é um pouco sozinho
+[00:12.40]First line of the song
+[00:15.80]Second line of the song
 ```
 
 **`.txt` format.** Raw lyrics, shown exactly as written (line breaks and blank lines kept), **without automatic scrolling**: the user scrolls by hand.
@@ -49,13 +49,14 @@ Example: `Elis Regina & Tom Jobim - 01 - Águas de Março.mp3` → `Elis Regina 
 
 **Behavior.**
 - Synced lyrics highlight the current line and scroll to keep it in view; tapping a line seeks to it. If the user scrolls by hand, automatic scrolling pauses until they tap "Back to current line" or a few seconds pass.
+- An **auto-scroll** toggle (a floating icon at the bottom right of synced lyrics) turns automatic scrolling off so the user can read freely. It is a **global setting, saved** with the other settings: it applies to every song and survives app restarts until the user changes it (default: on). While it is off, the current line is still highlighted and tapping a line still seeks, but nothing scrolls on its own.
 - Plain lyrics never scroll on their own.
 - Lyrics are proper text and are never translated.
 
 ## Consequences
 
 - The scanner records which songs have lyrics and where they come from (the lyrics file's document URI, or "embedded" when the audio file has a lyrics tag) and picks up new, changed or removed lyrics on the incremental scan. The text is read only when the user opens the lyrics, never stored in the database.
-- Where and how lyrics appear in "Now playing" is designed in the mockup first and approved by the maintainer (D6) before it is built.
+- Where and how lyrics appear in "Now playing" is designed in the mockup ("Lyrics" in [03-mockup.md](../design/03-mockup.md)) and approved by the maintainer (D6) before it is built.
 - The tools that organize the maintainer's music library (outside this repository) must keep `.lrc` and `.txt` files, rename them together with their audio file, and keep `USLT` tags when rewriting tags.
 - Songs whose audio file is renamed without its lyrics file lose their lyrics until the names match again.
 

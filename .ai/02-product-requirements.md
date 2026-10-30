@@ -117,10 +117,10 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 ## 11. Lyrics (D21) — P1
 
 - Lyrics come from a file next to the song with the **same base name**: `<name>.lrc` (synced when it has timestamps), else `<name>.txt` (plain), else the **lyrics embedded in the audio file** (ID3 `USLT`, Vorbis `LYRICS`/`UNSYNCEDLYRICS`, M4A `©lyr`; synced if the text has LRC timestamps, otherwise plain). Matching is case-insensitive. No lyrics are downloaded; ID3 `SYLT` is not read in v1.
-- **Synced (`.lrc`):** the current line is highlighted and kept in view while the song plays; tapping a line seeks to it; scrolling by hand pauses the automatic scroll until "back to current line" is tapped or a few seconds pass. `[offset:]` is applied; word-level timestamps are dropped; empty timed lines show a pause mark.
+- **Synced (`.lrc`):** the current line is highlighted and kept in view while the song plays; tapping a line seeks to it; scrolling by hand pauses the automatic scroll until "back to current line" is tapped or a few seconds pass; an auto-scroll icon toggle turns it off; this is a global setting saved across songs and app restarts, default on (highlight and tap-to-seek keep working). `[offset:]` is applied; word-level timestamps are dropped; empty timed lines show a pause mark.
 - **Plain (`.txt`, `.lrc` without timestamps, or embedded text without timestamps):** shown as written, **no automatic scroll**.
 - Files are UTF-8; invalid UTF-8 is read as Windows-1252.
-- The entry point and layout in "Now playing" come from the mockup, which must be updated and approved first (D6). Songs without lyrics show no lyrics view (exact treatment decided in the mockup).
+- The entry point and layout in "Now playing" follow the approved mockup ("Lyrics" shortcuts in the mockup panel; `docs/design/03-mockup.md`). The lyrics button is always shown; songs without lyrics open an empty state that explains how to add them.
 - Full rules: [D21](../docs/decisions/0021-lyrics-sources.md).
 
 ## 12. Later (do not build without asking)

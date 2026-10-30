@@ -95,7 +95,7 @@ Grouping rules:
 - **Artist folder** = the parent directory of the album folder when its name matches the artist name (normalized), otherwise the album folder's parent if it contains no audio files of its own. **Photo** = the D19 pick there.
 - Normalization for keys and search: Unicode NFD, strip diacritics, lowercase, trim, collapse spaces.
 
-Settings (DataStore): `subfolders`, `useFolderImages`, `resume`, `pauseOnUnplug`, `theme` (auto/light/dark), `librarySort` (az/recent/plays), `libraryTab` (default `artists` on every launch — do not persist a different start tab unless the maintainer asks).
+Settings (DataStore): `subfolders`, `useFolderImages`, `resume`, `pauseOnUnplug`, `theme` (auto/light/dark), `lyricsAutoScroll` (default true, D21), `librarySort` (az/recent/plays), `libraryTab` (default `artists` on every launch — do not persist a different start tab unless the maintainer asks).
 
 Playback state persistence (DataStore or a small table): queue track IDs, original order, index, position, shuffle, repeat, source (type + name + id).
 

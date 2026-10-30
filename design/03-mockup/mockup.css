@@ -306,6 +306,49 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 .np-extra .icon-btn.on { color: var(--color-primary); }
 .timer-tag { font: var(--type-caption); color: var(--color-primary); text-align: center; height: 16px; margin-top: -4px; font-variant-numeric: tabular-nums; }
 
+/* ---------- Lyrics (D21) ---------- */
+.np-top .src .ar { display: block; font: var(--type-caption); color: var(--color-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ly-disc { width: 48px; height: 48px; padding: 3px; border: 0; background: none; border-radius: 50%; cursor: pointer; flex: none; }
+.ly-disc svg { width: 100%; height: 100%; display: block; }
+.ly-auto { position: absolute; right: 16px; bottom: 8px; width: 44px; height: 44px; color: var(--color-text-2); }
+.ly-auto.on { color: var(--color-primary); }
+.ly-auto.on::after { bottom: 5px; }
+.ly-wrap { position: relative; flex: 1; min-height: 0; }
+.ly-scroll { position: relative; height: 100%; overflow-y: auto; padding: 28px 28px 200px; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(transparent, #000 36px, #000 calc(100% - 64px), transparent);
+  mask-image: linear-gradient(transparent, #000 36px, #000 calc(100% - 64px), transparent); }
+.ly-scroll::-webkit-scrollbar { display: none; }
+.ly-lines { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.ly-line { font: 600 22px/1.3 var(--font-ui); text-align: left; color: var(--color-text-2); opacity: .6; background: none; border: 0; padding: 6px 8px; margin: 0 -8px; border-radius: var(--radius-s); cursor: pointer;
+  transition: color var(--duration-medium) var(--easing-standard), opacity var(--duration-medium) var(--easing-standard); }
+.ly-line:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+.ly-line.past { opacity: .38; }
+.ly-line.cur { color: var(--color-primary); opacity: 1; }
+.ly-gap { display: flex; gap: 6px; padding: 16px 8px; opacity: .4; transition: opacity var(--duration-medium); }
+.ly-gap i { width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-2); }
+.ly-gap.cur { opacity: 1; }
+.ly-gap.cur i { background: var(--color-accent); animation: ly-dot 1200ms var(--easing-standard) infinite; }
+.ly-gap.cur i:nth-child(2) { animation-delay: 200ms; }
+.ly-gap.cur i:nth-child(3) { animation-delay: 400ms; }
+.paused .ly-gap.cur i { animation-play-state: paused; }
+@keyframes ly-dot { 0%, 100% { transform: scale(.6); opacity: .5; } 50% { transform: scale(1); opacity: 1; } }
+.ly-plain { white-space: pre-wrap; font: 500 19px/1.5 var(--font-ui); color: var(--color-text); }
+.ly-note { display: flex; align-items: center; gap: 8px; width: fit-content; font: var(--type-caption); color: var(--color-text-2); background: var(--color-surface-2); border-radius: var(--radius-full); padding: 6px 14px 6px 10px; margin-bottom: 20px; }
+.ly-note .ms { font-size: 18px; }
+.ly-from { margin-top: 32px; font: var(--type-caption); color: var(--color-text-3); }
+.ly-scroll:has(.ly-empty) { padding-bottom: 28px; }
+.ly-empty { min-height: 100%; display: grid; place-items: center; }
+.ly-empty .empty { padding: 0 8px; }
+.ly-back { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); height: 40px; padding: 0 18px 0 14px; box-shadow: var(--elevation-2); }
+.ly-back[hidden] { display: none; }
+.ly-back .ms { font-size: 20px; }
+.ly-controls { padding: 4px 16px 0; }
+.ly-controls > .icon-btn:first-child, .ly-controls > .icon-btn:last-child { color: var(--color-text-2); }
+.ly-controls > .icon-btn.on { color: var(--color-primary); }
+.play.sm { width: 60px; height: 60px; }
+.play.sm .ms { font-size: 34px; }
+.play.sm.is-playing { border-radius: 20px; }
+
 /* ---------- Overlays: sheets, dialogs, snackbars ---------- */
 .overlay { position: absolute; inset: 0; z-index: 30; pointer-events: none; }
 .scrim { position: absolute; inset: 0; background: var(--color-scrim); opacity: 0; transition: opacity var(--duration-medium) var(--easing-standard); pointer-events: auto; }
@@ -392,7 +435,7 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 .lock .hint { margin-top: auto; padding-bottom: 40px; text-align: center; font-size: 12px; opacity: .6; }
 
 @media (prefers-reduced-motion: reduce) {
-  .playing .rotor, .slowing .rotor, .eq i { animation: none !important; }
+  .playing .rotor, .slowing .rotor, .eq i, .ly-gap i { animation: none !important; }
   *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
 }
 

@@ -165,7 +165,7 @@ Tasks:
 - [ ] Search screen: auto-focus, clear, recent searches (max 6, saved on submit, clear), artists explorer when empty.
 - [ ] Highlight of the matched text.
 
-- [ ] **Design first (D6):** add the lyrics view to the HTML mockup (entry point in Now playing, synced and plain states, no-lyrics state, "Back to current line"), update `docs/design/03-mockup.md`, and get the maintainer's approval. Can be done any time before the lyrics UI tasks below.
+- [x] **Design first (D6):** add the lyrics view to the HTML mockup (entry point in Now playing, synced and plain states, no-lyrics state, "Back to current line"), update `docs/design/03-mockup.md`, and get the maintainer's approval. Can be done any time before the lyrics UI tasks below.
 - [ ] `LrcParser` (pure Kotlin), lyrics file reading with the UTF-8 → Windows-1252 fallback, and embedded lyrics reading (ID3 `USLT`, Vorbis `LYRICS`/`UNSYNCEDLYRICS`, M4A `©lyr`) (D21, `.ai/03-architecture.md`).
 - [ ] Lyrics view as approved in the mockup: synced (highlight, auto-scroll, tap to seek, pause auto-scroll on manual scroll, back to current line) and plain (static, no auto-scroll); reduce motion → no animated scroll.
 
@@ -234,3 +234,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-26 | — | — | Plan edited: builds delivered through CI pre-releases with a shared debug key; test library generator script; translations drafted after Phase 2 in parallel; Phase 6 done criteria clarified. |
 | 2026-10-30 | — | — | Plan edited: lyrics (D21) added to Phase 1 (file matching) and Phase 5 (parser, mockup design, lyrics view); test library gets lyrics cases. |
 | 2026-10-30 | — | — | Plan edited: embedded lyrics become the third fallback after `.lrc` and `.txt` (D21 revised). |
+| 2026-10-30 | 5 (design) | — | Lyrics view designed in the mockup and approved by the maintainer (synced, plain, none; global auto-scroll toggle). |

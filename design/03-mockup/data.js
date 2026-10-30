@@ -101,8 +101,57 @@
     { id: 'road', name: 'Road trip', songs: ['acabou-1', 'clube-3', 'transa-4', 'cabeca-2', 'expresso-3'] },
   ];
 
+  // Lyrics (D21): <same name>.lrc → <same name>.txt → lyrics embedded in the audio file → none.
+  // The texts are invented placeholders; the real lyrics of these songs are copyrighted.
+  const VERSE_1 = ['Morning light across the window', 'Coffee cooling on the sill', 'Someone hums a song from somewhere', 'And the street is standing still'];
+  const CHORUS = ['Turn it over, let it play', 'Side by side, we\'ll find our way', 'Every groove a little road', 'Every song a place to stay'];
+  const VERSE_2 = ['Rain is tapping on the rooftop', 'Like a drummer keeping time', 'Old guitar beside the doorway', 'Waiting for another rhyme'];
+  const BRIDGE = ['Slow it down, the needle\'s falling', 'Hear the crackle, hear the hum', 'Every ending is a turning', 'Of the record yet to come'];
+
+  // A synced .lrc with the usual LRC features: header tags, offset, an empty line (instrumental
+  // gap), word-level timestamps, and the chorus written once with three timestamps per line.
+  const SYNCED_LRC = `[ar:Elis Regina]
+[ti:Águas de Março]
+[al:Elis & Tom]
+[by:Vitrola Mp3 mockup]
+[offset:+300]
+[00:06.00]
+[00:12.40]${VERSE_1[0]}
+[00:17.10]${VERSE_1[1]}
+[00:22.00]${VERSE_1[2]}
+[00:27.30]${VERSE_1[3]}
+[00:44.00][01:46.00][02:58.00]${CHORUS[0]}
+[00:48.60][01:50.60][03:02.60]${CHORUS[1]}
+[00:53.20][01:55.20][03:07.20]${CHORUS[2]}
+[00:57.90][01:59.90][03:11.90]${CHORUS[3]}
+[01:04.00]
+[01:14.50]${VERSE_2[0]}
+[01:20.00]<01:20.00>Like <01:20.40>a <01:20.70>drummer <01:21.40>keeping <01:22.00>time
+[01:25.30]${VERSE_2[2]}
+[01:30.80]${VERSE_2[3]}
+[02:05.00]
+[02:20.00]${BRIDGE[0]}
+[02:26.40]${BRIDGE[1]}
+[02:32.60]${BRIDGE[2]}
+[02:38.80]${BRIDGE[3]}
+[03:18.00]`;
+
+  // LRC text stored inside the MP3's lyrics tag (some taggers do this): shown synced.
+  const EMBEDDED_LRC = ['Streetlights blinking in the distance', 'Pages turning on their own', 'Half a melody remembered', 'Half a melody unknown']
+    .flatMap((l, i) => [`[00:${String(10 + i * 6).padStart(2, '0')}.00]${l}`, `[01:${String(10 + i * 6).padStart(2, '0')}.00]${l}`]).join('\n');
+
+  const stanzas = (...s) => s.map(x => x.join('\n')).join('\n\n');
+  const lyrics = {
+    'elistom-1': { source: 'lrc', text: SYNCED_LRC },
+    'elistom-2': { source: 'txt', text: stanzas(VERSE_1, CHORUS, VERSE_2, CHORUS) },
+    'elistom-3': { source: 'embedded', text: stanzas(VERSE_2, BRIDGE) },
+    'elistom-4': { source: 'embedded', text: EMBEDDED_LRC },
+    // elistom-5 has no lyrics
+    'elistom-6': { source: 'lrc', text: `[ar:Elis Regina]\n[ti:Inútil Paisagem]\n${stanzas(BRIDGE, CHORUS)}` }, // .lrc without timestamps → plain
+  };
+
   const favoriteSongs = ['elistom-1', 'clube-1', 'acabou-2', 'construcao-4'];
   const favoriteAlbums = ['clube', 'transa'];
 
-  window.DATA = { artists, albums, songs, systemFolders: [...systemFolders], chosenFolders, playlists, favoriteSongs, favoriteAlbums };
+  window.DATA = { artists, albums, songs, systemFolders: [...systemFolders], chosenFolders, playlists, favoriteSongs, favoriteAlbums, lyrics };
 })();

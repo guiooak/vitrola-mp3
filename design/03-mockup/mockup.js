@@ -56,6 +56,8 @@ const INITIAL_STATE = () => ({
   queue: [], originalQueue: [], idx: 0, playing: false, pos: 0,
   shuffle: false, repeat: 0, source: null,
   timer: null,
+  lyricsOpen: false, // the lyrics view replaces the record in Now playing
+  lyricsAutoScroll: true, // global setting, saved: synced lyrics follow the song
   angle: 0, spinningSince: 0,
 });
 let S = INITIAL_STATE();
@@ -251,7 +253,7 @@ function go(name, params = {}, anim = 'push') {
 }
 function back() {
   if (closeOverlay()) return;
-  if (npEl.classList.contains('open')) return closeNowPlaying();
+  if (npEl.classList.contains('open')) return S.lyricsOpen ? toggleLyrics(false) : closeNowPlaying();
   if (stack.length > 1) { stack.pop(); render('pop'); }
 }
 function tab(name) {
@@ -807,6 +809,7 @@ function updateProgress() {
   const t = $('#np-pos'); if (t) t.textContent = fmt(S.pos);
   const tt = $('#np-timer'); if (tt) tt.textContent = S.timer ? timerLabel() : '';
   $$('.notif .bar i').forEach(b => b.style.width = pct);
+  updateLyrics();
 }
 function markActive() {
   const m = current();
@@ -840,7 +843,7 @@ function openNowPlaying() {
   npEl.classList.remove('closing');
   npEl.classList.add('open');
   npEl.setAttribute('aria-hidden', 'false');
-  updatePanel('now-playing');
+  updatePanel(npPanelKey());
   positionSnackbar();
 }
 function closeNowPlaying() {
@@ -850,12 +853,18 @@ function closeNowPlaying() {
   updatePanelForCurrent();
   positionSnackbar();
 }
+const seekHtml = m => `<div class="np-seek">
+      <input type="range" id="np-seek" min="0" max="${m.duration}" value="${S.pos}" aria-label="Song position" style="--p:${S.pos / m.duration * 100}%">
+      <div class="times"><span id="np-pos">${fmt(S.pos)}</span><span>${fmt(m.duration)}</span></div>
+    </div>`;
 function renderNowPlaying() {
   const m = current(); if (!m) return;
   const a = album(m.album);
   const fav = S.favoriteSongs.has(m.id);
   npEl.style.setProperty('--np-background', `color-mix(in srgb, ${albumColor(a)} 16%, var(--color-background))`);
-  npEl.innerHTML = `
+  npEl.classList.toggle('lyrics-mode', S.lyricsOpen);
+  if (S.lyricsOpen) renderLyricsView(m, a);
+  else npEl.innerHTML = `
     <div class="np-top">
       <button class="icon-btn" data-action="close-np" aria-label="Collapse player">${iconHtml('expand_more')}</button>
       <div class="src"><small>${esc(S.source ? S.source.type : 'Playing')}</small><b>${esc(S.source ? S.source.name : a.title)}</b></div>
@@ -866,10 +875,7 @@ function renderNowPlaying() {
       <div style="min-width:0"><h2>${esc(m.title)}</h2><button class="ar" data-action="artist-np" data-name="${esc(m.artist)}">${a.noMetadata ? '' : `<span class="av">${photo(m.artist)}</span>`}${esc(m.artist)}${a.noMetadata ? '' : ' · ' + esc(a.title)}</button></div>
       <button class="icon-btn ${fav ? 'fav-on' : ''}" data-action="favorite" data-mid="${m.id}" aria-label="${fav ? 'Remove from favorite songs' : 'Add to favorite songs'}" aria-pressed="${fav}">${iconHtml('favorite', fav ? 'fill' : '')}</button>
     </div>
-    <div class="np-seek">
-      <input type="range" id="np-seek" min="0" max="${m.duration}" value="${S.pos}" aria-label="Song position" style="--p:${S.pos / m.duration * 100}%">
-      <div class="times"><span id="np-pos">${fmt(S.pos)}</span><span>${fmt(m.duration)}</span></div>
-    </div>
+    ${seekHtml(m)}
     <div class="np-controls">
       <button class="icon-btn ${S.shuffle ? 'on' : ''}" data-action="shuffle" aria-label="Shuffle" aria-pressed="${S.shuffle}">${iconHtml('shuffle')}</button>
       <button class="icon-btn" data-action="previous" aria-label="Previous song">${iconHtml('skip_previous', 'fill big')}</button>
@@ -879,13 +885,139 @@ function renderNowPlaying() {
     </div>
     <div class="timer-tag" id="np-timer">${S.timer ? timerLabel() : ''}</div>
     <div class="np-extra">
+      <button class="icon-btn" data-action="lyrics" aria-label="Show lyrics">${iconHtml('lyrics')}</button>
       <button class="icon-btn ${S.timer ? 'on' : ''}" data-action="timer" aria-label="Sleep timer">${iconHtml('bedtime')}</button>
       <button class="icon-btn" data-action="queue" aria-label="Queue">${iconHtml('queue_music')}</button>
       <button class="icon-btn" data-action="file-info" data-mid="${m.id}" aria-label="File details">${iconHtml('info')}</button>
     </div>`;
   const seek = $('#np-seek', npEl);
-  seek.addEventListener('input', () => { S.pos = +seek.value; seek.style.setProperty('--p', (S.pos / m.duration * 100) + '%'); $('#np-pos').textContent = fmt(S.pos); const b = $('#mini .prog i'); if (b) b.style.width = (S.pos / m.duration * 100) + '%'; });
+  seek.addEventListener('input', () => { S.pos = +seek.value; seek.style.setProperty('--p', (S.pos / m.duration * 100) + '%'); $('#np-pos').textContent = fmt(S.pos); const b = $('#mini .prog i'); if (b) b.style.width = (S.pos / m.duration * 100) + '%'; updateLyrics(); });
   syncRecords();
+}
+
+/* ---------- Lyrics (D21) ----------
+   Sources, in order: <same name>.lrc → <same name>.txt → lyrics embedded in the audio file → none.
+   .lrc and embedded text are parsed as LRC: with timestamps they are synced, without them plain. */
+const LRC_STAMP = /\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\]/g;
+function parseLrc(text) {
+  let offset = 0;
+  const timed = [], plain = [];
+  text.replace(/^\uFEFF/, '').split(/\r?\n/).forEach(raw => {
+    const tag = raw.match(/^\[([a-z]+):(.*)\]\s*$/i); // [ar:], [ti:], [al:], [by:], [length:], [offset:]
+    if (tag) { if (tag[1].toLowerCase() === 'offset') offset = parseInt(tag[2], 10) || 0; return; }
+    const head = raw.match(/^(?:\[\d{1,2}:\d{2}(?:[.:]\d{1,3})?\])+/);
+    if (!head) { plain.push(raw); return; }
+    // word-level timestamps (<mm:ss.xx>) are dropped; the line is shown whole
+    const line = raw.slice(head[0].length).replace(/<\d{1,2}:\d{2}(?:[.:]\d{1,3})?>/g, '').replace(/\s+/g, ' ').trim();
+    for (const t of head[0].matchAll(LRC_STAMP)) timed.push({ t: +t[1] * 60 + +t[2] + (t[3] ? +('0.' + t[3]) : 0), text: line });
+  });
+  if (!timed.length) return { synced: false, text: plain.join('\n').trim() };
+  // a positive offset shows the lyrics earlier (LRC convention)
+  timed.forEach(l => { l.t = Math.max(0, l.t - offset / 1000); });
+  return { synced: true, lines: timed.sort((x, y) => x.t - y.t) };
+}
+const lyricsCache = {};
+function lyricsFor(m) {
+  const l = D.lyrics[m.id];
+  if (!l) return null;
+  if (!lyricsCache[m.id]) {
+    const parsed = l.source === 'txt' ? { synced: false, text: l.text.replace(/^\uFEFF/, '') } : parseLrc(l.text);
+    const file = m.file.replace(/\.[^.]+$/, '.' + l.source);
+    lyricsCache[m.id] = { ...parsed, source: l.source, file, from: l.source === 'embedded' ? 'Lyrics stored in the audio file' : `Lyrics from ${file}` };
+  }
+  return lyricsCache[m.id];
+}
+const npPanelKey = () => { if (!S.lyricsOpen) return 'now-playing'; const ly = current() && lyricsFor(current()); return !ly ? 'lyrics-none' : ly.synced ? 'lyrics' : 'lyrics-plain'; };
+
+function lyricsBody(m) {
+  const ly = lyricsFor(m);
+  if (!ly) return `<div class="ly-empty">${emptyRecord('No lyrics for this song', 'Put a .lrc or .txt file with the same name next to the song.', false)}</div>`;
+  if (!ly.synced) return `<div class="ly-note">${iconHtml('notes')}These lyrics aren't synced with the song.</div>
+    <div class="ly-plain">${esc(ly.text)}</div><div class="ly-from">${esc(ly.from)}</div>`;
+  return `<div class="ly-lines">${ly.lines.map((l, i) => l.text
+      ? `<button class="ly-line" data-action="lyrics-seek" data-i="${i}">${esc(l.text)}</button>`
+      : `<div class="ly-gap" data-i="${i}" role="img" aria-label="Instrumental"><i></i><i></i><i></i></div>`).join('')}</div>
+    <div class="ly-from">${esc(ly.from)}</div>`;
+}
+
+// Following the song: the current line stays at about a third of the view. Scrolling by hand pauses
+// it and shows "Back to current line"; it resumes on tap or after a few seconds.
+const LY = { song: null, follow: true, cur: -2, autoAt: 0, dragging: false, resume: null, scroll: 0 };
+const LY_RESUME_MS = 5000;
+const autoScrollOn = () => S.lyricsAutoScroll;
+function renderLyricsView(m, a) {
+  const sameSong = LY.song === m.id;
+  const prevScroll = sameSong ? ($('#ly-scroll') ? $('#ly-scroll').scrollTop : LY.scroll) : 0;
+  if (!sameSong) { LY.song = m.id; clearTimeout(LY.resume); }
+  if (!sameSong || !autoScrollOn()) LY.follow = autoScrollOn();
+  const synced = !!(lyricsFor(m) && lyricsFor(m).synced);
+  LY.cur = -2;
+  npEl.innerHTML = `
+    <div class="np-top">
+      <button class="icon-btn" data-action="close-np" aria-label="Collapse player">${iconHtml('expand_more')}</button>
+      <div class="src"><b>${esc(m.title)}</b><span class="ar">${esc(m.artist)}${a.noMetadata ? '' : ' · ' + esc(a.title)}</span></div>
+      <button class="ly-disc" data-action="lyrics" aria-label="Hide lyrics">${record({ a, withArm: false, player: true })}</button>
+    </div>
+    <div class="ly-wrap">
+      <div class="ly-scroll" id="ly-scroll">${lyricsBody(m)}</div>
+      ${synced ? `<button class="icon-btn ly-auto ${autoScrollOn() ? 'on' : ''}" data-action="lyrics-autoscroll" aria-label="Auto-scroll" aria-pressed="${autoScrollOn()}">${iconHtml('vertical_align_center')}</button>` : ''}
+      <button class="btn btn-tonal ly-back" data-action="lyrics-follow" ${LY.follow ? 'hidden' : ''}>${iconHtml('vertical_align_center')}Back to current line</button>
+    </div>
+    ${seekHtml(m)}
+    <div class="np-controls ly-controls">
+      <button class="icon-btn on" data-action="lyrics" aria-label="Hide lyrics" aria-pressed="true">${iconHtml('lyrics')}</button>
+      <button class="icon-btn" data-action="previous" aria-label="Previous song">${iconHtml('skip_previous', 'fill big')}</button>
+      <button class="play sm ${S.playing ? 'is-playing' : ''}" data-action="play" aria-label="${S.playing ? 'Pause' : 'Play'}">${iconHtml(S.playing ? 'pause' : 'play_arrow', 'fill')}</button>
+      <button class="icon-btn" data-action="next" aria-label="Next song">${iconHtml('skip_next', 'fill big')}</button>
+      <button class="icon-btn" data-action="queue" aria-label="Queue">${iconHtml('queue_music')}</button>
+    </div>`;
+  const sc = $('#ly-scroll', npEl);
+  const userScrolled = () => { if (synced && autoScrollOn()) pauseFollow(); };
+  sc.addEventListener('wheel', userScrolled, { passive: true });
+  sc.addEventListener('touchmove', userScrolled, { passive: true });
+  sc.addEventListener('pointerdown', () => { LY.dragging = true; });
+  sc.addEventListener('pointerup', () => { LY.dragging = false; });
+  sc.addEventListener('scroll', () => { LY.scroll = sc.scrollTop; if (LY.dragging && performance.now() - LY.autoAt > 800) userScrolled(); }, { passive: true });
+  sc.scrollTop = prevScroll;
+  updateLyrics(!sameSong || LY.follow ? 'jump' : false);
+}
+function updateLyrics(scroll = 'smooth') {
+  const sc = $('#ly-scroll'); const m = current();
+  if (!sc || !m) return;
+  const ly = lyricsFor(m);
+  if (!ly || !ly.synced) return;
+  let i = -1;
+  while (i + 1 < ly.lines.length && ly.lines[i + 1].t <= S.pos + 0.05) i++;
+  if (i === LY.cur && scroll !== 'jump') return;
+  LY.cur = i;
+  $$('.ly-lines [data-i]', sc).forEach(el => { const k = +el.dataset.i; el.classList.toggle('cur', k === i); el.classList.toggle('past', k < i); });
+  if (LY.follow && scroll) scrollLyrics(scroll === 'smooth');
+}
+function scrollLyrics(smooth) {
+  const sc = $('#ly-scroll'); if (!sc) return;
+  const el = $('.ly-lines .cur', sc);
+  const top = el ? el.offsetTop + el.offsetHeight / 2 - sc.clientHeight * 0.35 : 0;
+  LY.autoAt = performance.now();
+  sc.scrollTo({ top: Math.max(0, top), behavior: smooth && !reduceMotion ? 'smooth' : 'auto' });
+}
+function pauseFollow() {
+  LY.follow = false;
+  const b = $('.ly-back'); if (b) b.hidden = false;
+  clearTimeout(LY.resume);
+  LY.resume = setTimeout(resumeFollow, LY_RESUME_MS);
+}
+function resumeFollow() {
+  clearTimeout(LY.resume);
+  if (!autoScrollOn()) return;
+  LY.follow = true;
+  const b = $('.ly-back'); if (b) b.hidden = true;
+  scrollLyrics(true);
+}
+function toggleLyrics(on = !S.lyricsOpen) {
+  S.lyricsOpen = on;
+  LY.song = null;
+  renderNowPlaying();
+  updatePanel(npPanelKey());
 }
 
 /* ============================================================
@@ -954,6 +1086,7 @@ function fileInfo(id) {
       <b>Duration</b><span>${fmt(m.duration)}</span>
       <b>Format</b><span>MP3 · 320 kbps · 44.1 kHz</span>
       <b>Cover</b><span>${S.useFolderImages && album(m.album).cover ? esc(album(m.album).cover) + ' (album folder)' : 'Generated by the app'}</span>
+      <b>Lyrics</b><span>${(ly => !ly ? 'None' : (ly.source === 'embedded' ? 'Embedded in the file' : esc(ly.file) + ' (next to the song)') + (ly.synced ? ' · synced' : ''))(lyricsFor(m))}</span>
     </p>
     <div class="acts"><button class="btn btn-text" data-action="close-overlay">Close</button></div>`);
 }
@@ -1173,6 +1306,16 @@ const ACTIONS = {
   'shuffle': () => toggleShuffle(),
   'repeat': () => toggleRepeat(),
   'queue': () => openQueue(),
+  'lyrics': () => toggleLyrics(),
+  'lyrics-seek': b => { const ly = lyricsFor(current()); S.pos = Math.min(ly.lines[+b.dataset.i].t, current().duration - 1); LY.follow = autoScrollOn(); const back = $('.ly-back'); if (back) back.hidden = true; clearTimeout(LY.resume); updateProgress(); updateLyrics('smooth'); },
+  'lyrics-follow': () => resumeFollow(),
+  'lyrics-autoscroll': b => {
+    const off = autoScrollOn();
+    S.lyricsAutoScroll = !off;
+    b.setAttribute('aria-pressed', !off); b.classList.toggle('on', !off);
+    if (off) { clearTimeout(LY.resume); LY.follow = false; const back = $('.ly-back'); if (back) back.hidden = true; snackbar('Auto-scroll off'); }
+    else { resumeFollow(); snackbar('Auto-scroll on'); }
+  },
   'jump-to': (b, e) => { if (e.target.closest('[data-action="remove-from-queue"]')) return; S.idx = +b.dataset.i; S.pos = 0; play(true); updatePlayer(); },
   'remove-from-queue': b => { const i = +b.dataset.i; const [id] = S.queue.splice(i, 1); $('#queue-list').innerHTML = queueRows(); markActive(); snackbar('Removed from queue', 'Undo', () => { S.queue.splice(i, 0, id); const l = $('#queue-list'); if (l) l.innerHTML = queueRows(); }); },
   'timer': () => openTimer(),
@@ -1245,6 +1388,9 @@ const NOTES = {
   'playlist': 'Playlist details. The ⋮ at the top lets you rename or delete it.',
   'settings': 'Library folders (add and remove), subfolders, folder images, timer, resume, headphones, battery tip and theme.',
   'now-playing': 'The album cover becomes the record label. The arm drops when playing and lifts when paused, and the record slows down. The background takes a hint of the cover color. Tap the info icon to see the file.',
+  'lyrics': 'Synced lyrics from a .lrc file next to the song (D21). The current line is highlighted and stays in view; tap a line to jump there. Scroll by hand and "Back to current line" appears; following resumes on its own after 5 seconds. To read freely, turn off auto-scroll with the floating icon at the bottom right of the lyrics (it shows a dot while on). The choice is global and saved: it applies to every song until you change it. The current line is still highlighted. Tap the small record (or the lyrics button) to go back to the record. "Corcovado" has LRC text stored inside the MP3 and is synced too. The lyrics are invented placeholders.',
+  'lyrics-plain': 'Plain lyrics from a .txt file (D21): shown as written, with no automatic scrolling. "Só Tinha de Ser com Você" (lyrics stored inside the MP3) and "Inútil Paisagem" (a .lrc without timestamps) look the same. The lyrics are invented placeholders.',
+  'lyrics-none': 'No .lrc, no .txt and no lyrics inside the MP3: the lyrics view says how to add them. The lyrics button is always in Now playing, so the feature is easy to find.',
   'queue': 'What already played, what\'s playing and what\'s up next. Jump to a song or remove it from the queue. (Drag to reorder is left for the app.)',
   'menu': 'Song menu: play next, queue, playlist, favorite, go to album or artist, and file details.',
   'timer': 'Sleep timer: preset times or "at the end of this song". The countdown shows in the player and in Settings.',
@@ -1269,7 +1415,10 @@ const SHORTCUTS = [
   ['playlists', 'Playlists', () => { ensureLibrary(); root('playlists'); }],
   ['playlist', 'Playlist', () => { ensureLibrary(); root('playlists'); go('playlist', { id: 'sunday' }); }],
   ['settings', 'Settings', () => { ensureLibrary(); root('settings'); }],
-  ['now-playing', 'Now playing', () => { ensurePlaying(); openNowPlaying(); }],
+  ['now-playing', 'Now playing', () => { ensurePlaying(); S.lyricsOpen = false; openNowPlaying(); }],
+  ['lyrics', 'Lyrics · synced', () => { playElisTom(0, 40); S.lyricsOpen = true; openNowPlaying(); }],
+  ['lyrics-plain', 'Lyrics · plain text', () => { playElisTom(1, 20); S.lyricsOpen = true; openNowPlaying(); }],
+  ['lyrics-none', 'Lyrics · none', () => { playElisTom(4, 20); S.lyricsOpen = true; openNowPlaying(); }],
   ['queue', 'Queue', () => { ensurePlaying(); openNowPlaying(); setTimeout(openQueue, 200); }],
   ['menu', 'Song menu', () => { ensureLibrary(); if (currentScreen !== 'library') { S.libTab = 'songs'; root('library'); } songMenu('elistom-1'); }],
   ['timer', 'Sleep timer', () => { ensurePlaying(); openNowPlaying(); setTimeout(openTimer, 200); }],
@@ -1279,7 +1428,7 @@ $('#jump').innerHTML = SHORTCUTS.map(([k, n], i) => `<button data-jump="${k}"><s
 $('#jump').addEventListener('click', e => {
   const b = e.target.closest('[data-jump]'); if (!b) return;
   closeOverlay(true); $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
-  if (npEl.classList.contains('open') && !['now-playing', 'queue', 'timer'].includes(b.dataset.jump)) closeNowPlaying();
+  if (npEl.classList.contains('open') && !['now-playing', 'queue', 'timer', 'lyrics', 'lyrics-plain', 'lyrics-none'].includes(b.dataset.jump)) closeNowPlaying();
   SHORTCUTS.find(a => a[0] === b.dataset.jump)[2]();
   $('#panel').classList.remove('open');
 });
@@ -1289,7 +1438,7 @@ function updatePanel(key) {
 }
 function updatePanelForCurrent() {
   const def = SCREENS[currentScreen];
-  updatePanel(npEl.classList.contains('open') ? 'now-playing' : def.key ? def.key(stack[stack.length - 1].params) : currentScreen);
+  updatePanel(npEl.classList.contains('open') ? npPanelKey() : def.key ? def.key(stack[stack.length - 1].params) : currentScreen);
 }
 
 const SIMULATIONS = {
@@ -1339,6 +1488,13 @@ function ensurePlaying() {
   ensureLibrary();
   if (currentScreen === 'welcome' || currentScreen === 'scan') { S.libTab = 'artists'; root('library'); }
   if (!current()) { const a = library().filter(m => m.album === 'elistom'); playList(a.map(m => m.id), 0, { type: 'Playing from album', name: 'Elis & Tom' }, false); S.pos = 47; }
+}
+function playElisTom(i, pos) {
+  ensureLibrary();
+  if (currentScreen === 'welcome' || currentScreen === 'scan') { S.libTab = 'artists'; root('library'); }
+  const ids = library().filter(m => m.album === 'elistom').map(m => m.id);
+  playList(ids, i, { type: 'Playing from album', name: 'Elis & Tom' }, false);
+  S.pos = pos; updateProgress();
 }
 function reset() {
   S = INITIAL_STATE();
