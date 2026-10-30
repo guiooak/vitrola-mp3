@@ -2,7 +2,7 @@
 
 **Status:** ready to start · **Created:** 2026-10-26 · **Owner:** implementing agent · **Reviewer:** maintainer
 
-Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D27.
+Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D28.
 
 ## Working on a new machine
 
@@ -30,6 +30,7 @@ Setup:
 
 - Everything in **US English** (code, comments, files, source strings, docs, commits). Translations only via `i18n/translations.csv` with maintainer approval (D15, D18, D20).
 - **Commit and push directly to `main`** in small, working steps; the app must build on every commit (D10).
+- **Landscape from day one (D28):** every screen gets its portrait and landscape layouts in the same task, and is checked in both orientations.
 - No hardcoded UI strings: every string, plural and content description in `res/values/strings.xml` from day one.
 - Use only design tokens (generated from `tokens.json`) for colors, type, spacing, radii and motion (D9).
 - New decisions → a new record in `docs/decisions/` (next ID, from `template.md`, plus an index row) + matching `.ai/` file in the same commit (D22).
@@ -67,7 +68,7 @@ Tasks:
 - [ ] Bundle Fraunces and Outfit fonts (OFL) in `res/font`.
 - [ ] Icons: vector drawables for the Material Symbols Rounded set listed in 04-design-system.
 - [ ] Launcher icon from `design/01-logo/export/android/` (adaptive + monochrome), notification icon.
-- [ ] Navigation shell: bottom navigation (Library, Playlists, Search, Settings) with per-tab back stacks, placeholder screens, mini player slot.
+- [ ] Navigation shell: bottom navigation (Library, Playlists, Search, Settings) with per-tab back stacks, placeholder screens, mini player slot; in landscape a navigation rail with the mini player at the bottom of the content (D28).
 - [ ] Strings infrastructure: `strings.xml` with the catalog from `.ai/06-copy.md`; create `i18n/translations.csv` in the D20 format (columns incl. `quantity` and `en_hash_*`, English filled, pt-BR/es empty) and the generator: it validates keys, placeholders and plural quantities, escapes XML, detects stale rows by hash, and writes `values-pt-rBR`/`values-es` plus `locales_config` **only for languages whose rows are all approved** (D20). At this point it writes none.
 - [ ] CI per Q8 (proposed: GitHub Actions running `./gradlew lint testDebugUnitTest assembleDebug` on pushes that touch the app).
 - [ ] **Delivering builds** (proposed; log it as a decision with Q8). APKs for the maintainer always come from CI, never from a local machine:
@@ -242,3 +243,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-30 | — | — | Plan edited: Spinning record setting (D25) added to the Phase 6 Settings task. |
 | 2026-10-30 | — | — | Plan edited: record label image order and upright stop (D26) added to the Phase 3 record component task. |
 | 2026-10-30 | — | — | Plan edited: tonearm rules and touch-the-record gesture (D27) added to the Phase 3 record component task. |
+| 2026-10-30 | — | — | Plan edited: landscape for every screen (D28) is a ground rule; navigation shell gets the rail. |

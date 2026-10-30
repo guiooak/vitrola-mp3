@@ -122,9 +122,14 @@ Playback state persistence (DataStore or a small table): queue track IDs, origin
 - Respect the "Use folder photos and covers" setting in the resolver.
 - Dominant color for the "Now playing" tint and the notification: AndroidX Palette on the resolved cover; for the generated cover use its background color.
 
+## Orientation and window size (D28)
+
+- No `screenOrientation` lock: every screen rotates. Pick layouts with `WindowSizeClass` (`currentWindowAdaptiveInfo()`): compact height (phone in landscape) → `NavigationRail` instead of the bottom `NavigationBar`, two-pane album/artist/playlist pages, side-by-side Now playing, lyrics and equalizer, centered sheets (max 560dp).
+- Keep state across rotation: ViewModels for screen state, `rememberSaveable` for scroll positions, open sheets/dialogs and lyrics follow state; playback lives in the service and is unaffected.
+
 ## Driving mode (D24)
 
-- UI: a `DrivingModeScreen` shown above the navigation (its own state, two tabs). While it is visible: `FLAG_KEEP_SCREEN_ON`, and the activity allows landscape (`screenOrientation` switched from portrait to sensor/user while the mode is open; portrait elsewhere in v1).
+- UI: a `DrivingModeScreen` shown above the navigation (its own state, two tabs). While it is visible: `FLAG_KEEP_SCREEN_ON`. Orientation follows the phone like every screen (D28).
 - `DrivingModeController` (app scope): exposes `isOpen`, `openedAutomatically`. Car detection when `driveAuto` is on: a runtime `BroadcastReceiver` for `BluetoothDevice.ACTION_ACL_CONNECTED` / `ACTION_ACL_DISCONNECTED` (filtered by `driveCarAddress`) registered while the app or `PlaybackService` runs, plus a check of the device's connection state (A2DP/headset profile proxy `getConnectedDevices()`) when the activity resumes.
 - Connected + activity in the foreground → open the mode (automatic). Connected while in the background → open it on the next resume. Disconnected → close it only if it was opened automatically. Never start an activity from the background and never start playback.
 - Car picker: `BluetoothAdapter.bondedDevices` (needs `BLUETOOTH_CONNECT` on Android 12+); store address + name in DataStore.

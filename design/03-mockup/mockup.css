@@ -245,6 +245,9 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 .pl-mosaic { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; width: 100%; height: 100%; }
 .pl-mosaic svg, .pl-art > svg { width: 100%; height: 100%; display: block; }
 
+/* Side + main columns of album, artist and playlist pages: neutral in portrait, two columns in landscape (D28) */
+.split, .split-side, .split-main { display: contents; }
+
 /* ---------- Search ---------- */
 .search { margin: 4px 16px 12px; height: 52px; border-radius: var(--radius-full); background: var(--color-surface-2); display: flex; align-items: center; gap: 10px; padding: 0 4px 0 16px; border: 2px solid transparent; transition: border-color var(--duration-fast); }
 .search:focus-within { border-color: var(--color-primary); background: var(--color-surface); }
@@ -375,26 +378,6 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 :root[data-theme="dark"] .sys-dialog .box > .ms { color: #A8C7FA; }
 .sys-dialog .acts.col { flex-direction: column; align-items: stretch; gap: 4px; }
 .sys-dialog .acts.col button { text-align: center; padding: 12px; }
-
-/* Landscape (phone in a car mount): side rail with Exit and the tabs */
-@media (min-width: 761px) {
-  .phone.landscape { width: 868px; height: 412px; }
-  .phone.landscape .app { width: 846px; height: 390px; }
-  .phone.landscape .drive { padding: 30px 16px 12px 0; grid-template-columns: 132px 1fr; grid-template-rows: auto 1fr; grid-template-areas: "top body" "tabs body"; }
-  .phone.landscape .dv-top { padding: 0 12px 8px 16px; }
-  .phone.landscape .dv-exit { width: 100%; justify-content: center; }
-  .phone.landscape .dv-title { display: none; }
-  .phone.landscape .dv-tabs { grid-template-columns: 1fr; grid-auto-rows: 1fr; padding: 0 12px 0 16px; }
-  .phone.landscape .dv-tabs button { height: auto; flex-direction: column; gap: 4px; font-size: 15px; }
-  .phone.landscape .dv-body { padding: 0 0 0 8px; }
-  .phone.landscape .dv-player { flex-direction: row; gap: 36px; padding: 0 8px; }
-  .phone.landscape .dv-art { width: 200px; flex: none; }
-  .phone.landscape .dv-info { flex: 1; min-width: 0; }
-  .phone.landscape .dv-meta { text-align: left; }
-  .phone.landscape .dv-tiles { grid-template-columns: 1fr 1fr 1fr; }
-  .phone.landscape .dv-tile.accent { grid-column: auto; flex-direction: column; align-items: flex-start; justify-content: space-between; min-height: 120px; }
-  .phone.landscape .statusbar { padding-left: 32px; padding-right: 32px; }
-}
 
 /* ---------- Equalizer (D23) ---------- */
 .eqz-page { padding-bottom: 24px; }
@@ -610,3 +593,140 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 .detail-actions .fav-album.fav-on { color: var(--color-primary); box-shadow: inset 0 0 0 1.5px var(--color-primary); background: var(--color-primary-container); }
 .fav-album .ms.fill { animation: pulse var(--duration-medium) var(--easing-standard); }
 @keyframes pulse { 50% { transform: scale(1.25); } }
+
+/* ============================================================
+   Landscape (D28): every screen adapts. The phone frame turns on a computer ("Rotate phone");
+   on a real phone the mockup follows the phone's orientation.
+   ============================================================ */
+@media (min-width: 761px) {
+  .phone.landscape { width: 868px; height: 412px; }
+  .phone.landscape .app { width: 846px; height: 390px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .stage { padding: 0; display: block; }
+  .phone-wrap { width: 100%; }
+  .phone, .phone.landscape { width: 100%; height: 100dvh; border-radius: 0; padding: 0; box-shadow: none; background: none; }
+  .app, .phone.landscape .app { width: 100%; height: 100dvh; border-radius: 0; }
+  .statusbar, .gesture { display: none; }
+  .panel { display: none; position: fixed; inset: 0; z-index: 100; width: auto; max-height: none; border-radius: 0; top: 0; }
+  .panel.open { display: flex; }
+  .panel-fab { display: grid; place-items: center; position: fixed; top: 50%; left: 0; z-index: 101; width: 22px; height: 56px; margin-top: -28px; border-radius: 0 12px 12px 0; border: 0; background: var(--color-text); color: var(--color-background); opacity: .45; cursor: pointer; padding: 0; }
+}
+
+/* Shell: navigation rail on the left, mini player at the bottom of the content */
+.phone.landscape .app { display: grid; grid-template-columns: 88px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+.phone.landscape .statusbar { grid-column: 1 / -1; grid-row: 1; height: 28px; padding: 4px 36px 0; }
+.phone.landscape .screens { grid-column: 2; grid-row: 2; }
+.phone.landscape .app:has(#bottom[hidden]) .screens { grid-column: 1 / -1; grid-row: 2 / 4; }
+.phone.landscape #bottom:not([hidden]) { display: contents; }
+.phone.landscape .mini { grid-column: 2; grid-row: 3; margin: 0 12px 10px; }
+.phone.landscape .bnav { grid-column: 1; grid-row: 2 / 4; display: flex; flex-direction: column; justify-content: center; gap: 14px; border-top: 0; border-right: 1px solid var(--color-border); padding: 8px 4px; }
+.phone.landscape .gesture { bottom: 5px; }
+
+/* Height is short: compact top bar, chips and action buttons */
+.phone.landscape .topbar { min-height: 48px; padding: 0 8px; }
+.phone.landscape .topbar h1 { font: var(--type-title-m); }
+.phone.landscape .chips { padding-bottom: 6px; }
+.phone.landscape .list-head { padding-top: 0; padding-bottom: 0; }
+.phone.landscape .detail-actions { padding-bottom: 8px; }
+.phone.landscape .detail-actions .btn { height: 40px; }
+.phone.landscape .mini .row { padding-top: 4px; padding-bottom: 4px; }
+.phone.landscape .mini svg.mdisc { width: 40px; height: 40px; }
+
+/* Lists and grids use the extra width */
+.phone.landscape .artists-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+.phone.landscape .albums { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+.phone.landscape .screen > .group, .phone.landscape .screen > .group-title, .phone.landscape .screen > .tip,
+.phone.landscape .theme-seg, .phone.landscape .about, .phone.landscape .eqz-page { max-width: 680px; margin-left: auto; margin-right: auto; }
+.phone.landscape .screen > .group-title { padding: 0 16px; }
+.phone.landscape .empty { padding: 20px 32px; }
+.phone.landscape .empty svg { width: 100px; height: 100px; }
+
+/* Album, artist and playlist: details on the left, songs on the right */
+.phone.landscape .split { display: grid; grid-template-columns: 290px minmax(0, 1fr); align-items: start; }
+.phone.landscape .split-side, .phone.landscape .split-main { display: block; min-width: 0; }
+.phone.landscape .split-side { position: sticky; top: 48px; }
+.phone.landscape .split-side .detail-head { display: grid; grid-template-columns: 104px minmax(0, 1fr); grid-auto-rows: auto; column-gap: 14px; row-gap: 4px; align-content: center; align-items: center; justify-items: start; text-align: left; padding: 4px 16px 14px; }
+.phone.landscape .split-side .detail-head > :first-child { grid-row: 1 / span 4; }
+.phone.landscape .split-side .detail-head .art { width: 104px; height: 104px; margin: 0; }
+.phone.landscape .split-side .pl-art { width: 104px; height: 104px; margin: 0; }
+.phone.landscape .split-side .pl-art .ms { font-size: 52px; }
+.phone.landscape .split-side .detail-head h2 { font: var(--type-title-m); }
+.phone.landscape .split-main .sec-title:first-child { margin-top: 4px; }
+.phone.landscape .split-side:has(.artist-hero) { top: 0; }
+.phone.landscape .artist-hero { height: 240px; margin-top: -48px; border-radius: 0 0 var(--radius-l) 0; }
+.phone.landscape .artist-hero h2 { font: var(--type-title); }
+
+/* Welcome and scan */
+.phone.landscape .welcome { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto; column-gap: 40px; align-items: center; padding: 12px 48px 24px; }
+.phone.landscape .welcome .hero { grid-row: 1 / 3; }
+.phone.landscape .welcome .hero svg { width: 170px; height: 170px; }
+.phone.landscape .welcome .promises { margin: 0; align-self: end; }
+.phone.landscape .welcome > .btn { margin-top: 20px; }
+.phone.landscape .scan { gap: 10px; padding: 12px; }
+.phone.landscape .scan svg { width: 150px; height: 143px; }
+
+/* Now playing: record on the left, song and controls on the right */
+.phone.landscape .np { padding: 28px 16px 10px 8px; }
+.phone.landscape .np:not(.lyrics-mode) { display: grid; column-gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto minmax(0, 1fr);
+  grid-template-areas: "top top" "disc ." "disc info" "disc seek" "disc ctrl" "disc timer" "disc extra" "disc ."; }
+.phone.landscape .np:not(.lyrics-mode) .np-top { grid-area: top; }
+.phone.landscape .np:not(.lyrics-mode) .np-disc { grid-area: disc; padding: 0 0 4px; display: block; height: 100%; min-height: 0; }
+.phone.landscape .np:not(.lyrics-mode) .np-disc svg { display: block; width: 100%; height: 100%; max-width: none; max-height: none; }
+.phone.landscape .np:not(.lyrics-mode) .np-info { grid-area: info; padding: 0 0 0 8px; }
+.phone.landscape .np:not(.lyrics-mode) .np-seek { grid-area: seek; padding: 6px 8px 0; }
+.phone.landscape .np:not(.lyrics-mode) .np-controls { grid-area: ctrl; padding: 2px 0; }
+.phone.landscape .np:not(.lyrics-mode) .timer-tag { grid-area: timer; }
+.phone.landscape .np:not(.lyrics-mode) .np-extra { grid-area: extra; padding: 0; }
+.phone.landscape .np .play { width: 68px; height: 68px; }
+.phone.landscape .np .play.is-playing { border-radius: 24px; }
+
+/* Lyrics: record, title and controls on the left, lyrics on the right */
+.phone.landscape .np.lyrics-mode { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-areas: "top lyrics" "seek lyrics" "ctrl lyrics"; padding: 28px 8px 10px 0; }
+.phone.landscape .np.lyrics-mode .np-top { grid-area: top; position: relative; flex-direction: column; justify-content: center; gap: 12px; padding: 4px 16px; }
+.phone.landscape .np.lyrics-mode .np-top > .icon-btn:first-child { position: absolute; top: 0; left: 4px; }
+.phone.landscape .np.lyrics-mode .np-top .src { flex: none; width: 100%; }
+.phone.landscape .np.lyrics-mode .ly-disc { order: -1; width: 132px; height: 132px; padding: 0; }
+.phone.landscape .np.lyrics-mode .ly-wrap { grid-area: lyrics; }
+.phone.landscape .np.lyrics-mode .np-seek { grid-area: seek; padding: 4px 20px 0; }
+.phone.landscape .np.lyrics-mode .ly-controls { grid-area: ctrl; padding: 0 12px; }
+.phone.landscape .ly-scroll { padding-top: 16px; padding-bottom: 120px; }
+
+/* Sheets: centered, not full width */
+.phone.landscape .sheet { left: 50%; right: auto; width: min(560px, 92%); max-height: 94%; transform: translate(-50%, 100%); padding-bottom: 16px; }
+.phone.landscape .sheet.on { transform: translate(-50%, 0); }
+
+/* Equalizer: settings on the left, the curve on the right */
+.phone.landscape .eqz { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); grid-template-areas: "switch graph" "presets graph" "bass graph"; align-content: start; column-gap: 4px; }
+.phone.landscape .eqz-switch { grid-area: switch; }
+.phone.landscape .eqz-presets { grid-area: presets; flex-wrap: wrap; overflow: visible; }
+.phone.landscape .eqz-graph { grid-area: graph; align-self: start; }
+.phone.landscape .eqz-bass { grid-area: bass; padding-left: 16px; }
+
+/* Driving mode: side rail with Exit and the tabs */
+.phone.landscape .drive { padding: 30px 16px 12px 0; grid-template-columns: 132px 1fr; grid-template-rows: auto 1fr; grid-template-areas: "top body" "tabs body"; }
+.phone.landscape .dv-top { padding: 0 12px 8px 16px; }
+.phone.landscape .dv-exit { width: 100%; justify-content: center; }
+.phone.landscape .dv-title { display: none; }
+.phone.landscape .dv-tabs { grid-template-columns: 1fr; grid-auto-rows: 1fr; padding: 0 12px 0 16px; }
+.phone.landscape .dv-tabs button { height: auto; flex-direction: column; gap: 4px; font-size: 15px; }
+.phone.landscape .dv-body { padding: 0 0 0 8px; }
+.phone.landscape .dv-player { flex-direction: row; gap: 36px; padding: 0 8px; }
+.phone.landscape .dv-art { width: 200px; flex: none; }
+.phone.landscape .dv-info { flex: 1; min-width: 0; }
+.phone.landscape .dv-meta { text-align: left; }
+.phone.landscape .dv-tiles { grid-template-columns: 1fr 1fr 1fr; }
+.phone.landscape .dv-tile.accent { grid-column: auto; flex-direction: column; align-items: flex-start; justify-content: space-between; min-height: 120px; }
+
+/* System screens (Android's own): picker, dialogs, notification shade, lock screen */
+.phone.landscape .sys-top { padding-top: 30px; }
+.phone.landscape .sys-bottom { padding-bottom: 14px; }
+.phone.landscape .shade { padding: 34px 0 0; }
+.phone.landscape .shade .notif { max-width: 520px; margin: 0 auto; }
+.phone.landscape .lock { padding: 36px 48px 0; display: grid; grid-template-columns: 1fr 1.3fr; grid-template-rows: auto auto 1fr auto; column-gap: 40px; align-items: center; }
+.phone.landscape .lock .clock { grid-column: 1; grid-row: 2; font-size: 72px; }
+.phone.landscape .lock .date { grid-column: 1; grid-row: 3; align-self: start; margin-top: 8px; }
+.phone.landscape .lock .notif { grid-column: 2; grid-row: 2 / 4; }
+.phone.landscape .lock .hint { grid-column: 1 / -1; grid-row: 4; padding-bottom: 16px; }

@@ -62,7 +62,8 @@ const INITIAL_STATE = () => ({
   lyricsAutoScroll: true, // global setting, saved: synced lyrics follow the song
   spinRecord: true, // global setting, saved (D25): when off, the record stays still
   // driving mode (D24): manual, or automatic when the chosen car's Bluetooth connects
-  drive: { on: false, tab: 'playing', sub: null, auto: false, car: null, autoEntered: false, btGranted: false, landscape: false },
+  drive: { on: false, tab: 'playing', sub: null, auto: false, car: null, autoEntered: false, btGranted: false },
+  landscape: false, // phone orientation (D28): every screen has a landscape layout
   // equalizer (D23): global, saved; hidden on Android 8
   eq: { on: false, preset: 'flat', bands: Array(10).fill(0), custom: Array(10).fill(0), bass: 0 },
   angle: 0, spinningSince: 0,
@@ -577,6 +578,7 @@ const SCREENS = {
       const k = ctx(ms.map(m => m.id), { type: 'Playing from album', name: a.title });
       const total = ms.reduce((s, m) => s + m.duration, 0);
       return `${topbar('', { actions: `<button class="icon-btn" data-action="album-menu" data-id="${id}" aria-label="More options">${iconHtml('more_vert')}</button>` })}
+        <div class="split"><div class="split-side">
         <div class="detail-head">
           <div class="art">${cover(a)}</div>
           <h2>${esc(a.title)}</h2>
@@ -584,9 +586,11 @@ const SCREENS = {
           <div class="meta">${a.year ? a.year + ' · ' : ''}${plural(ms.length, 'song', 'songs')} · ${totalDuration(total)}</div>
         </div>
         ${playActions(k, a.noMetadata ? null : id)}
+        </div><div class="split-main">
         ${a.noMetadata ? `<p class="pad" style="font:var(--type-body-s);color:var(--color-text-2);margin:0 0 8px">These files have no album or artist information. The app shows the file name.</p>` : ''}
         ${ms.map((m, i) => songRow(m, k, i, { numbered: true })).join('')}
-        <div class="crumbs" style="padding-top:16px">${iconHtml('folder')} ${esc(a.folder)}</div>`;
+        <div class="crumbs" style="padding-top:16px">${iconHtml('folder')} ${esc(a.folder)}</div>
+        </div></div>`;
     },
   },
 
@@ -598,6 +602,7 @@ const SCREENS = {
       const k = ctx(ms.map(m => m.id), { type: 'Playing from artist', name });
       const withPhoto = hasImage(artistInfo(name));
       return `${topbar('', { overPhoto: true })}
+        <div class="split"><div class="split-side">
         <div class="artist-hero ${withPhoto ? '' : 'no-photo'}">
           <div class="bg">${photo(name, 'xMidYMin slice')}</div>
           <div class="grad"></div>
@@ -605,10 +610,12 @@ const SCREENS = {
             <div class="meta">${plural(as.length, 'album', 'albums')} · ${plural(ms.length, 'song', 'songs')}</div></div>
         </div>
         ${playActions(k)}
+        </div><div class="split-main">
         <div class="sec-title">Albums</div>
         <div class="hscroll">${as.map(albumCard).join('')}</div>
         <div class="sec-title">Songs</div>
-        ${ms.map((m, i) => songRow(m, k, i)).join('')}`;
+        ${ms.map((m, i) => songRow(m, k, i)).join('')}
+        </div></div>`;
     },
   },
 
@@ -712,10 +719,14 @@ const SCREENS = {
         ? `<div class="pl-art" style="background:var(--color-primary-container);color:var(--color-on-primary-container)">${iconHtml(info.icon, 'fill')}</div>`
         : `<div class="pl-art" style="overflow:hidden">${mosaic(ids)}</div>`;
       return `${topbar('', { actions: info.editable ? `<button class="icon-btn" data-action="playlist-menu" data-id="${id}" aria-label="Playlist options">${iconHtml('more_vert')}</button>` : '' })}
+        <div class="split"><div class="split-side">
         <div class="detail-head">${art}<h2>${esc(info.name)}</h2>
           <div class="meta">${info.desc ? info.desc + ' · ' : ''}${plural(ids.length, 'song', 'songs')}${ids.length ? ' · ' + totalDuration(total) : ''}</div></div>
-        ${ids.length ? playActions(k) + ids.map((mid, i) => songRow(song(mid), k, i)).join('')
-          : `<div class="empty"><span class="ms big">${info.icon || 'queue_music'}</span><h3>Nothing here yet</h3><p>${id === 'favorite-songs' ? 'Tap the heart on a song, in the player or in the ⋮ menu, to see it here.' : 'Use the ⋮ menu on any song and choose "Add to playlist".'}</p></div>`}`;
+        ${ids.length ? playActions(k) : ''}
+        </div><div class="split-main">
+        ${ids.length ? ids.map((mid, i) => songRow(song(mid), k, i)).join('')
+          : `<div class="empty"><span class="ms big">${info.icon || 'queue_music'}</span><h3>Nothing here yet</h3><p>${id === 'favorite-songs' ? 'Tap the heart on a song, in the player or in the ⋮ menu, to see it here.' : 'Use the ⋮ menu on any song and choose "Add to playlist".'}</p></div>`}
+        </div></div>`;
     },
   },
 
@@ -1004,7 +1015,7 @@ function renderNowPlaying() {
 
 /* ---------- Driving mode (D24) ----------
    A simplified full-screen player for the car: big text, big buttons, two tabs (Now playing, Music),
-   no search, menus or dialogs. Screen stays on. Has its own landscape layout. */
+   no search, menus or dialogs. Screen stays on. Has its own landscape layout (like every screen, D28). */
 const PAIRED_DEVICES = ['HR-V Multimedia', 'JBL Flip 5', 'Galaxy Buds2 Pro', 'Pixel Watch 2'];
 function driveTiles() {
   return [
@@ -1047,7 +1058,6 @@ function renderDrive() {
   const d = S.drive;
   driveEl.classList.toggle('open', d.on);
   driveEl.setAttribute('aria-hidden', !d.on);
-  $('#phone').classList.toggle('landscape', d.on && d.landscape);
   if (!d.on) { driveEl.innerHTML = ''; return; }
   driveEl.innerHTML = `
     <div class="dv-top">
@@ -1071,12 +1081,12 @@ function enterDrive(auto = false) {
   updatePanel(driveKey());
 }
 function exitDrive() {
-  Object.assign(S.drive, { on: false, autoEntered: false, landscape: false, sub: null });
+  Object.assign(S.drive, { on: false, autoEntered: false, sub: null });
   renderDrive();
   positionSnackbar();
   updatePanelForCurrent();
 }
-const driveKey = () => S.drive.landscape ? 'drive-landscape' : S.drive.tab === 'music' ? 'drive-music' : 'drive';
+const driveKey = () => S.landscape ? 'drive-landscape' : S.drive.tab === 'music' ? 'drive-music' : 'drive';
 function drivePlay(k) {
   const lib = library().map(m => m.id);
   if (k === 'shuffle-all') playList(lib, Math.floor(Math.random() * lib.length), { type: 'Playing from', name: 'All songs' }, true);
@@ -1361,7 +1371,16 @@ function positionSnackbar() {
   const area = $('#snack-area');
   const np = npEl.classList.contains('open');
   const b = $('#bottom');
-  if (S.drive.on) { area.style.bottom = (S.drive.landscape ? 16 : 104) + 'px'; return; }
+  area.style.left = '12px';
+  if (S.landscape) {
+    // landscape (D28): the navigation is a rail on the left; the mini player sits at the bottom of the content
+    const rail = !np && !S.drive.on && !b.hidden;
+    const mini = $('#mini');
+    area.style.left = (rail ? 100 : 12) + 'px';
+    area.style.bottom = (rail && !mini.hidden ? mini.offsetHeight + 16 : 16) + 'px';
+    return;
+  }
+  if (S.drive.on) { area.style.bottom = '104px'; return; }
   area.style.bottom = (np ? 40 : b.hidden ? 40 : b.offsetHeight + 12) + 'px';
 }
 
@@ -1751,9 +1770,9 @@ const SHORTCUTS = [
   ['lyrics-plain', 'Lyrics · plain text', () => { playElisTom(1, 20); S.lyricsOpen = true; openNowPlaying(); }],
   ['lyrics-none', 'Lyrics · none', () => { playElisTom(4, 20); S.lyricsOpen = true; openNowPlaying(); }],
   ['queue', 'Queue', () => { ensurePlaying(); openNowPlaying(); setTimeout(openQueue, 200); }],
-  ['drive', 'Driving mode', () => { ensurePlaying(); S.drive.landscape = false; enterDrive(false); }],
-  ['drive-music', 'Driving mode · music', () => { ensurePlaying(); S.drive.landscape = false; enterDrive(false); S.drive.tab = 'music'; renderDrive(); updatePanel('drive-music'); }],
-  ['drive-landscape', 'Driving mode · landscape', () => { ensurePlaying(); enterDrive(false); S.drive.landscape = true; renderDrive(); updatePanel('drive-landscape'); }],
+  ['drive', 'Driving mode', () => { ensurePlaying(); setLandscape(false); enterDrive(false); }],
+  ['drive-music', 'Driving mode · music', () => { ensurePlaying(); setLandscape(false); enterDrive(false); S.drive.tab = 'music'; renderDrive(); updatePanel('drive-music'); }],
+  ['drive-landscape', 'Driving mode · landscape', () => { ensurePlaying(); enterDrive(false); setLandscape(true); updatePanel('drive-landscape'); }],
   ['menu', 'Song menu', () => { ensureLibrary(); if (currentScreen !== 'library') { S.libTab = 'songs'; root('library'); } songMenu('elistom-1'); }],
   ['timer', 'Sleep timer', () => { ensurePlaying(); openNowPlaying(); setTimeout(openTimer, 200); }],
   ['empty', 'Empty library', () => { ensureLibrary(); S.folders = []; S.queue = []; S.playing = false; root('library'); updatePanel('empty'); }],
@@ -1818,10 +1837,7 @@ const SIMULATIONS = {
     if (npEl.classList.contains('open')) closeNowPlaying();
     enterDrive(true); snackbar(`Connected to ${esc(S.drive.car)} · driving mode on`);
   },
-  'rotate': () => {
-    if (!S.drive.on) { ensurePlaying(); enterDrive(false); }
-    S.drive.landscape = !S.drive.landscape; renderDrive(); updatePanel(driveKey());
-  },
+  'rotate': () => setLandscape(!S.landscape),
   'reset': () => reset(),
 };
 $$('[data-simulate]').forEach(b => b.addEventListener('click', () => { SIMULATIONS[b.dataset.simulate](); $('#panel').classList.remove('open'); }));
@@ -1843,7 +1859,9 @@ function playElisTom(i, pos) {
   S.pos = pos; updateProgress();
 }
 function reset() {
+  const landscape = S.landscape; // the phone's orientation is not app state
   S = INITIAL_STATE();
+  setLandscape(landscape);
   renderDrive();
   npEl.classList.remove('open');
   overlayEl.innerHTML = ''; $('#snack-area').innerHTML = '';
@@ -1851,11 +1869,25 @@ function reset() {
   root('welcome');
 }
 
+/* ---------- Orientation (D28) ----------
+   Every screen adapts to landscape: on a computer the panel's "Rotate phone" turns the frame; on a
+   real phone the mockup follows the phone's own orientation. */
+const phoneLandscape = matchMedia('(orientation: landscape) and (max-height: 500px)');
+function setLandscape(on) {
+  S.landscape = on;
+  $('#phone').classList.toggle('landscape', on);
+  syncRecords(); positionSnackbar();
+  if (S.drive.on) updatePanel(driveKey());
+  const active = $('.ly-lines .cur'); if (active && typeof scrollLyrics === 'function') scrollLyrics(false);
+}
+phoneLandscape.addEventListener('change', e => setLandscape(e.matches));
+
 /* ============================================================
    Start
    ============================================================ */
 let savedTheme = 'auto';
 try { savedTheme = localStorage.getItem('vitrola-mockup-theme') || 'auto'; } catch (e) {}
 setTheme(savedTheme);
+setLandscape(phoneLandscape.matches);
 root('welcome');
 })();

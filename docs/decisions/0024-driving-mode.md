@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-30
+- **Revised:** 2026-10-30: the rest of the app also adapts to landscape (D28).
 - **Related:** [D1](0001-personal-use-play-store-ready.md), [D3](0003-library-from-chosen-folders.md), [D4](0004-background-playback.md), [D6](0006-design-before-code.md), [D11](0011-navigation-structure.md)
 
 ## Context
@@ -20,7 +21,7 @@ The maintainer wants a driving mode: a screen similar to Android Auto, focused o
 - An **Exit** button with a text label. No search, song menus, dialogs, queue editing, lyrics or equalizer inside the mode. Snackbars are allowed (above the tabs).
 - Large touch targets everywhere (controls 56–104dp, tabs and tiles 72dp+ tall), large type, the app's normal theme (light/dark as chosen).
 - **Screen stays on** while driving mode is open.
-- **Landscape:** driving mode has its own landscape layout (Exit and the tabs in a side rail, the record on the left, title and controls on the right; tiles in 3 columns). The rest of the app keeps its portrait layouts in v1.
+- **Landscape:** driving mode has its own landscape layout (Exit and the tabs in a side rail, the record on the left, title and controls on the right; tiles in 3 columns). Every other screen adapts to landscape too (D28).
 
 **Entering and leaving.**
 - **Manual:** a car button in the Now playing top bar and Settings › Driving › Driving mode. Exit button or system back leaves (back first closes the playlists list).

@@ -59,6 +59,7 @@
 
 ### UI
 - 200% font scale, very long titles (ellipsize); RTL is not required (the three languages are LTR).
+- **Landscape (D28):** every screen in both orientations; rotate with a sheet or dialog open, with lyrics scrolled, in driving mode, during the scan and in the middle of the onboarding → same screen and state; the rail replaces the bottom bar; nothing is cut off at 200% font scale in landscape (scroll instead).
 - Switch the device (or per-app) language to Portuguese (Brazil) and Spanish: every screen, dialog, snackbar, notification and plural is translated; longer Spanish/Portuguese strings still fit.
 - Dark theme on all screens, including the system picker hand-off and dialogs.
 - Edge-to-edge insets on gesture and 3-button navigation.
@@ -85,4 +86,5 @@
 17. Lyrics: open a song with a `.lrc` (line follows the song, tap a line to seek, manual scroll then "Back to current line", auto-scroll off, then check another song and an app restart keep it off), one with only a `.txt` (static, scrolls by hand), one with only embedded lyrics (plain), and one with nothing.
 18. Equalizer: pick presets, drag bands (Custom), bass boost, switch off/on; check the Settings status row, the Now playing dot, and an app restart; on an Android 8 device or emulator the equalizer does not appear.
 19. Driving mode: open it from Now playing and from Settings; play from each tile; Playlists list and back; favorite/shuffle; rotate to landscape; screen stays on; turn on the automatic start (permission + pick the car), connect and disconnect the car Bluetooth with the app in the foreground and in the background.
-20. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).
+20. Rotate the phone on every main screen (library tabs, album, artist, folder, search, playlists, playlist, settings, equalizer, Now playing, lyrics, queue, driving mode, welcome, scan) and check the landscape layout and that nothing resets.
+21. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).

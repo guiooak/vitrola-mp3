@@ -39,6 +39,10 @@ Open http://localhost:8765/03-mockup/. Opening `design/03-mockup/index.html` dir
 | 15 | **Sleep timer** | 15 / 30 / 45 / 60 min or "at the end of this song", with a countdown in the player and in Settings. |
 | 16 | **Empty library** | State with no folder chosen. |
 
+## Landscape
+
+Every screen adapts to landscape ([D28](../decisions/0028-landscape.md)). On a computer, use **Rotate phone (portrait / landscape)** under Simulate, then any shortcut; on a real phone, just turn it. The bottom bar becomes a navigation rail, album, artist and playlist pages split into two columns, Now playing and lyrics put the record on the left, sheets are centered, and the equalizer and welcome use two columns.
+
 ## Artist photos and album covers
 
 The user organizes music like this, with one image per folder:
@@ -127,7 +131,7 @@ Example: searching "águas" brings Elis Regina (artist), Elis & Tom (album) and 
 | Broken file | Skips to the next song with the "Couldn't play…" snackbar |
 | Lose folder access | Dialog asking to choose the folder again |
 | Car Bluetooth connects / disconnects | With the automatic start on, connecting opens driving mode and disconnecting closes it |
-| Rotate phone (driving mode) | Turns the phone frame to landscape to show the driving mode landscape layout |
+| Rotate phone (portrait / landscape) | Turns the phone frame to landscape (and back) on any screen |
 | Start over | Back to the welcome screen |
 
 ## Decisions made in the mockup

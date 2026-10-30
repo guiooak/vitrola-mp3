@@ -25,6 +25,10 @@ Dialogs: file details, new/rename playlist, delete playlist, remove folder, lost
 - System back: closes sheet/dialog → collapses Now playing → pops the stack → leaves the app.
 - Welcome and Scan hide the bottom bar and the mini player.
 
+## Landscape (D28)
+
+Every screen below also has a landscape layout (see 02 §14 and 04 → Landscape). In the mockup, use "Rotate phone (portrait / landscape)" under Simulate and then any shortcut.
+
 ## Screen list
 
 | # | Screen | Key behavior | Mockup panel shortcut |

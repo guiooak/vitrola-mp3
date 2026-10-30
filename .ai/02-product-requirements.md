@@ -144,6 +144,12 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - Optional automatic start (off by default): Settings › Driving › Start automatically in the car → Nearby devices permission (Android 12+) → pick the car from paired Bluetooth devices. Opens when that car connects (app in the foreground, or the next time it opens); an automatically opened mode closes when the car disconnects. Never starts playback or brings the app to the front by itself.
 - Full rules: [D24](../docs/decisions/0024-driving-mode.md). Layout: the "Driving mode" shortcuts in the mockup.
 
-## 14. Later (do not build without asking)
+## 14. Landscape (D28) — P0
+
+- Every screen rotates with the phone and has a landscape layout: navigation rail instead of the bottom bar (mini player at the bottom of the content), compact 48dp top bars, wider grids, two-column album/artist/playlist pages, Now playing with the record on the left, lyrics with a left column, centered sheets, equalizer in two columns, welcome in two columns, driving mode with its side rail.
+- Rotating never loses state (screen, scroll, open sheet or dialog, lyrics position, playback, driving mode tab).
+- Full rules: [D28](../docs/decisions/0028-landscape.md). Layouts: "Rotate phone" in the mockup's Simulate panel.
+
+## 15. Later (do not build without asking)
 
 Android Auto, home-screen widget, crossfade, per-output equalizer settings, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.
