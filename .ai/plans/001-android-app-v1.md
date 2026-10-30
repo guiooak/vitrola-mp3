@@ -2,7 +2,7 @@
 
 **Status:** ready to start · **Created:** 2026-10-26 · **Owner:** implementing agent · **Reviewer:** maintainer
 
-Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D26.
+Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D27.
 
 ## Working on a new machine
 
@@ -130,7 +130,7 @@ Tasks:
 - [ ] `PlaybackService` (`MediaSessionService`, foreground `mediaPlayback`), ExoPlayer with audio focus, becoming-noisy (setting), wake mode (D4); `POST_NOTIFICATIONS` request on first play.
 - [ ] App-owned queue: play a context from a song, Play / Shuffle buttons, shuffle (current first, restore order), repeat off/all/one, previous (> 3 s restarts), play next / add to end (song and album), remove with Undo.
 - [ ] `MediaController` in ViewModels; mini player (progress line, small record, title, play/pause, next).
-- [ ] **Record component**: geometry, label image (album → artist → generated, D26), tonearm −14° when paused, 1800 ms per turn, global angle continuity between mini player and Now playing, coast to an upright stop (D26), Spinning record setting (D25), reduce-motion support (04-design-system).
+- [ ] **Record component**: geometry, label image (album → artist → generated, D26), tonearm −14° when paused, 1800 ms per turn, global angle continuity between mini player and Now playing, coast to an upright stop (D26), Spinning record setting (D25), animated tonearm with the D27 rest rules, touch-the-record gesture with live playback speed (D27), reduce-motion support (04-design-system).
 - [ ] Now playing screen: source label, record, title, artist chip, heart slot, seek bar, controls, timer row placeholder, queue button, file details dialog; album-color background tint (Palette).
 - [ ] Queue sheet (jump, remove + Undo; drag handle visual only until Q5 is answered).
 - [ ] Media notification and lock screen with artwork; custom heart command (wired in Phase 4).
@@ -241,3 +241,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-30 | — | — | Plan edited: driving mode (D24) added to Phase 6; its design was approved in the mockup the same day. |
 | 2026-10-30 | — | — | Plan edited: Spinning record setting (D25) added to the Phase 6 Settings task. |
 | 2026-10-30 | — | — | Plan edited: record label image order and upright stop (D26) added to the Phase 3 record component task. |
+| 2026-10-30 | — | — | Plan edited: tonearm rules and touch-the-record gesture (D27) added to the Phase 3 record component task. |

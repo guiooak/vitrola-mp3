@@ -32,6 +32,7 @@ Architecture Decision Records (ADRs) for Vitrola Mp3: one file per product or te
 | D24 | [Driving mode](0024-driving-mode.md) | Accepted | 2026-10-30 |
 | D25 | [Setting to keep the record still](0025-spinning-record-setting.md) | Accepted | 2026-10-30 |
 | D26 | [Record label image and upright resting position](0026-record-label-image.md) | Accepted | 2026-10-30 |
+| D27 | [Touching the record, and when the tonearm rests](0027-touch-the-record-and-tonearm.md) | Accepted | 2026-10-30 |
 
 ## Adding a decision
 

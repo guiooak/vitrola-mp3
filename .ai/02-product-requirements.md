@@ -73,6 +73,8 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - "Now playing" (full screen, slides up): source label ("Playing from album · Elis & Tom"), collapse button, ⋮ song menu, **the record** (cover as label, spinning, tonearm), title, artist chip with small photo + album name, heart, seek bar with times, controls (shuffle, previous, play/pause, next, repeat), sleep timer status, bottom row (sleep timer, queue, file details).
 - The background takes a light tint of the album's dominant color (mockup: 16% mix with the background color).
 - Record animation rules: see 04-design-system → Motion. When the record is still, its label always rests upright (D26).
+- **Tonearm (D27):** on the record whenever music plays (including between songs and while the record is touched); back at its rest when playback stops and waits for the user (manual pause, end of queue, sleep timer, headphones out, error, lost folder); a short interruption that Android resumes by itself keeps it down. Every move animated (700 ms).
+- **Touching the record (D27):** a playful gesture on the spinning record in Now playing — hold = music stops, turn faster/slower = music faster/slower (pitch follows), release = normal again. Not a control: never changes queue, play state or settings.
 
 ## 6. Favorites (D13) — P0
 

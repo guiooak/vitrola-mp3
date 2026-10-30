@@ -233,7 +233,7 @@ function record({ a = null, withArm = true, player = false, demo = false } = {})
 /* Continuous rotation of the player records: the angle is global, so the
    mini player and the full screen spin together and never "jump" on re-render. */
 const TURN = T.motion.duration['record-spin'];
-const currentAngle = () => S.playing && S.spinRecord ? S.angle + (performance.now() - S.spinningSince) / TURN * 360 : S.angle;
+const currentAngle = () => S.playing && S.spinRecord && !scratch ? S.angle + (performance.now() - S.spinningSince) / TURN * 360 : S.angle;
 // When the record stops (pause, or "Spinning record" turned off) it coasts to the next upright
 // angle, so the label image always rests in its normal position (D26). The coast starts at the
 // spinning speed and eases out; the stop angle is a multiple of 360°.
@@ -245,12 +245,19 @@ function coastTo(cur) {
   S.coast = { from: cur, to, dur, easing: `cubic-bezier(.25,${y1.toFixed(3)},.4,1)` };
   return to;
 }
-function syncRecords(slowDown = false) {
+// Tonearm (D27): on the record whenever music plays (also while the record is held); back at its
+// rest, off the record, when playback stops and waits for the user. A freshly drawn record starts
+// from the position last shown, so the arm always moves with its 700 ms animation.
+let armShown = false;
+function syncRecords(slowDown = false, scope = document) {
   const coast = slowDown ? S.coast : null;
   if (slowDown) S.coast = null;
-  $$('svg[data-record]').forEach(svg => {
+  $$('svg[data-record]', scope).forEach(svg => {
     const g = $('.rotor', svg);
+    if (!svg.dataset.armReady) { svg.classList.toggle('down', armShown); svg.getBoundingClientRect(); svg.dataset.armReady = '1'; }
     svg.classList.toggle('down', S.playing);
+    svg.classList.toggle('scratchable', S.playing && S.spinRecord && !reduceMotion);
+    if (scratch) { g.style.animation = 'none'; g.style.transform = `rotate(${S.angle}deg)`; return; }
     if (S.playing && S.spinRecord && !reduceMotion) {
       g.style.transform = '';
       g.style.animation = `spin ${TURN}ms linear ${-((currentAngle() % 360) / 360) * TURN}ms infinite`;
@@ -260,6 +267,61 @@ function syncRecords(slowDown = false) {
     if (coast && !reduceMotion) g.animate([{ transform: `rotate(${coast.from}deg)` }, { transform: `rotate(${coast.to}deg)` }], { duration: coast.dur, easing: coast.easing });
     g.style.transform = `rotate(${S.angle}deg)`;
   });
+}
+
+/* Touching the record (D27) — a playful gesture, not a control. While music plays and the record
+   spins, a finger on the big record in Now playing holds it: the music stops. Turning it faster or
+   slower than normal speeds the music up or slows it down (rate = finger speed / normal speed,
+   0–3×; turning backwards counts as holding). Letting go returns to normal playback and spin. */
+let scratch = null;
+function bindScratch(svg) {
+  const C = { x: 150, y: 160 }, R = 130; // disc center and radius in the record's viewBox
+  const toView = ev => { const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; return pt.matrixTransform(svg.getScreenCTM().inverse()); };
+  const angleAt = v => Math.atan2(v.y - C.y, v.x - C.x) * 180 / Math.PI;
+  const rateEl = $('.scratch-rate', svg.parentElement);
+  const showRate = r => { if (!rateEl) return; rateEl.textContent = r < 0.05 ? 'Held' : `${r.toFixed(1)}×`; };
+  const tick = () => {
+    if (!scratch) return;
+    const idle = performance.now() - scratch.lastMove;
+    if (idle > 80) scratch.rate *= 0.6; // finger still → the music stops
+    showRate(scratch.rate);
+    scratch.raf = requestAnimationFrame(tick);
+  };
+  svg.addEventListener('pointerdown', ev => {
+    if (!S.playing || !S.spinRecord || reduceMotion || scratch) return;
+    const v = toView(ev);
+    if (Math.hypot(v.x - C.x, v.y - C.y) > R) return; // only on the record itself
+    ev.preventDefault();
+    svg.setPointerCapture(ev.pointerId);
+    S.angle = S.angle + (performance.now() - S.spinningSince) / TURN * 360; // freeze where it is
+    scratch = { id: ev.pointerId, last: angleAt(v), lastMove: performance.now(), rate: 0 };
+    svg.classList.add('scratching'); rateEl && rateEl.classList.add('on');
+    syncRecords(); tick();
+  });
+  svg.addEventListener('pointermove', ev => {
+    if (!scratch || ev.pointerId !== scratch.id) return;
+    const now = performance.now(), a = angleAt(toView(ev));
+    let d = a - scratch.last; if (d > 180) d -= 360; if (d < -180) d += 360;
+    const dt = Math.max(1, now - scratch.lastMove);
+    scratch.last = a; scratch.lastMove = now;
+    S.angle += d;
+    $$('svg[data-record] .rotor').forEach(g => { g.style.transform = `rotate(${S.angle}deg)`; });
+    const r = Math.max(0, Math.min(3, (d / dt) / SPIN_SPEED));
+    scratch.rate = scratch.rate * 0.7 + r * 0.3;
+    // the music moves with the record: one turn = 1.8 s of the song (backwards = held)
+    const m = current();
+    if (m && d > 0) { S.pos = Math.min(m.duration - 0.5, S.pos + d / 360 * TURN / 1000); updateProgress(); }
+  });
+  const release = ev => {
+    if (!scratch || ev.pointerId !== scratch.id) return;
+    cancelAnimationFrame(scratch.raf);
+    scratch = null;
+    svg.classList.remove('scratching'); rateEl && rateEl.classList.remove('on');
+    S.spinningSince = performance.now(); // back to normal speed from where it was let go
+    syncRecords();
+  };
+  svg.addEventListener('pointerup', release);
+  svg.addEventListener('pointercancel', release);
 }
 
 /* ============================================================
@@ -821,7 +883,7 @@ setInterval(() => {
   // status bar clock
   const d = new Date(); $('#clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
   if (S.timer && !S.timer.endOfSong && Date.now() >= S.timer.end) { S.timer = null; if (S.playing) play(false); snackbar('Sleep timer ended. Good night!'); }
-  if (!S.playing || !current()) return;
+  if (!S.playing || !current() || scratch) return;
   S.pos += 1;
   if (S.pos >= current().duration) {
     if (S.timer && S.timer.endOfSong) { S.timer = null; S.pos = 0; play(false); snackbar('Sleep timer ended. Good night!'); return; }
@@ -872,7 +934,7 @@ function renderMini() {
       <button class="icon-btn" data-action="play" aria-label="${S.playing ? 'Pause' : 'Play'}">${iconHtml(S.playing ? 'pause' : 'play_arrow', 'fill')}</button>
       <button class="icon-btn" data-action="next" aria-label="Next song">${iconHtml('skip_next', 'fill')}</button>
     </div>`;
-  syncRecords();
+  syncRecords(false, mini);
   positionSnackbar();
 }
 
@@ -903,6 +965,8 @@ function renderNowPlaying() {
   const fav = S.favoriteSongs.has(m.id);
   npEl.style.setProperty('--np-background', `color-mix(in srgb, ${albumColor(a)} 16%, var(--color-background))`);
   npEl.classList.toggle('lyrics-mode', S.lyricsOpen);
+  const oldDisc = $('.np-disc svg[data-record]', npEl);
+  if (oldDisc) armShown = oldDisc.classList.contains('down'); // the new record starts where the arm was
   if (S.lyricsOpen) renderLyricsView(m, a);
   else npEl.innerHTML = `
     <div class="np-top">
@@ -911,7 +975,7 @@ function renderNowPlaying() {
       <button class="icon-btn" data-action="drive-open" aria-label="Driving mode">${iconHtml('directions_car')}</button>
       <button class="icon-btn" data-action="menu" data-mid="${m.id}" aria-label="More options">${iconHtml('more_vert')}</button>
     </div>
-    <div class="np-disc">${record({ a, withArm: true, player: true })}</div>
+    <div class="np-disc">${record({ a, withArm: true, player: true })}<span class="scratch-rate" aria-hidden="true"></span></div>
     <div class="np-info">
       <div style="min-width:0"><h2>${esc(m.title)}</h2><button class="ar" data-action="artist-np" data-name="${esc(m.artist)}">${a.noMetadata ? '' : `<span class="av">${photo(m.artist)}</span>`}${esc(m.artist)}${a.noMetadata ? '' : ' · ' + esc(a.title)}</button></div>
       <button class="icon-btn ${fav ? 'fav-on' : ''}" data-action="favorite" data-mid="${m.id}" aria-label="${fav ? 'Remove from favorite songs' : 'Add to favorite songs'}" aria-pressed="${fav}">${iconHtml('favorite', fav ? 'fill' : '')}</button>
@@ -933,6 +997,7 @@ function renderNowPlaying() {
       <button class="icon-btn" data-action="file-info" data-mid="${m.id}" aria-label="File details">${iconHtml('info')}</button>
     </div>`;
   const seek = $('#np-seek', npEl);
+  const disc = $('.np-disc svg[data-record]', npEl); if (disc) bindScratch(disc);
   seek.addEventListener('input', () => { S.pos = +seek.value; seek.style.setProperty('--p', (S.pos / m.duration * 100) + '%'); $('#np-pos').textContent = fmt(S.pos); const b = $('#mini .prog i'); if (b) b.style.width = (S.pos / m.duration * 100) + '%'; updateLyrics(); });
   syncRecords();
 }
@@ -1646,7 +1711,7 @@ const NOTES = {
   'favorite-albums': 'Albums marked with the heart, on the album page or in its ⋮ menu.',
   'playlist': 'Playlist details. The ⋮ at the top lets you rename or delete it.',
   'settings': 'Library folders (add and remove), subfolders, folder images, equalizer, timer, resume, headphones, driving mode, battery tip, theme and "Spinning record" (turn it off to keep the record still everywhere; D25).',
-  'now-playing': 'The album cover becomes the record label. The arm drops when playing and lifts when paused, and the record slows down. The background takes a hint of the cover color. Tap the info icon to see the file.',
+  'now-playing': 'Touch the spinning record: holding it stops the music, turning it faster or slower speeds the music up or slows it down (the bubble shows the speed here; in the app you hear it), and letting go returns to normal (D27). The tonearm stays on the record while music plays and goes back to its rest when you pause or the queue ends. ' + 'The album cover becomes the record label. The arm drops when playing and lifts when paused, and the record slows down. The background takes a hint of the cover color. Tap the info icon to see the file.',
   'lyrics': 'Synced lyrics from a .lrc file next to the song (D21). The current line is highlighted and stays in view; tap a line to jump there. Scroll by hand and "Back to current line" appears; following resumes on its own after 5 seconds. To read freely, turn off auto-scroll with the floating icon at the bottom right of the lyrics (it shows a dot while on). The choice is global and saved: it applies to every song until you change it. The current line is still highlighted. Tap the small record (or the lyrics button) to go back to the record. "Corcovado" has LRC text stored inside the MP3 and is synced too. The lyrics are invented placeholders.',
   'lyrics-plain': 'Plain lyrics from a .txt file (D21): shown as written, with no automatic scrolling. "Só Tinha de Ser com Você" (lyrics stored inside the MP3) and "Inútil Paisagem" (a .lrc without timestamps) look the same. The lyrics are invented placeholders.',
   'lyrics-none': 'No .lrc, no .txt and no lyrics inside the MP3: the lyrics view says how to add them. The lyrics button is always in Now playing, so the feature is easy to find.',

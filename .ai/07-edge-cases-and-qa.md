@@ -53,6 +53,8 @@
 - **Seek** while paused updates the position without starting playback.
 - **Reduce motion** on → no disc spin, no equalizer animation.
 - **Record label** (D26): album without an image but with an artist photo → the label shows the artist photo; neither → generated cover; pause at any moment → the record coasts and stops with the label upright (also after reopening the app and with reduce motion).
+- **Touching the record** (D27): hold → music stops but play state, notification and play count do not change; turn forward fast/slow → faster/slower with pitch; turn backwards → held; release → 1× and normal spin; not available when paused, with Spinning record off, with reduce motion, in the mini player, lyrics or driving mode; swipe-down-to-close does not trigger from the record.
+- **Tonearm** (D27): drops (animated) on play and when opening Now playing while playing; lifts (animated) on manual pause, end of queue, sleep timer, headphones out; stays down between songs and during a phone call that resumes.
 - **Spinning record** off → no record spins anywhere (mini player, Now playing, lyrics, driving mode), while playing or paused; turning it on resumes without a jump; the setting survives a restart (D25).
 
 ### UI

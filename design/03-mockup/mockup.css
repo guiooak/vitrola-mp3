@@ -218,10 +218,18 @@ button { font: inherit; color: inherit; }
 .slowing .rotor { animation: spin var(--duration-record-spin) cubic-bezier(.2,.6,.4,1) 1; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .tonearm { transform-box: view-box; transition: transform var(--duration-tonearm) var(--easing-tonearm); }
-svg.demo .tonearm, svg[data-record] .tonearm { transform: rotate(-14deg); }
+svg.demo .tonearm, svg[data-record] .tonearm { transform: rotate(-20deg); } /* rest: off the record (D27) */
 svg.demo, svg[data-record] { overflow: visible; }
 svg.demo.down .tonearm, svg[data-record].down .tonearm { transform: none; }
 svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infinite; animation-delay: var(--duration-tonearm); }
+
+/* Touching the record (D27): the finger holds or drags the record; a small speed readout (mockup only) */
+.np-disc svg[data-record].scratchable .rotor { cursor: grab; }
+.np-disc svg[data-record].scratching .rotor { cursor: grabbing; }
+.np-disc svg[data-record] { touch-action: none; }
+.np-disc { position: relative; }
+.scratch-rate { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); font: var(--type-label); font-variant-numeric: tabular-nums; color: var(--color-on-primary); background: var(--color-primary); padding: 4px 12px; border-radius: var(--radius-full); box-shadow: var(--elevation-1); pointer-events: none; opacity: 0; transition: opacity var(--duration-fast); }
+.scratch-rate.on { opacity: 1; }
 
 /* ---------- Detail (album, artist, playlist) ---------- */
 .detail-head { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 4px 24px 16px; gap: 6px; }

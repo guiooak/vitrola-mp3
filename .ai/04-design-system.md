@@ -82,7 +82,7 @@ Geometry from `record()` in `design/03-mockup/mockup.js` (SVG units):
 - **Now playing:** viewBox 320×300. Disc center (150, 160), radius 130, rim stroke 3 `#6A5B50`, grooves every 9 units between r=120 and the label (alternating opacity 1 / 0.55, color `groove`), two highlight arcs (white 17% and 8%), **label radius 50 = the label image clipped to a circle: album image → artist photo → generated cover (D26)**, mustard ring on the label edge, spindle hole r=5 in the background color.
 - **Tonearm:** pivot (296, 24); path (296,24) → (282,150) → (240,190), stroke 8 `metal` with a soft shadow; mustard headshell at the end; counterweight above the pivot.
 - **Mini player:** viewBox 200×200, center (100,100), radius 96, label radius 38, no arm.
-- States: playing → arm down (rotation 0°) and disc spinning; paused → arm lifted **−14° around the pivot** and disc coasting to a stop **upright** (label in its normal position, D26).
+- States: playing → arm down (rotation 0°) and disc spinning; paused → arm back at its rest, **−20° around the pivot** (off the record), and disc coasting to a stop **upright** (label in its normal position, D26).
 
 Generated cover (fallback) — deterministic, from the album title:
 - `h` = 32-bit unsigned hash: for each code point `h = (h * 31 + code) mod 2^32`.
@@ -98,7 +98,7 @@ Generated cover (fallback) — deterministic, from the album title:
 | `fast` | 150 ms | Taps, state changes, press scale |
 | `medium` | 300 ms | Screen push/pop, tab fade, switches, play morph |
 | `long` | 500 ms | Mini player → Now playing |
-| `tonearm` | 700 ms, easing `tonearm` (0.4, 0.1, 0.2, 1) | Arm lowering/lifting |
+| `tonearm` | 700 ms, easing `tonearm` (0.4, 0.1, 0.2, 1) | Arm lowering/lifting — every move is animated, starting from the position last shown (D27) |
 | `record-spin` | 1800 ms per turn (33⅓ rpm), linear | Disc rotation |
 
 - Easings: `standard` (0.2, 0, 0, 1), `decelerate` (0.05, 0.7, 0.1, 1) for things entering, `accelerate` (0.3, 0, 0.8, 0.15) for things leaving.
@@ -106,6 +106,7 @@ Generated cover (fallback) — deterministic, from the album title:
 - Screen transitions: push = new screen slides in from the right, old one shifts 25% left and dims; pop = reverse; tab switch = fade + 8dp rise.
 - Now playing opens with a slide up (500 ms, decelerate) and closes with 300 ms accelerate.
 - Favorite heart on the album page pulses (scale 1.25) when turned on.
+- **Touching the record** (D27, Now playing only, while it spins): the finger holds the record (music stops) or turns it (music speed = finger angular speed / normal spin, 0–3×; backwards = hold); release → normal spin and 1× from the release angle. No speed readout in the app.
 - **Spinning record setting** (D25): when `spinRecord` is off, every record stays still, upright (the shared angle stops advancing, D26); the tonearm and other animations are unchanged.
 - **Reduce motion** (system "remove animations" / animator scale 0): disc does not spin, equalizer bars stop, transitions become short fades.
 
