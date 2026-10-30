@@ -107,7 +107,7 @@ Generated cover (fallback) — deterministic, from the album title:
 - Screen transitions: push = new screen slides in from the right, old one shifts 25% left and dims; pop = reverse; tab switch = fade + 8dp rise.
 - Now playing opens with a slide up (500 ms, decelerate) and closes with 300 ms accelerate.
 - Favorite heart on the album page pulses (scale 1.25) when turned on.
-- **Touching the record** (D27, Now playing only, while it spins): the finger holds the record (music stops) or turns it (music speed = finger angular speed / normal spin, 0–3×; backwards = hold); release → normal spin and 1× from the release angle. No speed readout in the app.
+- **Touching the record** (D27, Now playing only, while it spins): the finger holds the record (music stops) or turns it (music speed = finger angular speed / normal spin, 0.1–3×, stopped below 0.05×; backwards = hold); release → normal spin and 1× from the release angle. No speed readout in the app.
 - **Spinning record setting** (D25): when `spinRecord` is off, every record stays still, upright (the shared angle stops advancing, D26); the tonearm and other animations are unchanged.
 - **Reduce motion** (system "remove animations" / animator scale 0): disc does not spin, equalizer bars stop, transitions become short fades.
 

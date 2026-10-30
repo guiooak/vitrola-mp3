@@ -131,7 +131,7 @@ Tasks:
 - [ ] `PlaybackService` (`MediaSessionService`, foreground `mediaPlayback`), ExoPlayer with audio focus, becoming-noisy (setting), wake mode (D4); `POST_NOTIFICATIONS` request on first play.
 - [ ] App-owned queue: play a context from a song, Play / Shuffle buttons, shuffle (current first, restore order), repeat off/all/one, previous (> 3 s restarts), play next / add to end (song and album), remove with Undo.
 - [ ] `MediaController` in ViewModels; mini player (progress line, small record, title, play/pause, next).
-- [ ] **Record component**: geometry, label image (album → artist → generated, D26), tonearm −14° when paused, 1800 ms per turn, global angle continuity between mini player and Now playing, coast to an upright stop (D26), Spinning record setting (D25), animated tonearm with the D27 rest rules, touch-the-record gesture with live playback speed (D27), reduce-motion support (04-design-system).
+- [ ] **Record component**: geometry, label image (album → artist → generated, D26), tonearm −20° at rest, 1800 ms per turn, global angle continuity between mini player and Now playing, coast to an upright stop (D26), Spinning record setting (D25), animated tonearm with the D27 rest rules, touch-the-record gesture with live playback speed 0.1–3× (D27), reduce-motion support (04-design-system).
 - [ ] Now playing screen: source label, record, title, artist chip, heart slot, seek bar, controls, timer row placeholder, queue button, file details dialog; album-color background tint (Palette).
 - [ ] Queue sheet (jump, remove + Undo; drag handle visual only until Q5 is answered).
 - [ ] Media notification and lock screen with artwork; custom heart command (wired in Phase 4).
@@ -244,3 +244,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-30 | — | — | Plan edited: record label image order and upright stop (D26) added to the Phase 3 record component task. |
 | 2026-10-30 | — | — | Plan edited: tonearm rules and touch-the-record gesture (D27) added to the Phase 3 record component task. |
 | 2026-10-30 | — | — | Plan edited: landscape for every screen (D28) is a ground rule; navigation shell gets the rail. |
+| 2026-10-30 | — | — | Plan edited: touch-the-record speed range is 0.1–3× (D27 revised); tonearm rest angle corrected to −20°. |

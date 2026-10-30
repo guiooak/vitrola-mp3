@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-30
+- **Revised:** 2026-10-30: the slowest speed is 0.1× (was 0.25×); turning backwards and speeds below 0.1× go to the "Later" list.
 - **Related:** [D4](0004-background-playback.md), [D24](0024-driving-mode.md), [D25](0025-spinning-record-setting.md), [D26](0026-record-label-image.md)
 
 ## Context
@@ -12,10 +13,10 @@ The maintainer wants the spinning record to react to touch, like a real turntabl
 
 **Touching the record (Now playing only).** Available only while music plays and the record spins (not with "Spinning record" off, D25, not with reduce motion, not in the mini player, the lyrics header or driving mode, D24).
 - **Finger on the record → the record holds still and the music stops** (silent, not paused: the app still shows it as playing).
-- **Turning it with the finger → the music follows the record:** the speed is the finger's angular speed divided by the normal spin (one turn = 1.8 s of music), from 0 to 3×, with the pitch following the speed like vinyl. Turning backwards counts as holding (no reverse playback). A finger that stops moving brings the music to a stop again.
+- **Turning it with the finger → the music follows the record:** the speed is the finger's angular speed divided by the normal spin (one turn = 1.8 s of music), from 0.1× to 3×, with the pitch following the speed like vinyl, so a very slow turn drags the music very slowly. Below 0.05× (a finger almost still) the music stops; between 0.05× and 0.1× it plays at 0.1×. Turning backwards counts as holding (no reverse playback). A finger that stops moving brings the music to a stop again.
 - **Letting go → normal playback at 1× and the normal spin resume** from where the record was released.
 - It never changes the queue, the play/pause state, the notification, the play count or any setting. The gesture works only on the record itself (inside the disc), and it takes priority over any screen gesture on that area (e.g. swipe down to close, Q6).
-- No speed readout in the app (you hear it). The mockup shows a small "Held / 1.4×" bubble because it has no sound.
+- No speed readout in the app (you hear it). The mockup shows a small "Held / 0.15× / 1.4×" bubble because it has no sound.
 
 **Tonearm.**
 - **On the record whenever music plays**: while a song plays, between songs of a queue, while loading, and while the user holds or turns the record.
@@ -26,7 +27,12 @@ The maintainer wants the spinning record to react to touch, like a real turntabl
 
 ## Consequences
 
-- Playback: during the gesture the service applies `PlaybackParameters(speed, pitch = speed)` at about 30 Hz with smoothing, clamped to 0.25–3×; when the finger holds still (rate < 0.1 for about 80 ms) the output is silenced and the speed kept at the minimum instead of pausing, so the media session state does not flicker. On release: `PlaybackParameters(1, 1)` and full volume. A custom session command or a direct call from the UI drives it (`setScratch(rate)` / `endScratch()`).
+- Playback: during the gesture the service applies `PlaybackParameters(speed, pitch = speed)` at about 30 Hz with smoothing, clamped to 0.1–3× (0.1× is the slowest speed Media3's Sonic processor accepts); when the finger holds still (rate < 0.05 for about 80 ms) the output is silenced and the speed kept at the minimum instead of pausing, so the media session state does not flicker. On release: `PlaybackParameters(1, 1)` and full volume. A custom session command or a direct call from the UI drives it (`setScratch(rate)` / `endScratch()`).
 - The record component tracks the touch angle around the disc center, updates the shared rotation angle directly while touched, and restarts the spin from that angle on release (D26 keeps the stop upright).
 - The tonearm state comes from "is playing or will resume by itself" (transient focus loss), not from the raw player state.
 - Designed in the mockup (Now playing: touch the spinning record; pause, play and end of queue for the arm) and approved before it is built (D6).
+- The audio pipeline is built through the app's own `RenderersFactory` / `DefaultAudioSink.Builder`, so a custom `AudioProcessor` can be added later without rework (see Alternatives).
+
+## Alternatives considered
+
+- **Playing backwards when the record turns backwards, and speeds below 0.1× down to zero** (a DJ-style scratch). Possible with a custom `AudioProcessor` that keeps the last ~10 s of decoded audio and plays it at the finger's speed in either direction, with short fades on direction changes and a seamless return to the player's position on release. Left for "Later": it adds about 1–2 weeks of real-time audio work and device tuning, it is hard to test automatically, it depends on lower-level Media3 APIs, and Bluetooth output latency (150–300 ms) makes it feel loose in headphones and cars. It is a playful effect, not a feature worth delaying v1. If built, the same processor would also replace the forward `PlaybackParameters` path.

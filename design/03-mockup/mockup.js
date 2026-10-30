@@ -273,14 +273,14 @@ function syncRecords(slowDown = false, scope = document) {
 /* Touching the record (D27) — a playful gesture, not a control. While music plays and the record
    spins, a finger on the big record in Now playing holds it: the music stops. Turning it faster or
    slower than normal speeds the music up or slows it down (rate = finger speed / normal speed,
-   0–3×; turning backwards counts as holding). Letting go returns to normal playback and spin. */
+   0.1–3×, stopped below 0.05×; turning backwards counts as holding). Letting go returns to normal playback and spin. */
 let scratch = null;
 function bindScratch(svg) {
   const C = { x: 150, y: 160 }, R = 130; // disc center and radius in the record's viewBox
   const toView = ev => { const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; return pt.matrixTransform(svg.getScreenCTM().inverse()); };
   const angleAt = v => Math.atan2(v.y - C.y, v.x - C.x) * 180 / Math.PI;
   const rateEl = $('.scratch-rate', svg.parentElement);
-  const showRate = r => { if (!rateEl) return; rateEl.textContent = r < 0.05 ? 'Held' : `${r.toFixed(1)}×`; };
+  const showRate = r => { if (!rateEl) return; rateEl.textContent = r < 0.05 ? 'Held' : r < 1 ? `${Math.max(0.1, r).toFixed(2)}×` : `${r.toFixed(1)}×`; };
   const tick = () => {
     if (!scratch) return;
     const idle = performance.now() - scratch.lastMove;

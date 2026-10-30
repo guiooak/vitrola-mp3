@@ -152,4 +152,4 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 
 ## 15. Later (do not build without asking)
 
-Android Auto, home-screen widget, crossfade, per-output equalizer settings, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.
+Android Auto, home-screen widget, crossfade, per-output equalizer settings, "side A / side B", vinyl crackle effect, reverse scratch (turning the record backwards plays backwards, and speeds below 0.1×, D27), Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.
