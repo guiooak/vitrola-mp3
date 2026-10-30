@@ -2,7 +2,7 @@
 
 **Status:** ready to start · **Created:** 2026-10-26 · **Owner:** implementing agent · **Reviewer:** maintainer
 
-Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D21.
+Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D22.
 
 ## Working on a new machine
 
@@ -24,7 +24,7 @@ Setup:
 
 1. Read `.ai/README.md` and files 01–08 in order, plus `CLAUDE.md`.
 2. Open the mockup (https://guiooak.github.io/vitrola-mp3/03-mockup/) and walk through every panel shortcut and simulation.
-3. Ask the maintainer the open questions that block early phases (`.ai/08-open-questions.md`): **Q7** (project layout), **Q8** (CI), **Q10** (delivery order — this plan proposes one). Q4, Q5, Q6 and Q9 can wait for their phases. Record each answer in `docs/decisions.md` and update `08-open-questions.md`.
+3. Ask the maintainer the open questions that block early phases (`.ai/08-open-questions.md`): **Q7** (project layout), **Q8** (CI), **Q10** (delivery order — this plan proposes one). Q4, Q5, Q6 and Q9 can wait for their phases. Record each answer as a decision record in `docs/decisions/` and update `08-open-questions.md`.
 
 ## Ground rules for every phase
 
@@ -32,7 +32,7 @@ Setup:
 - **Commit and push directly to `main`** in small, working steps; the app must build on every commit (D10).
 - No hardcoded UI strings: every string, plural and content description in `res/values/strings.xml` from day one.
 - Use only design tokens (generated from `tokens.json`) for colors, type, spacing, radii and motion (D9).
-- New decisions → `docs/decisions.md` (next ID) + matching `.ai/` file in the same commit.
+- New decisions → a new record in `docs/decisions/` (next ID, from `template.md`, plus an index row) + matching `.ai/` file in the same commit (D22).
 - Each phase ends with: unit tests passing, a short entry in `docs/` or `.ai/` if behavior changed, and the phase checklist below ticked in this file.
 
 ## Phase overview

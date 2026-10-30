@@ -2,7 +2,7 @@
 
 All UI text comes from `design/03-mockup/mockup.js` and the style guide's voice rules. The tables below are the **source strings (US English)** for `res/values/strings.xml` (use `<plurals>` for counts); do not hardcode strings in Compose.
 
-**Translations (D18, D20) — review workflow.** D20 in `docs/decisions.md` has the full file format and generator rules.
+**Translations (D18, D20) — review workflow.** [D20](../docs/decisions/0020-translation-review.md) has the full file format and generator rules.
 
 1. Every English string gets rows in `i18n/translations.csv` (UTF-8, RFC 4180 quoting). Columns: `key, quantity, en, pt-BR, es, status_pt-BR, status_es, en_hash_pt-BR, en_hash_es, notes`.
 2. **Plurals:** one row per quantity (`one`, `many`, `other`) with the same `key`; `quantity` is empty for plain strings. pt-BR and es need all three; the English cell of the `many` row repeats the `other` text as a reference.

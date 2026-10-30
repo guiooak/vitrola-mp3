@@ -9,4 +9,4 @@ Implementation plans for the Vitrola Mp3 Android app. Each plan lists phases, ta
 Conventions:
 - One file per plan: `NNN-short-name.md`, newest number last.
 - Tick tasks (`- [x]`) and fill the plan's progress log as you go, committing with the work.
-- If the plan changes, edit it in place and note why in the progress log; new decisions also go to `docs/decisions.md`.
+- If the plan changes, edit it in place and note why in the progress log; new decisions also go to `docs/decisions/` as ADR files.

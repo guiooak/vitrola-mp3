@@ -2,7 +2,7 @@
 
 Priority: **P0** = required for the first usable version · **P1** = expected soon after · **Later** = backlog, do not build without asking.
 
-Each requirement references the decision (D#) in `docs/decisions.md` when there is one.
+Each requirement references the decision (D#) in `docs/decisions/` when there is one.
 
 ## 1. Library from chosen folders (D3) — P0
 
@@ -121,7 +121,7 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - **Plain (`.txt`, `.lrc` without timestamps, or embedded text without timestamps):** shown as written, **no automatic scroll**.
 - Files are UTF-8; invalid UTF-8 is read as Windows-1252.
 - The entry point and layout in "Now playing" come from the mockup, which must be updated and approved first (D6). Songs without lyrics show no lyrics view (exact treatment decided in the mockup).
-- Full rules: D21 in `docs/decisions.md`.
+- Full rules: [D21](../docs/decisions/0021-lyrics-sources.md).
 
 ## 12. Later (do not build without asking)
 

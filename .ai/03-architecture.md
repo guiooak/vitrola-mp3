@@ -1,6 +1,6 @@
 # 03 · Architecture
 
-Items marked **Decided** come from `docs/decisions.md`. Items marked **Proposed** are recommendations from the design phase: use them unless you have a good reason not to, and log the final choice as a new decision.
+Items marked **Decided** come from the decision records in `docs/decisions/`. Items marked **Proposed** are recommendations from the design phase: use them unless you have a good reason not to, and log the final choice as a new decision.
 
 ## Stack
 

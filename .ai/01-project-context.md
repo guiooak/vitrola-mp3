@@ -35,7 +35,7 @@ Personal use first, **Play Store–ready** from day one:
 - **US English only** in everything committed: code, identifiers, comments, file names, docs, commit messages, and the source (default) UI strings — even when the maintainer writes in Brazilian Portuguese. Proper names and real titles (artists, albums, songs) are not translated. (D15)
 - The **app ships in three languages** — US English (default), Brazilian Portuguese and Spanish — via Android string resources only (D18). **Every translation must be reviewed and approved by the maintainer; no automatic translation ships** (D20).
 - **Commit and push directly to `main`.** No branches, no pull requests. (D10)
-- **Log decisions** in `docs/decisions.md` and keep `.ai/` in sync.
+- **Record decisions** as ADRs in `docs/decisions/` (one file each, D22) and keep `.ai/` in sync.
 - **Design before code** (D6). The design is done; when the app needs UI that the mockup does not cover, follow the style guide and record the decision.
 - The `design/` folder is published by `.github/workflows/pages.yml`. Do not move or rename files in `design/` without updating links (README, landing page, docs).
 
@@ -61,7 +61,7 @@ design/
   03-mockup/         index.html, mockup.css, mockup.js, data.js
   index.html         landing page
 docs/
-  decisions.md       D1–D21
+  decisions/         ADRs D1–D22, one file each, plus README index and template
   design/            01-logo.md, 02-style-guide.md, 03-mockup.md
 ```
 

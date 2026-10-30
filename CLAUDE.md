@@ -4,7 +4,7 @@
 
 Everything committed to this repository must be written in **US English**:
 
-- Documentation (`README.md`, `docs/`, `design/**/README.md`)
+- Documentation (`README.md`, `docs/` including the decision records in `docs/decisions/`, `.ai/`, `design/**/README.md`)
 - Code: identifiers, comments, file and folder names, design token names
 - User-facing text in the design pages and the mockup
 - Commit messages
@@ -17,13 +17,13 @@ Exceptions:
 
 ## Implementing the app
 
-Start with [`.ai/README.md`](.ai/README.md): it is the handoff for the agent that builds the Android app (context, requirements, architecture, design system, screens, copy, QA and open questions). Keep it in sync with `docs/decisions.md`. The current implementation plan is [`.ai/plans/001-android-app-v1.md`](.ai/plans/001-android-app-v1.md).
+Start with [`.ai/README.md`](.ai/README.md): it is the handoff for the agent that builds the Android app (context, requirements, architecture, design system, screens, copy, QA and open questions). Keep it in sync with the decision records in `docs/decisions/`. The current implementation plan is [`.ai/plans/001-android-app-v1.md`](.ai/plans/001-android-app-v1.md).
 
 The maintainer converses in Brazilian Portuguese: reply in Brazilian Portuguese in chat, and keep everything committed in US English.
 
 ## Workflow
 
 - Design comes before code: logo → style guide → HTML mockup → Android app. Each step waits for the maintainer's approval and is documented in `docs/design/`.
-- Product and technical decisions are logged in `docs/decisions.md`.
+- Product and technical decisions are recorded as ADRs in `docs/decisions/`, one file per decision (`NNNN-short-title.md`, IDs D1, D2…), following `docs/decisions/README.md` and the template there (D22). Update the index and `.ai/` in the same commit.
 - Commit and push directly to `main`. No branches or pull requests.
 - The `design/` folder is published to GitHub Pages by `.github/workflows/pages.yml`.

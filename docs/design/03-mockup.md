@@ -134,7 +134,7 @@ Example: searching "águas" brings Elis Regina (artist), Elis & Tom (album) and 
 - **Destructive actions** (remove folder, delete playlist, remove from queue) ask for confirmation when they can't be undone, or show "Undo" in the snackbar.
 - **Files without metadata** show up by file name, grouped under "Unknown album" and "Unknown artist".
 - **Transparency:** the app always shows where each song comes from (folder at the bottom of the album, "File details").
-- **Language:** the mockup copy is in English; the app ships in English, Brazilian Portuguese and Spanish (D18 in [decisions.md](../decisions.md)).
+- **Language:** the mockup copy is in English; the app ships in English, Brazilian Portuguese and Spanish ([D18](../decisions/0018-three-app-languages.md)).
 
 ## Left for the app
 

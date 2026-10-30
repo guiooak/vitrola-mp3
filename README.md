@@ -42,7 +42,7 @@ design/
   03-mockup/        clickable app for validating screens and interactions
   index.html        website landing page
 docs/
-  decisions.md      log of product and technical decisions
+  decisions/        decision records (ADRs), one file per decision
   design/           documentation for each design step
 CLAUDE.md           repository rules (everything in US English)
 ```
@@ -65,7 +65,7 @@ Then open:
 
 ## Documentation
 
-- [Project decisions](docs/decisions.md)
+- [Project decisions (ADRs)](docs/decisions/README.md)
 - [Implementation handoff (.ai/)](.ai/README.md)
 - [Design: logo](docs/design/01-logo.md)
 - [Design: style guide](docs/design/02-style-guide.md)

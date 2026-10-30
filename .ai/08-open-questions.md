@@ -1,6 +1,6 @@
 # 08 · Open questions
 
-Ask the maintainer before deciding these. Record the answer in `docs/decisions.md` and update this file.
+Ask the maintainer before deciding these. Record the answer as a decision record in `docs/decisions/` and update this file.
 
 | # | Question | Context / current assumption |
 |---|---|---|
