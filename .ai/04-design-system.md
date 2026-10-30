@@ -40,7 +40,7 @@ Motion durations/easings go into `VitrolaTokens.motion` (see below).
 
 ## Icons
 
-**Material Symbols Rounded**, weight 400, 24dp; outlined by default, **filled** for the active tab, favorited hearts and playback controls. Use vector drawables exported from Material Symbols (or `material-icons-extended` Rounded where the glyph matches). Icons used in the mockup: `library_music, queue_music, search, settings, play_arrow, pause, skip_previous, skip_next, shuffle, repeat, repeat_one, favorite, more_vert, expand_more, arrow_back, album, mic, folder, folder_open, folder_special, folder_off, create_new_folder, sd_card, smartphone, image, audio_file, playlist_play, playlist_add, add_to_queue, add, edit, delete, info, description, bedtime, history, headset_off, photo_library, refresh, subdirectory_arrow_right, battery_alert, swap_vert, check, close, chevron_right, drag_indicator, radio_button_checked, radio_button_unchecked, trending_up, schedule, search_off, headphones, lock`.
+**Material Symbols Rounded**, weight 400, 24dp; outlined by default, **filled** for the active tab, favorited hearts and playback controls. Use vector drawables exported from Material Symbols (or `material-icons-extended` Rounded where the glyph matches). Icons used in the mockup: `library_music, queue_music, search, settings, play_arrow, pause, skip_previous, skip_next, shuffle, repeat, repeat_one, favorite, more_vert, expand_more, arrow_back, album, mic, folder, folder_open, folder_special, folder_off, create_new_folder, sd_card, smartphone, image, audio_file, playlist_play, playlist_add, add_to_queue, add, edit, delete, info, description, bedtime, history, headset_off, photo_library, refresh, subdirectory_arrow_right, battery_alert, swap_vert, check, close, chevron_right, drag_indicator, radio_button_checked, radio_button_unchecked, trending_up, schedule, search_off, headphones, lock, lyrics, notes, vertical_align_center, tune`.
 
 ## App icon and logo assets
 
@@ -71,6 +71,7 @@ Motion durations/easings go into `VitrolaTokens.motion` (see below).
 | Snackbar | inverted (text color background), radius m, action in `snackbar-action`; 3 s, or 5 s when it has an action; sits above the mini player/nav, or 40dp from the bottom on "Now playing". |
 | Empty state | dashed-ring record illustration (140dp), title-m heading, body-s text, primary action. |
 | Scan progress | 6dp bar with moving diagonal mustard stripes. |
+| Equalizer | "Use equalizer" switch row, preset filter chips (horizontal scroller), a 200dp plot with a dB scale (+12 / 0 / −12), a dashed zero line, a wine curve with a 10% fill through 10 band thumbs (16dp mustard, like the seek thumb; value bubble while dragging), frequency labels below, then a "Bass boost" slider styled like the seek bar. Off: controls at 45% opacity. |
 | Artist hero | 320dp tall full-width photo (top-biased crop), gradient to background, name in `display`; without a photo: first album cover blurred (~18dp), scaled 1.2, 70% opacity. |
 
 ## The record (signature component)

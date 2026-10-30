@@ -306,6 +306,34 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 .np-extra .icon-btn.on { color: var(--color-primary); }
 .timer-tag { font: var(--type-caption); color: var(--color-primary); text-align: center; height: 16px; margin-top: -4px; font-variant-numeric: tabular-nums; }
 
+/* ---------- Equalizer (D23) ---------- */
+.eqz-page { padding-bottom: 24px; }
+.eqz { display: flex; flex-direction: column; gap: 4px; }
+.eqz-switch { margin: 0 16px 8px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-l); }
+.sheet .eqz-switch { background: var(--color-surface-2); border-color: transparent; }
+.eqz-presets { padding-bottom: 8px; }
+.eqz-graph, .eqz-bass { transition: opacity var(--duration-medium) var(--easing-standard); }
+.eqz.off .eqz-graph, .eqz.off .eqz-bass, .eqz.off .eqz-presets { opacity: .45; }
+.eqz-graph { display: grid; grid-template-columns: 30px 1fr; grid-template-rows: 200px auto; column-gap: 6px; padding: 8px 16px 0 10px; }
+.eqz-scale { display: flex; flex-direction: column; justify-content: space-between; padding: 12px 0; font: var(--type-caption); color: var(--color-text-3); text-align: right; font-variant-numeric: tabular-nums; }
+.eqz-plot { position: relative; border-radius: var(--radius-m); background: color-mix(in srgb, var(--color-text) 4%, transparent); }
+.eqz-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.eqz-plot .zero { stroke: var(--color-border-strong); stroke-width: 1; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.eqz-plot .line { fill: none; stroke: var(--color-primary); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.eqz-plot .area { fill: var(--color-primary); fill-opacity: .1; }
+.eqz-bands { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(10, 1fr); }
+.eqz-band { position: relative; cursor: ns-resize; touch-action: none; outline: none; }
+.eqz-band .trk { position: absolute; left: 50%; top: 6%; bottom: 6%; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--color-border); }
+.eqz-band .thumb { position: absolute; left: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--color-accent); border: 3px solid var(--color-surface); box-shadow: var(--elevation-1); transition: transform var(--duration-fast) var(--easing-standard); }
+.eqz-band .thumb b { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; font: var(--type-caption); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--color-on-primary); background: var(--color-primary); padding: 2px 6px; border-radius: var(--radius-xs); opacity: 0; pointer-events: none; transition: opacity var(--duration-fast); }
+.eqz-band.active .thumb, .eqz-band:focus-visible .thumb { transform: scale(1.25); }
+.eqz-band.active .thumb b, .eqz-band:focus-visible .thumb b { opacity: 1; }
+.eqz-freqs { grid-column: 2; display: grid; grid-template-columns: repeat(10, 1fr); padding-top: 6px; font: var(--type-caption); color: var(--color-text-2); text-align: center; font-variant-numeric: tabular-nums; }
+.eqz-bass { padding: 16px 16px 0 46px; }
+.eqz-bass-head { display: flex; justify-content: space-between; font: var(--type-label); }
+.eqz-bass-head span:last-child { color: var(--color-text-2); font-variant-numeric: tabular-nums; }
+.eqz-bass .np-seek { padding: 4px 0 0; }
+
 /* ---------- Lyrics (D21) ---------- */
 .np-top .src .ar { display: block; font: var(--type-caption); color: var(--color-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ly-disc { width: 48px; height: 48px; padding: 3px; border: 0; background: none; border-radius: 50%; cursor: pointer; flex: none; }

@@ -28,6 +28,7 @@ Items marked **Decided** come from the decision records in `docs/decisions/`. It
 - **No** `READ_MEDIA_AUDIO`, `READ_EXTERNAL_STORAGE` or `MANAGE_EXTERNAL_STORAGE` (D3).
 - `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` (Android 14+ requires the typed permission), `WAKE_LOCK`.
 - `POST_NOTIFICATIONS` (Android 13+), requested when playback first starts, not at launch.
+- `MODIFY_AUDIO_SETTINGS` (normal permission, granted without a prompt) for the equalizer (D23).
 - Service declared with `android:foregroundServiceType="mediaPlayback"` and the `androidx.media3.session.MediaSessionService` intent filter.
 - No `INTERNET` permission needed. If you add it for any reason, log a decision (the app promises "nothing leaves your phone").
 - Battery: do not use `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`; open `Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS` from the Settings tip card.
@@ -95,7 +96,7 @@ Grouping rules:
 - **Artist folder** = the parent directory of the album folder when its name matches the artist name (normalized), otherwise the album folder's parent if it contains no audio files of its own. **Photo** = the D19 pick there.
 - Normalization for keys and search: Unicode NFD, strip diacritics, lowercase, trim, collapse spaces.
 
-Settings (DataStore): `subfolders`, `useFolderImages`, `resume`, `pauseOnUnplug`, `theme` (auto/light/dark), `lyricsAutoScroll` (default true, D21), `librarySort` (az/recent/plays), `libraryTab` (default `artists` on every launch — do not persist a different start tab unless the maintainer asks).
+Settings (DataStore): `subfolders`, `useFolderImages`, `resume`, `pauseOnUnplug`, `theme` (auto/light/dark), `lyricsAutoScroll` (default true, D21), `eqEnabled` (false), `eqPreset` (`flat`), `eqBands` / `eqCustomBands` (10 ints, dB), `eqBassBoost` (0–100) (D23), `librarySort` (az/recent/plays), `libraryTab` (default `artists` on every launch — do not persist a different start tab unless the maintainer asks).
 
 Playback state persistence (DataStore or a small table): queue track IDs, original order, index, position, shuffle, repeat, source (type + name + id).
 
@@ -118,6 +119,15 @@ Playback state persistence (DataStore or a small table): queue track IDs, origin
 - Generated cover: drawn in Compose (Canvas) with the deterministic rule in 04-design-system, keyed by album title. Never store it as a file.
 - Respect the "Use folder photos and covers" setting in the resolver.
 - Dominant color for the "Now playing" tint and the notification: AndroidX Palette on the resolved cover; for the generated cover use its background color.
+
+## Equalizer (D23)
+
+- `PlaybackService` owns an `EqualizerController` next to the `ExoPlayer`. On Android 9+ (API 28) it creates `DynamicsProcessing` on the player's audio session (`player.audioSessionId`; recreate it when the session id changes, release it with the player).
+- Config: one stage of **10 EQ bands** (pre-EQ or post-EQ; cutoffs placed between the centers 31, 62, 125, 250, 500, 1k, 2k, 4k, 8k, 16k Hz), **limiter enabled** to prevent clipping; MBC off.
+- Gains = preset or custom bands (±12 dB) + bass boost (`bass% × [8, 8, 6, 3, 0…] dB` on the lowest bands), clamped to the range; input gain may be lowered by the largest positive gain.
+- `setEnabled(eqEnabled)`; changes from the UI are applied live and saved to DataStore.
+- If creation throws (unsupported device) or API < 28, expose `isAvailable = false` and the UI hides every equalizer entry point.
+- Presets are app data (a Kotlin table matching `EQ_PRESETS` in `design/03-mockup/mockup.js`), names from string resources.
 
 ## Lyrics (D21)
 

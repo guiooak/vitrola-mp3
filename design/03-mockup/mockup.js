@@ -58,6 +58,8 @@ const INITIAL_STATE = () => ({
   timer: null,
   lyricsOpen: false, // the lyrics view replaces the record in Now playing
   lyricsAutoScroll: true, // global setting, saved: synced lyrics follow the song
+  // equalizer (D23): global, saved; hidden on Android 8
+  eq: { on: false, preset: 'flat', bands: Array(10).fill(0), custom: Array(10).fill(0), bass: 0 },
   angle: 0, spinningSince: 0,
 });
 let S = INITIAL_STATE();
@@ -635,6 +637,10 @@ const SCREENS = {
   },
 
   /* ---------- 11. Settings ---------- */
+  'equalizer': {
+    render: () => `${topbar('Equalizer', { small: true })}<div class="eqz-page">${eqHtml()}</div>`,
+    mount: el => bindEq(el),
+  },
   'settings': {
     render: () => {
       const theme = document.documentElement.dataset.theme || 'auto';
@@ -653,6 +659,7 @@ const SCREENS = {
         <div class="group-title">Playback</div>
         <div class="group">
           <div class="row-i" data-action="timer" tabindex="0"><div class="ic tinted">${iconHtml('bedtime')}</div><div><div class="ti">Sleep timer</div><div class="sb" id="timer-status">${timerText}</div></div>${iconHtml('chevron_right', 'chev')}</div>
+          <div class="row-i" data-action="equalizer" tabindex="0"><div class="ic tinted">${iconHtml('tune')}</div><div><div class="ti">Equalizer</div><div class="sb">${eqStatus()}</div></div>${iconHtml('chevron_right', 'chev')}</div>
           <div class="row-i" data-action="toggle" data-k="resume"><div class="ic tinted">${iconHtml('history')}</div><div><div class="ti">Resume where you left off</div><div class="sb">When the app opens, the last song is ready to play</div></div><button class="switch" role="switch" aria-checked="${S.resume}" aria-label="Resume where you left off"></button></div>
           <div class="row-i" data-action="toggle" data-k="pauseOnUnplug"><div class="ic tinted">${iconHtml('headset_off')}</div><div><div class="ti">Pause when headphones disconnect</div><div class="sb">Wired or Bluetooth</div></div><button class="switch" role="switch" aria-checked="${S.pauseOnUnplug}" aria-label="Pause when headphones disconnect"></button></div>
         </div>
@@ -886,6 +893,7 @@ function renderNowPlaying() {
     <div class="timer-tag" id="np-timer">${S.timer ? timerLabel() : ''}</div>
     <div class="np-extra">
       <button class="icon-btn" data-action="lyrics" aria-label="Show lyrics">${iconHtml('lyrics')}</button>
+      <button class="icon-btn ${S.eq.on ? 'on' : ''}" data-action="eq-sheet" aria-label="Equalizer" aria-pressed="${S.eq.on}">${iconHtml('tune')}</button>
       <button class="icon-btn ${S.timer ? 'on' : ''}" data-action="timer" aria-label="Sleep timer">${iconHtml('bedtime')}</button>
       <button class="icon-btn" data-action="queue" aria-label="Queue">${iconHtml('queue_music')}</button>
       <button class="icon-btn" data-action="file-info" data-mid="${m.id}" aria-label="File details">${iconHtml('info')}</button>
@@ -894,6 +902,106 @@ function renderNowPlaying() {
   seek.addEventListener('input', () => { S.pos = +seek.value; seek.style.setProperty('--p', (S.pos / m.duration * 100) + '%'); $('#np-pos').textContent = fmt(S.pos); const b = $('#mini .prog i'); if (b) b.style.width = (S.pos / m.duration * 100) + '%'; updateLyrics(); });
   syncRecords();
 }
+
+/* ---------- Equalizer (D23) ----------
+   10 fixed bands (Android DynamicsProcessing, Android 9+), ±12 dB, app presets, bass boost and an
+   on/off switch. One global setting for every song, saved. Hidden on Android 8. */
+const EQ_FREQS = ['31', '62', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'];
+const EQ_MAX = 12;
+const EQ_PRESETS = {
+  flat: ['Flat', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+  bass: ['Bass', [6, 5, 4, 2, 0, 0, 0, 0, 0, 0]],
+  vocal: ['Vocal', [-2, -2, -1, 1, 3, 4, 3, 1, 0, -1]],
+  treble: ['Treble', [0, 0, 0, 0, 0, 1, 2, 4, 5, 6]],
+  rock: ['Rock', [5, 4, 2, -1, -2, -1, 2, 3, 4, 4]],
+  pop: ['Pop', [-1, 0, 2, 3, 4, 3, 1, 0, -1, -1]],
+  jazz: ['Jazz', [3, 2, 1, 2, -1, -1, 0, 1, 2, 3]],
+  classical: ['Classical', [4, 3, 2, 1, -1, -1, 0, 2, 3, 4]],
+  electronic: ['Electronic', [5, 4, 1, 0, -2, 1, 0, 1, 4, 5]],
+  acoustic: ['Acoustic', [4, 3, 2, 1, 1, 1, 2, 2, 3, 2]],
+};
+const eqPresetName = k => k === 'custom' ? 'Custom' : EQ_PRESETS[k][0];
+const eqStatus = () => !S.eq.on ? 'Off' : `On · ${eqPresetName(S.eq.preset)}${S.eq.bass ? ` · bass boost ${S.eq.bass}%` : ''}`;
+const dbText = v => v === 0 ? '0 dB' : `${v > 0 ? '+' : '−'}${Math.abs(v)} dB`;
+
+function eqCurve(bands) {
+  // smooth line through the band values (Catmull-Rom → Bézier), in a 1000×200 box
+  const pts = bands.map((v, i) => [(i + 0.5) * 100, 100 - v / EQ_MAX * 88]);
+  let d = `M0 ${pts[0][1]} L${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+    d += ` C${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}`;
+  }
+  d += ` L1000 ${pts[pts.length - 1][1]}`;
+  return { line: d, area: `${d} L1000 100 L0 100 Z` };
+}
+function eqHtml() {
+  const e = S.eq, c = eqCurve(e.bands);
+  return `<div class="eqz ${e.on ? '' : 'off'}">
+    <div class="row-i eqz-switch" data-action="eq-toggle"><div class="ic tinted">${iconHtml('tune')}</div>
+      <div><div class="ti">Use equalizer</div><div class="sb">Applies to every song</div></div>
+      <button class="switch" role="switch" aria-checked="${e.on}" aria-label="Use equalizer"></button></div>
+    <div class="chips eqz-presets" role="group" aria-label="Presets">${[...Object.keys(EQ_PRESETS), 'custom'].map(k =>
+      `<button class="chip-f" data-action="eq-preset" data-p="${k}" aria-pressed="${e.preset === k}">${iconHtml('check')}${eqPresetName(k)}</button>`).join('')}</div>
+    <div class="eqz-graph">
+      <div class="eqz-scale" aria-hidden="true"><span>+${EQ_MAX}</span><span>0</span><span>−${EQ_MAX}</span></div>
+      <div class="eqz-plot">
+        <svg viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true">
+          <line x1="0" y1="100" x2="1000" y2="100" class="zero"/>
+          <path class="area" d="${c.area}"/><path class="line" d="${c.line}"/>
+        </svg>
+        <div class="eqz-bands">${e.bands.map((v, i) => `<div class="eqz-band" role="slider" tabindex="0" data-i="${i}" aria-label="${EQ_FREQS[i]} Hz"
+          aria-valuemin="-${EQ_MAX}" aria-valuemax="${EQ_MAX}" aria-valuenow="${v}" aria-valuetext="${dbText(v)}">
+          <i class="trk"></i><i class="thumb" style="top:${50 - v / EQ_MAX * 44}%"><b>${dbText(v)}</b></i></div>`).join('')}</div>
+      </div>
+      <div class="eqz-freqs" aria-hidden="true">${EQ_FREQS.map(f => `<span>${f}</span>`).join('')}</div>
+    </div>
+    <div class="eqz-bass">
+      <div class="eqz-bass-head"><span>Bass boost</span><span id="eqz-bass-val">${e.bass ? e.bass + '%' : 'Off'}</span></div>
+      <div class="np-seek"><input type="range" id="eqz-bass" min="0" max="100" step="5" value="${e.bass}" aria-label="Bass boost" style="--p:${e.bass}%"></div>
+    </div>
+  </div>`;
+}
+function refreshEq(root) {
+  const e = S.eq, box = $('.eqz', root); if (!box) return;
+  box.classList.toggle('off', !e.on);
+  $('.eqz-switch .switch', box).setAttribute('aria-checked', e.on);
+  $$('.eqz-presets .chip-f', box).forEach(b => b.setAttribute('aria-pressed', b.dataset.p === e.preset));
+  $$('.eqz-band', box).forEach((b, i) => {
+    const v = e.bands[i];
+    b.setAttribute('aria-valuenow', v); b.setAttribute('aria-valuetext', dbText(v));
+    const t = $('.thumb', b); t.style.top = `${50 - v / EQ_MAX * 44}%`; $('b', t).textContent = dbText(v);
+  });
+  const c = eqCurve(e.bands); $('.eqz-plot .line', box).setAttribute('d', c.line); $('.eqz-plot .area', box).setAttribute('d', c.area);
+  const np = $('[data-action="eq-sheet"]', npEl); if (np) { np.classList.toggle('on', e.on); np.setAttribute('aria-pressed', e.on); }
+}
+function setBand(root, i, v) {
+  v = Math.max(-EQ_MAX, Math.min(EQ_MAX, Math.round(v)));
+  if (S.eq.bands[i] === v && S.eq.preset === 'custom' && S.eq.on) return;
+  S.eq.bands[i] = v; S.eq.custom = S.eq.bands.slice(); S.eq.preset = 'custom'; S.eq.on = true;
+  refreshEq(root);
+}
+function bindEq(root) {
+  $$('.eqz-band', root).forEach(b => {
+    const i = +b.dataset.i;
+    const fromY = y => { const r = b.getBoundingClientRect(); return (0.5 - (y - r.top) / r.height) / 0.44 * EQ_MAX; };
+    b.addEventListener('pointerdown', ev => { b.setPointerCapture(ev.pointerId); b.classList.add('active'); setBand(root, i, fromY(ev.clientY)); });
+    b.addEventListener('pointermove', ev => { if (b.hasPointerCapture(ev.pointerId)) setBand(root, i, fromY(ev.clientY)); });
+    const end = () => b.classList.remove('active');
+    b.addEventListener('pointerup', end); b.addEventListener('pointercancel', end);
+    b.addEventListener('keydown', ev => {
+      const step = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[ev.key];
+      if (step) { ev.preventDefault(); setBand(root, i, S.eq.bands[i] + step); }
+    });
+  });
+  const bass = $('#eqz-bass', root);
+  bass && bass.addEventListener('input', () => {
+    S.eq.bass = +bass.value; S.eq.on = true; bass.style.setProperty('--p', bass.value + '%');
+    $('#eqz-bass-val', root).textContent = S.eq.bass ? S.eq.bass + '%' : 'Off';
+    refreshEq(root);
+  });
+}
+function eqRoot() { return $('.eqz', overlayEl) ? overlayEl : $('.screen:last-child', screensEl); }
 
 /* ---------- Lyrics (D21) ----------
    Sources, in order: <same name>.lrc → <same name>.txt → lyrics embedded in the audio file → none.
@@ -1307,6 +1415,10 @@ const ACTIONS = {
   'repeat': () => toggleRepeat(),
   'queue': () => openQueue(),
   'lyrics': () => toggleLyrics(),
+  'equalizer': () => go('equalizer'),
+  'eq-sheet': () => { openSheet(`<h3>Equalizer</h3><div class="s-body">${eqHtml()}</div>`, 'eq-sheet'); bindEq(overlayEl); },
+  'eq-toggle': (b, e) => { S.eq.on = !S.eq.on; refreshEq(eqRoot()); snackbar(S.eq.on ? `Equalizer on · ${eqPresetName(S.eq.preset)}` : 'Equalizer off'); },
+  'eq-preset': b => { const k = b.dataset.p; S.eq.preset = k; S.eq.bands = (k === 'custom' ? S.eq.custom : EQ_PRESETS[k][1]).slice(); S.eq.on = true; refreshEq(eqRoot()); },
   'lyrics-seek': b => { const ly = lyricsFor(current()); S.pos = Math.min(ly.lines[+b.dataset.i].t, current().duration - 1); LY.follow = autoScrollOn(); const back = $('.ly-back'); if (back) back.hidden = true; clearTimeout(LY.resume); updateProgress(); updateLyrics('smooth'); },
   'lyrics-follow': () => resumeFollow(),
   'lyrics-autoscroll': b => {
@@ -1391,6 +1503,8 @@ const NOTES = {
   'lyrics': 'Synced lyrics from a .lrc file next to the song (D21). The current line is highlighted and stays in view; tap a line to jump there. Scroll by hand and "Back to current line" appears; following resumes on its own after 5 seconds. To read freely, turn off auto-scroll with the floating icon at the bottom right of the lyrics (it shows a dot while on). The choice is global and saved: it applies to every song until you change it. The current line is still highlighted. Tap the small record (or the lyrics button) to go back to the record. "Corcovado" has LRC text stored inside the MP3 and is synced too. The lyrics are invented placeholders.',
   'lyrics-plain': 'Plain lyrics from a .txt file (D21): shown as written, with no automatic scrolling. "Só Tinha de Ser com Você" (lyrics stored inside the MP3) and "Inútil Paisagem" (a .lrc without timestamps) look the same. The lyrics are invented placeholders.',
   'lyrics-none': 'No .lrc, no .txt and no lyrics inside the MP3: the lyrics view says how to add them. The lyrics button is always in Now playing, so the feature is easy to find.',
+  'equalizer': 'Equalizer (D23): 10 fixed bands, the same on every phone. Pick a preset or drag the bands (that becomes "Custom", which is remembered). Bass boost and an on/off switch that keeps your settings. One setting for every song, saved. Also opens from the Now playing bottom row. On Android 8 the equalizer is hidden (its engine needs Android 9).',
+  'eq-sheet': 'The equalizer opened from Now playing: the same controls as in Settings. The icon in Now playing shows a dot while the equalizer is on.',
   'queue': 'What already played, what\'s playing and what\'s up next. Jump to a song or remove it from the queue. (Drag to reorder is left for the app.)',
   'menu': 'Song menu: play next, queue, playlist, favorite, go to album or artist, and file details.',
   'timer': 'Sleep timer: preset times or "at the end of this song". The countdown shows in the player and in Settings.',
@@ -1415,6 +1529,7 @@ const SHORTCUTS = [
   ['playlists', 'Playlists', () => { ensureLibrary(); root('playlists'); }],
   ['playlist', 'Playlist', () => { ensureLibrary(); root('playlists'); go('playlist', { id: 'sunday' }); }],
   ['settings', 'Settings', () => { ensureLibrary(); root('settings'); }],
+  ['equalizer', 'Equalizer', () => { ensureLibrary(); root('settings'); go('equalizer'); }],
   ['now-playing', 'Now playing', () => { ensurePlaying(); S.lyricsOpen = false; openNowPlaying(); }],
   ['lyrics', 'Lyrics · synced', () => { playElisTom(0, 40); S.lyricsOpen = true; openNowPlaying(); }],
   ['lyrics-plain', 'Lyrics · plain text', () => { playElisTom(1, 20); S.lyricsOpen = true; openNowPlaying(); }],

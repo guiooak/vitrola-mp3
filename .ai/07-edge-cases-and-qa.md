@@ -27,6 +27,13 @@
 - Seeking, skipping songs and repeat-one with the lyrics open → the highlight follows the new position.
 - Auto-scroll toggle off → no automatic scrolling and no "Back to current line"; it stays off for the next songs and after the app is closed and reopened, until turned on again.
 
+### Equalizer (D23)
+- Android 8 or a device where `DynamicsProcessing` cannot be created → no Settings row and no Now playing button; playback unaffected.
+- Turning it off and on keeps preset, bands and bass boost; touching a control while off turns it on.
+- Moving a band selects Custom; picking another preset and then Custom restores the custom curve.
+- Settings survive app restart and process death; the effect is reapplied when the audio session changes (e.g. after an error or a new player).
+- All bands at +12 dB plus bass boost 100 % → no audible clipping (limiter).
+
 ### Playback
 - **Broken/unsupported file** → skip with a snackbar; if every file in the queue fails, stop and show the snackbar once.
 - **Audio focus loss** (call) → pause; transient loss for navigation prompts → duck.
@@ -64,4 +71,5 @@
 15. Put a corrupt `.mp3` in a folder → it is skipped with the snackbar.
 16. Change the app language to Português (Brasil) and Español in system settings → all text switches, numbers and plurals are correct. A language appears only if the generator wrote its file, which means every row in `i18n/translations.csv` is `approved` and up to date (D20). Also check that a device set to a not-yet-approved language shows the app fully in English, with no mixed strings.
 17. Lyrics: open a song with a `.lrc` (line follows the song, tap a line to seek, manual scroll then "Back to current line", auto-scroll off, then check another song and an app restart keep it off), one with only a `.txt` (static, scrolls by hand), one with only embedded lyrics (plain), and one with nothing.
-18. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).
+18. Equalizer: pick presets, drag bands (Custom), bass boost, switch off/on; check the Settings status row, the Now playing dot, and an app restart; on an Android 8 device or emulator the equalizer does not appear.
+19. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).

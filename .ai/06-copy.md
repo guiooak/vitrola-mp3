@@ -142,6 +142,18 @@ Suggested keys are given; adjust naming to your conventions.
 
 The lyrics themselves are never translated.
 
+## Equalizer (D23)
+
+| Text |
+|---|
+| Title: Equalizer · Settings row: Equalizer — Off / On · %1$s / On · %1$s · bass boost %2$d%% |
+| Switch row: Use equalizer — Applies to every song |
+| Presets: Flat · Bass · Vocal · Treble · Rock · Pop · Jazz · Classical · Electronic · Acoustic · Custom |
+| Bass boost · Off / %d%% |
+| Band content descriptions: "%s Hz" with value text "+3 dB" / "0 dB" / "−3 dB" |
+| Snackbars: Equalizer on · %s · Equalizer off |
+| Now playing button content description: Equalizer |
+
 ## Sleep timer
 
 | Text |

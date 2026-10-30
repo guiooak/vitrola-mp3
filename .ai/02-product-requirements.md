@@ -123,6 +123,15 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - The entry point and layout in "Now playing" follow the approved mockup ("Lyrics" shortcuts in the mockup panel; `docs/design/03-mockup.md`). The lyrics button is always shown; songs without lyrics open an empty state that explains how to add them.
 - Full rules: [D21](../docs/decisions/0021-lyrics-sources.md).
 
-## 12. Later (do not build without asking)
+## 12. Equalizer (D23) — P1
 
-Android Auto, home-screen widget, equalizer, crossfade, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.
+- 10 fixed bands (31 Hz–16 kHz), −12 to +12 dB, through Android `DynamicsProcessing`. **Android 8, or a device where the effect cannot be created: the equalizer is hidden** everywhere.
+- Opened from Settings › Playback › Equalizer (own screen; row status "Off" / "On · <preset>[ · bass boost N%]") and from a button in the Now playing bottom row (same controls in a sheet; the button shows the "on" dot while it is on).
+- Controls: "Use equalizer" switch (off keeps the settings; touching a control turns it on), app presets (Flat, Bass, Vocal, Treble, Rock, Pop, Jazz, Classical, Electronic, Acoustic, Custom), 10 band sliders over a curve, bass boost 0–100 %.
+- Moving a band selects Custom; the Custom curve is remembered when another preset is picked.
+- One global setting for every song and output, saved across restarts. Default: off, Flat, bass boost 0.
+- Full rules: [D23](../docs/decisions/0023-equalizer.md). Layout: the "Equalizer" shortcut in the mockup.
+
+## 13. Later (do not build without asking)
+
+Android Auto, home-screen widget, crossfade, per-output equalizer settings, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.
