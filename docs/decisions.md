@@ -158,17 +158,20 @@ No automatic or unreviewed translation ships. The maintainer reviews and approve
 
 Runtime machine translation (e.g. a translation API) is never used.
 
-### D21 · Lyrics from a `.lrc` or `.txt` file next to each song
-**2026-10-30**
+### D21 · Lyrics from a `.lrc` or `.txt` file next to each song, else from the audio file
+**2026-10-30** (revised the same day: lyrics embedded in the audio file are the third fallback)
 
 The app shows song lyrics, read from text files the maintainer keeps next to the audio files. This moves lyrics out of the "Later" list. The app never downloads lyrics: it stays offline (no `INTERNET` permission).
 
 **Where the app looks.** In the song's own folder, a file with the **same base name** as the audio file (compared case-insensitively, extension in any case):
 1. `<name>.lrc` → **synced** lyrics when it has timestamps;
 2. otherwise `<name>.txt` → **plain** lyrics;
-3. otherwise the song has no lyrics.
+3. otherwise lyrics **embedded in the audio file** (see below);
+4. otherwise the song has no lyrics.
 
-Example: `01 - Águas de Março.mp3` → `01 - Águas de Março.lrc` (or `.txt`). Lyrics embedded in the audio tags are not read in v1.
+Example from the maintainer's library: `Elis Regina & Tom Jobim - 01 - Águas de Março.mp3` → `Elis Regina & Tom Jobim - 01 - Águas de Março.lrc` (or `.txt`).
+
+**Embedded lyrics (third fallback).** The unsynchronized lyrics tag of the audio file: ID3v2 `USLT` in MP3 (first frame when there are several), `LYRICS` / `UNSYNCEDLYRICS` Vorbis comments in FLAC and OGG/Opus, `©lyr` in M4A. If the embedded text contains LRC timestamps (some taggers store LRC text there), it is parsed with the `.lrc` rules and shown synced; otherwise it is shown as plain lyrics, with no automatic scrolling. The binary synced frame (ID3 `SYLT`) is not read in v1.
 
 **`.lrc` format (LRC).**
 - Lines start with one or more timestamps `[mm:ss.xx]` (also `[mm:ss]` and `[mm:ss.xxx]`); a line with several timestamps is repeated at each time. Lines are shown in time order.
@@ -184,6 +187,6 @@ Example: `01 - Águas de Março.mp3` → `01 - Águas de Março.lrc` (or `.txt`)
 **Behavior.**
 - Synced lyrics highlight the current line and scroll to keep it in view; tapping a line seeks to it. If the user scrolls by hand, automatic scrolling pauses until they tap "back to current line" or a few seconds pass.
 - Plain lyrics never scroll on their own.
-- The scanner records which songs have lyrics (document URI of the file) and picks up new, changed or removed lyrics files on the incremental scan. The text is read only when the user opens the lyrics, never stored in the database.
+- The scanner records which songs have lyrics and where they come from (the lyrics file's document URI, or "embedded" when the audio file has a lyrics tag) and picks up new, changed or removed lyrics on the incremental scan. The text is read only when the user opens the lyrics, never stored in the database.
 - Lyrics are proper text and are never translated.
 - Where and how lyrics appear in "Now playing" is designed in the mockup first and approved by the maintainer (D6) before it is built.

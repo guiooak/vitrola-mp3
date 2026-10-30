@@ -64,7 +64,7 @@ The system picker blocks the storage root and `Download` on modern Android; the 
 - Recurse into subfolders only if "Include subfolders" is ON.
 - Audio files: `MIME_TYPE` starts with `audio/` or the extension is in the supported list.
 - Image files (`.jpg`, `.jpeg`, `.png`): remember every image per folder, then pick with the D19 rule (`folder.*` any case → the only image → none).
-- Lyrics files (`.lrc`, `.txt`, any case): match each audio file to `<same base name>.lrc`, else `.txt`, in the same folder (D21). Store only the document URI and its `lastModified`; a change in either file updates the track on the incremental scan.
+- Lyrics files (`.lrc`, `.txt`, any case): match each audio file to `<same base name>.lrc`, else `.txt`, in the same folder (D21). Store only the document URI and its `lastModified`; a change in either file updates the track on the incremental scan. With no lyrics file, record whether the audio file has an embedded lyrics tag (read with the rest of the metadata, see Lyrics below).
 - **Incremental:** a file is re-read only when `lastModified` or `size` changed; files that disappeared are removed. Store `dateAdded` = first time the file was seen (drives "Recently added").
 - Metadata via `MediaMetadataRetriever` (`setDataSource(context, uri)`): title, artist, album artist, album, track number, disc number, year, duration, and whether an embedded picture exists (do not store the bitmap in the DB).
 - Missing title → file name without extension. Missing artist → "Unknown artist". Missing album → "Unknown album".
@@ -76,7 +76,7 @@ folders(id PK, treeUri UNIQUE, displayName, locationLabel, addedAt, lostAccess B
 tracks(id PK, folderId FK, documentUri UNIQUE, relativeDir, fileName, mimeType,
        title, artist, albumArtist, album, trackNumber, discNumber, year,
        durationMs, sizeBytes, lastModified, dateAdded, hasEmbeddedArt BOOL,
-       lyricsDocumentUri NULL, lyricsType NULL (lrc/txt),
+       lyricsDocumentUri NULL, lyricsSource NULL (lrc/txt/embedded),
        albumKey, artistKey)
 albums(key PK, title, artistName, year, folderRelativeDir, coverDocumentUri NULL, noMetadata BOOL)
 artists(key PK, name, folderRelativeDir NULL, photoDocumentUri NULL)
@@ -121,7 +121,11 @@ Playback state persistence (DataStore or a small table): queue track IDs, origin
 
 ## Lyrics (D21)
 
-- `LyricsRepository.load(track)` reads the file on demand (IO dispatcher): decode UTF-8 (drop BOM), fall back to Windows-1252 when invalid.
+- `LyricsRepository.load(track)` reads lyrics on demand (IO dispatcher), never at scan time and never into the database:
+  - `.lrc` / `.txt`: decode UTF-8 (drop BOM), fall back to Windows-1252 when invalid.
+  - **Embedded:** `MediaMetadataRetriever` does not expose lyrics. Use Media3 `MetadataRetriever` and look for: ID3 `USLT` (if Media3 returns it only as a raw `BinaryFrame`, decode it: encoding byte, 3-byte language, null-terminated descriptor, then the text in that encoding), `VorbisComment` keys `LYRICS` / `UNSYNCEDLYRICS`, and the M4A `©lyr` entry. If this proves unreliable for a format, log the choice of a small tag-reading library as a decision.
+  - Embedded text goes through the same `LrcParser`: timestamps → synced, none → plain.
+- At scan time, only detect whether an embedded lyrics tag exists (`lyricsSource = embedded`). If that makes large scans noticeably slower, detect lazily the first time the song plays instead and log the choice.
 - `LrcParser` (pure Kotlin, unit-tested): timestamps `[mm:ss]`, `[mm:ss.xx]`, `[mm:ss.xxx]`, several per line; `[offset:]`; ignore other header tags; strip `<mm:ss.xx>` word tags; sort by time; no valid timestamp → plain. Output: `Synced(lines: List<TimedLine>)` or `Plain(text)`.
 - The current line comes from the `MediaController` position (binary search over line times), sampled while the lyrics view is visible only.
 
@@ -136,6 +140,6 @@ Run against Room data in memory (the library is small, thousands of rows) or wit
 
 ## Testing expectations
 
-- Unit tests: LRC parser and lyrics file matching, search engine, grouping/normalization, cover/photo resolution order, shuffle/repeat/previous logic, sleep timer, play counting.
+- Unit tests: LRC parser, lyrics source order (`.lrc` → `.txt` → embedded) and USLT frame decoding, search engine, grouping/normalization, cover/photo resolution order, shuffle/repeat/previous logic, sleep timer, play counting.
 - Instrumented/manual: SAF flows, lost access, background playback, notification, headset unplug, resume after process death (see 07-edge-cases-and-qa).
 - Optional CI: a GitHub Actions workflow running `./gradlew lint test assembleDebug` on push to `main` (log it as a decision if added).
