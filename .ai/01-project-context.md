@@ -61,7 +61,7 @@ design/
   03-mockup/         index.html, mockup.css, mockup.js, data.js
   index.html         landing page
 docs/
-  decisions.md       D1–D20
+  decisions.md       D1–D21
   design/            01-logo.md, 02-style-guide.md, 03-mockup.md
 ```
 

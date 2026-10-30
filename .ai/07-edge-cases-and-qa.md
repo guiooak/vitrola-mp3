@@ -16,6 +16,14 @@
 - **Unknown album / Unknown artist** always sort last and cannot be favorited (album).
 - **Images (D19):** `FOLDER.JPG`/`Folder.png` match regardless of case; `folder.jpg` wins over other images; one image with any name is used; several images and no `folder.*` → no folder image (embedded/generated); huge images → downsample; corrupt images → fall back silently.
 
+### Lyrics (D21)
+- `.lrc` and `.txt` both present → `.lrc` wins. `Song.LRC` / `song.Txt` match regardless of case.
+- `.lrc` with no valid timestamps → plain lyrics, no auto-scroll.
+- Several timestamps on one line, unsorted lines, `[offset:]` positive and negative, word-level `<…>` tags, empty timed lines.
+- File in Windows-1252 (accents) → still readable; empty or unreadable file → "Couldn't read the lyrics file." and no crash.
+- Lyrics file added, changed or deleted after the first scan → the next incremental scan picks it up.
+- Seeking, skipping songs and repeat-one with the lyrics open → the highlight follows the new position.
+
 ### Playback
 - **Broken/unsupported file** → skip with a snackbar; if every file in the queue fails, stop and show the snackbar once.
 - **Audio focus loss** (call) → pause; transient loss for navigation prompts → duck.
@@ -52,4 +60,5 @@
 14. Revoke folder access (Settings → Apps → Vitrola Mp3 → Storage/Files, or move the folder) → lost-access dialog.
 15. Put a corrupt `.mp3` in a folder → it is skipped with the snackbar.
 16. Change the app language to Português (Brasil) and Español in system settings → all text switches, numbers and plurals are correct. A language appears only if the generator wrote its file, which means every row in `i18n/translations.csv` is `approved` and up to date (D20). Also check that a device set to a not-yet-approved language shows the app fully in English, with no mixed strings.
-17. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).
+17. Lyrics: open a song with a `.lrc` (line follows the song, tap a line to seek, manual scroll then "Back to current line"), one with only a `.txt` (static, scrolls by hand), and one with neither.
+18. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).

@@ -114,6 +114,15 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - "Unknown artist" / "Unknown album" are translated labels, but grouping must not depend on the label text (use a flag/key).
 - **No automatic translation (D20).** All pt-BR and es strings are reviewed and approved by the maintainer through `i18n/translations.csv`. A language is **all or nothing**: its resource file is generated (and the language listed in `locales_config`) only when every one of its strings is approved and up to date; otherwise the app runs fully in English for that language, never a mix. Details in D20 and 06-copy.
 
-## 11. Later (do not build without asking)
+## 11. Lyrics (D21) — P1
 
-Android Auto, home-screen widget, equalizer, lyrics (.lrc), crossfade, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.
+- Lyrics come from a file next to the song with the **same base name**: `<name>.lrc` (synced when it has timestamps), else `<name>.txt` (plain). Matching is case-insensitive. No lyrics are downloaded and embedded tags are not read in v1.
+- **Synced (`.lrc`):** the current line is highlighted and kept in view while the song plays; tapping a line seeks to it; scrolling by hand pauses the automatic scroll until "back to current line" is tapped or a few seconds pass. `[offset:]` is applied; word-level timestamps are dropped; empty timed lines show a pause mark.
+- **Plain (`.txt`, or `.lrc` without timestamps):** shown as written, **no automatic scroll**.
+- Files are UTF-8; invalid UTF-8 is read as Windows-1252.
+- The entry point and layout in "Now playing" come from the mockup, which must be updated and approved first (D6). Songs without lyrics show no lyrics view (exact treatment decided in the mockup).
+- Full rules: D21 in `docs/decisions.md`.
+
+## 12. Later (do not build without asking)
+
+Android Auto, home-screen widget, equalizer, crossfade, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.

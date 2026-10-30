@@ -20,8 +20,9 @@ Ask the maintainer before deciding these. Record the answer in `docs/decisions.m
 | Q1 | Is the HTML mockup formally approved? | **Yes** (D17, 2026-10-25). |
 | Q2 | UI language(s) at launch | **US English, Brazilian Portuguese and Spanish** (D18). |
 | Q2b | Translation process | **Maintainer reviews and approves every pt-BR/es string via `i18n/translations.csv`; a language ships only when fully approved; no automatic translation** (D20). |
+| Q12 | Lyrics | **`.lrc` next to the song with the same name (synced), else `.txt` (plain, no auto-scroll); offline only** (D21, 2026-10-30). |
 | Q3 | Image file names | **`folder.(jpg|jpeg|png)` in any case, else the folder's only image** (D19). |
 
 ## Explicitly out of scope for now
 
-Android Auto, widget, equalizer, lyrics, crossfade, Wear OS, Spotify integration (its APIs cannot play audio inside this app), cloud/streaming features, accounts, analytics, ads.
+Android Auto, widget, equalizer, crossfade, downloading lyrics from the internet, Wear OS, Spotify integration (its APIs cannot play audio inside this app), cloud/streaming features, accounts, analytics, ads.

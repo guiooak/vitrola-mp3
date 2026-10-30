@@ -64,6 +64,7 @@ The system picker blocks the storage root and `Download` on modern Android; the 
 - Recurse into subfolders only if "Include subfolders" is ON.
 - Audio files: `MIME_TYPE` starts with `audio/` or the extension is in the supported list.
 - Image files (`.jpg`, `.jpeg`, `.png`): remember every image per folder, then pick with the D19 rule (`folder.*` any case → the only image → none).
+- Lyrics files (`.lrc`, `.txt`, any case): match each audio file to `<same base name>.lrc`, else `.txt`, in the same folder (D21). Store only the document URI and its `lastModified`; a change in either file updates the track on the incremental scan.
 - **Incremental:** a file is re-read only when `lastModified` or `size` changed; files that disappeared are removed. Store `dateAdded` = first time the file was seen (drives "Recently added").
 - Metadata via `MediaMetadataRetriever` (`setDataSource(context, uri)`): title, artist, album artist, album, track number, disc number, year, duration, and whether an embedded picture exists (do not store the bitmap in the DB).
 - Missing title → file name without extension. Missing artist → "Unknown artist". Missing album → "Unknown album".
@@ -75,6 +76,7 @@ folders(id PK, treeUri UNIQUE, displayName, locationLabel, addedAt, lostAccess B
 tracks(id PK, folderId FK, documentUri UNIQUE, relativeDir, fileName, mimeType,
        title, artist, albumArtist, album, trackNumber, discNumber, year,
        durationMs, sizeBytes, lastModified, dateAdded, hasEmbeddedArt BOOL,
+       lyricsDocumentUri NULL, lyricsType NULL (lrc/txt),
        albumKey, artistKey)
 albums(key PK, title, artistName, year, folderRelativeDir, coverDocumentUri NULL, noMetadata BOOL)
 artists(key PK, name, folderRelativeDir NULL, photoDocumentUri NULL)
@@ -117,6 +119,12 @@ Playback state persistence (DataStore or a small table): queue track IDs, origin
 - Respect the "Use folder photos and covers" setting in the resolver.
 - Dominant color for the "Now playing" tint and the notification: AndroidX Palette on the resolved cover; for the generated cover use its background color.
 
+## Lyrics (D21)
+
+- `LyricsRepository.load(track)` reads the file on demand (IO dispatcher): decode UTF-8 (drop BOM), fall back to Windows-1252 when invalid.
+- `LrcParser` (pure Kotlin, unit-tested): timestamps `[mm:ss]`, `[mm:ss.xx]`, `[mm:ss.xxx]`, several per line; `[offset:]`; ignore other header tags; strip `<mm:ss.xx>` word tags; sort by time; no valid timestamp → plain. Output: `Synced(lines: List<TimedLine>)` or `Plain(text)`.
+- The current line comes from the `MediaController` position (binary search over line times), sampled while the lyrics view is visible only.
+
 ## Search engine (pure Kotlin, unit-test it)
 
 Port `searchResults()` from `design/03-mockup/mockup.js`:
@@ -128,6 +136,6 @@ Run against Room data in memory (the library is small, thousands of rows) or wit
 
 ## Testing expectations
 
-- Unit tests: search engine, grouping/normalization, cover/photo resolution order, shuffle/repeat/previous logic, sleep timer, play counting.
+- Unit tests: LRC parser and lyrics file matching, search engine, grouping/normalization, cover/photo resolution order, shuffle/repeat/previous logic, sleep timer, play counting.
 - Instrumented/manual: SAF flows, lost access, background playback, notification, headset unplug, resume after process death (see 07-edge-cases-and-qa).
 - Optional CI: a GitHub Actions workflow running `./gradlew lint test assembleDebug` on push to `main` (log it as a decision if added).

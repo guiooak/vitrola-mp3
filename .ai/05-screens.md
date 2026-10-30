@@ -44,6 +44,7 @@ Dialogs: file details, new/rename playlist, delete playlist, remove folder, lost
 | 13 | **Queue** (sheet) | Title "Queue" + "N songs up next"; labels "Now playing" / "Up next"; played rows at 50% opacity; drag handle; remove (×) on upcoming rows; opens scrolled to the current song. | Queue |
 | 14 | **Song menu** (sheet) | Header (cover, title, artist). Play next · Add to end of queue · Add to playlist · Add to/Remove from favorite songs · Go to album · Go to artist · File details. Album/artist entries hidden for "Unknown album". | Song menu |
 | 15 | **Sleep timer** (sheet) | Explanation line, 2×2 grid (15 min, 30 min, 45 min, 1 hour), full-width "At the end of this song" (selected state), "Turn off timer" in error color when active. | Sleep timer |
+| 15b | **Lyrics** (D21) | Synced: current line highlighted, auto-scroll, tap to seek, "back to current line". Plain: static text, manual scroll. **Not in the mockup yet** — design it there and get approval before building. | — |
 | 16 | **Empty library** | Empty state with "Choose folder". | Empty library |
 
 Other overlays (no shortcut): album menu, playlist menu, add-to-playlist sheet, sort sheet, new/rename/delete playlist dialogs, remove folder dialog, file details dialog, lost-access dialog, snackbars.

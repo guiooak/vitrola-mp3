@@ -2,7 +2,7 @@
 
 **Status:** ready to start · **Created:** 2026-10-26 · **Owner:** implementing agent · **Reviewer:** maintainer
 
-Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D20.
+Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D21.
 
 ## Working on a new machine
 
@@ -44,7 +44,7 @@ Setup:
 | 2 | Browsing UI | Welcome, scan, library (Artists default), album, artist, folder screens | Screenshots review |
 | 3 | Playback core | Background playback, mini player, Now playing with the record, notification, queue | **First installable build (debug APK)** |
 | 4 | Personal features | Resume, sleep timer, play counts, favorites, playlists | Answer Q4 (play count), Q5 (drag reorder) |
-| 5 | Search | Three-section linked search | — |
+| 5 | Search and lyrics | Three-section linked search; lyrics from `.lrc`/`.txt` files (D21) | **Approve the lyrics design in the mockup** (before the lyrics UI is built) |
 | 6 | Settings and polish | Settings screen, theme, battery tip, motion, accessibility, gestures | Answer Q6 (gestures); second build |
 | 7 | Localization | pt-BR and es drafts → maintainer review → approved resources → languages enabled | **Review every translation (D20)**; answer Q11 (Spanish reviewer and variant) |
 | 8 | QA and release prep | Full test pass, performance, signing and Play Store readiness | Answer Q9; release-candidate build |
@@ -75,7 +75,7 @@ Tasks:
   - Checkpoint builds are published as a **GitHub pre-release** (tag `v0.N-debug`) with the APK attached and a short "what to try" list, so the maintainer can download it straight on the phone.
   - `versionCode` increases on every build (e.g. from the CI run number) so Android accepts the update.
   - The release key (Phase 8, Q9) is separate and never used for these builds.
-- [ ] **Test library generator:** `tools/make_test_library.py` (python3 + ffmpeg, no other dependencies) writes a library mirroring `design/03-mockup/data.js` into a folder given as an argument (default `build/test-library/`, ignored by git): `Music/<Genre>/<Artist>/<Album (Year)>/NN - Title.mp3` as short tagged MP3s (a few seconds of tone, title/artist/album/track/year tags, some with embedded art), plus `folder.jpg`, a `Folder.PNG` case, an "only image" case, an ambiguous two-image case, untagged files and a corrupt `.mp3`. Same input → same output, so tests are repeatable on any machine. Document it in `README.md` with the `adb push` command.
+- [ ] **Test library generator:** `tools/make_test_library.py` (python3 + ffmpeg, no other dependencies) writes a library mirroring `design/03-mockup/data.js` into a folder given as an argument (default `build/test-library/`, ignored by git): `Music/<Genre>/<Artist>/<Album (Year)>/NN - Title.mp3` as short tagged MP3s (a few seconds of tone, title/artist/album/track/year tags, some with embedded art), plus `folder.jpg`, a `Folder.PNG` case, an "only image" case, an ambiguous two-image case, untagged files, a corrupt `.mp3`, and lyrics cases (a synced `.lrc`, a `.lrc` without timestamps, a `.txt` only, both `.lrc` and `.txt`, an upper-case `.LRC`, a Windows-1252 `.txt`; D21). Same input → same output, so tests are repeatable on any machine. Document it in `README.md` with the `adb push` command.
 - [ ] Update `README.md` (how to build) and log the layout/CI decisions.
 
 Done when: `./gradlew assembleDebug` succeeds, the app opens to a themed shell in light and dark, and CI is green.
@@ -94,6 +94,7 @@ Tasks:
 - [ ] Metadata reader (`MediaMetadataRetriever`) with fallbacks: file name as title, "Unknown artist"/"Unknown album" as **flags/keys**, not label text.
 - [ ] Grouping: album key, artist key, album folder, artist folder (02 §3, 03 grouping rules).
 - [ ] **Image rule D19:** per folder, `folder.(jpg|jpeg|png)` any case → only image (`jpg/jpeg/png`) → none; store the picked document URI; respect "Use folder photos and covers".
+- [ ] **Lyrics matching (D21):** per audio file, `<same base name>.lrc` else `.txt` in the same folder, case-insensitive; store `lyricsDocumentUri` + type; incremental updates when a lyrics file is added, changed or removed.
 - [ ] Repositories exposing `Flow`s for artists, albums, songs, folders.
 
 Tests: unit tests for normalization, grouping, D19 picking (all four mockup cases: name match, case-insensitive, only image, ambiguous), incremental diff logic.
@@ -157,14 +158,18 @@ Done when: QA items 7, 8, 13 pass.
 
 ---
 
-## Phase 5 · Search
+## Phase 5 · Search and lyrics
 
 Tasks:
 - [ ] Pure-Kotlin search engine ported from `searchResults()` in `design/03-mockup/mockup.js`: accent/case-insensitive, file names, direct + linked results, "starts with" first, Artists → Albums → Songs, counts, 6 songs + "See all N songs", "Nothing found" only without direct matches.
 - [ ] Search screen: auto-focus, clear, recent searches (max 6, saved on submit, clear), artists explorer when empty.
 - [ ] Highlight of the matched text.
 
-Tests: unit tests with the mockup examples ("aguas", "milton", "esquina", no match). Done when: QA item 9 passes.
+- [ ] **Design first (D6):** add the lyrics view to the HTML mockup (entry point in Now playing, synced and plain states, no-lyrics state, "Back to current line"), update `docs/design/03-mockup.md`, and get the maintainer's approval. Can be done any time before the lyrics UI tasks below.
+- [ ] `LrcParser` (pure Kotlin) and lyrics file reading with the UTF-8 → Windows-1252 fallback (D21, `.ai/03-architecture.md`).
+- [ ] Lyrics view as approved in the mockup: synced (highlight, auto-scroll, tap to seek, pause auto-scroll on manual scroll, back to current line) and plain (static, no auto-scroll); reduce motion → no animated scroll.
+
+Tests: unit tests with the mockup examples ("aguas", "milton", "esquina", no match); `LrcParser` cases from `.ai/07-edge-cases-and-qa.md` (Lyrics). Done when: QA items 9 and 17 pass.
 
 ---
 
@@ -227,3 +232,4 @@ Add one line per completed phase: date, commit, notes.
 |---|---|---|---|
 | 2026-10-26 | — | — | Plan edited: D20 revised (all-or-nothing languages, stale-row hashes, validation, plural rows); Phase 0 generator and Phase 7 updated; Q11 added. |
 | 2026-10-26 | — | — | Plan edited: builds delivered through CI pre-releases with a shared debug key; test library generator script; translations drafted after Phase 2 in parallel; Phase 6 done criteria clarified. |
+| 2026-10-30 | — | — | Plan edited: lyrics (D21) added to Phase 1 (file matching) and Phase 5 (parser, mockup design, lyrics view); test library gets lyrics cases. |
