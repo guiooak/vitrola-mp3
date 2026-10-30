@@ -154,6 +154,19 @@ The lyrics themselves are never translated.
 | Snackbars: Equalizer on · %s · Equalizer off |
 | Now playing button content description: Equalizer |
 
+## Driving mode (D24)
+
+| Text |
+|---|
+| Exit · Driving mode · Driving mode · %s (car name, when opened automatically) |
+| Tabs: Now playing · Music |
+| Tiles: Shuffle all · Favorite songs · Most played · Recently added · Playlists |
+| Nothing playing (empty) · No playlists yet · Nothing here yet |
+| Settings group: Driving — Driving mode: "Big buttons and only the essentials while you drive" · Start automatically in the car: "When your phone connects to your car's Bluetooth" / "When %s connects" · Car: %s |
+| Car picker sheet: **Choose your car** — Paired Bluetooth devices. Driving mode starts when this one connects. |
+| Snackbars: Driving mode will start when %s connects · Driving mode won't start on its own · Vitrola Mp3 needs this permission to recognize your car · Connected to %s · driving mode on · %s disconnected · driving mode off |
+| Now playing top bar button content description: Driving mode |
+
 ## Sleep timer
 
 | Text |

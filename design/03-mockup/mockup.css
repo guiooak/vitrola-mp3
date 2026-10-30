@@ -306,6 +306,88 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 .np-extra .icon-btn.on { color: var(--color-primary); }
 .timer-tag { font: var(--type-caption); color: var(--color-primary); text-align: center; height: 16px; margin-top: -4px; font-variant-numeric: tabular-nums; }
 
+/* ---------- Driving mode (D24) ---------- */
+.drive { position: absolute; inset: 0; z-index: 25; background: var(--color-background); display: none; padding: 44px 0 20px;
+  grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; grid-template-areas: "top" "body" "tabs"; }
+.drive.open { display: grid; animation: fadeIn var(--duration-medium) var(--easing-standard); }
+@media (max-width: 760px) { .drive { padding-top: 8px; padding-bottom: max(12px, env(safe-area-inset-bottom)); } }
+.dv-top { grid-area: top; display: flex; align-items: center; gap: 12px; padding: 4px 16px 8px; }
+.dv-exit { height: 52px; padding: 0 20px 0 14px; border-radius: var(--radius-full); border: 0; background: var(--color-surface-2); color: var(--color-text); font: var(--type-label); font-size: 17px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; flex: none; }
+.dv-exit .ms { font-size: 26px; }
+.dv-title { display: flex; align-items: center; gap: 8px; min-width: 0; font: var(--type-label); color: var(--color-text-2); }
+.dv-title span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv-body { grid-area: body; min-height: 0; overflow-y: auto; padding: 0 16px; display: flex; flex-direction: column; }
+.dv-tabs { grid-area: tabs; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 16px 0; }
+.dv-tabs button { height: 72px; border: 0; border-radius: var(--radius-l); background: var(--color-surface-2); color: var(--color-text-2); font: var(--type-label); font-size: 17px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+.dv-tabs button .ms { font-size: 30px; }
+.dv-tabs button[aria-current="page"] { background: var(--color-primary-container); color: var(--color-on-primary-container); }
+
+.dv-player { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+.dv-art { width: min(240px, 62%); aspect-ratio: 1; }
+.dv-art svg { width: 100%; height: 100%; display: block; }
+.dv-info { width: 100%; display: flex; flex-direction: column; gap: 18px; }
+.dv-meta { text-align: center; min-width: 0; }
+.dv-meta h2 { font: 700 30px/1.15 var(--font-brand); margin: 0 0 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dv-meta p { font: 500 20px/1.3 var(--font-ui); color: var(--color-text-2); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dv-prog { height: 6px; border-radius: 3px; background: var(--color-surface-3); overflow: hidden; }
+.dv-prog i { display: block; height: 100%; background: var(--color-primary); border-radius: 3px; }
+.dv-times { display: flex; justify-content: space-between; margin-top: 6px; font: var(--type-label); color: var(--color-text-2); font-variant-numeric: tabular-nums; }
+.dv-ctrls { display: flex; align-items: center; justify-content: space-between; }
+.dv-btn { width: 76px; height: 76px; border-radius: 50%; border: 0; background: transparent; color: var(--color-text); display: grid; place-items: center; cursor: pointer; position: relative; flex: none; }
+.dv-btn:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.dv-btn .ms { font-size: 48px; }
+.dv-btn:first-child, .dv-btn:last-child { width: 56px; height: 56px; color: var(--color-text-2); }
+.dv-btn:first-child .ms, .dv-btn:last-child .ms { font-size: 32px; }
+.dv-btn.fav-on, .dv-btn.on { color: var(--color-primary) !important; }
+.dv-btn.on::after { content: ""; position: absolute; bottom: 6px; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.dv-play { width: 104px; height: 104px; border-radius: 50%; border: 0; background: var(--color-primary); color: var(--color-on-primary); display: grid; place-items: center; cursor: pointer; box-shadow: var(--elevation-2); flex: none; transition: border-radius var(--duration-medium) var(--easing-standard); }
+.dv-play .ms { font-size: 60px; }
+.dv-play.is-playing { border-radius: 34px; }
+
+.dv-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--color-text-2); }
+.dv-empty > .ms { font-size: 64px; color: var(--color-text-3); }
+.dv-empty h2 { font: var(--type-title); color: var(--color-text); margin: 0; }
+.dv-big { height: 72px; padding: 0 32px; border-radius: var(--radius-full); border: 0; background: var(--color-accent); color: var(--color-on-accent); font: var(--type-label); font-size: 19px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+
+.dv-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 0 8px; }
+.dv-tile { min-height: 120px; border: 0; border-radius: var(--radius-l); background: var(--color-surface-2); color: var(--color-text); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; font: var(--type-label); font-size: 19px; cursor: pointer; }
+.dv-tile .ms { font-size: 36px; color: var(--color-primary); }
+.dv-tile.accent { grid-column: 1 / -1; min-height: 96px; flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; background: var(--color-accent); color: var(--color-on-accent); }
+.dv-tile.accent .ms { color: inherit; }
+.dv-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 8px; }
+.dv-row { min-height: 76px; border: 0; border-radius: var(--radius-l); background: var(--color-surface-2); color: var(--color-text); display: grid; grid-template-columns: 52px 1fr; grid-template-rows: auto auto; column-gap: 14px; align-items: center; text-align: left; padding: 12px 16px; font: var(--type-label); font-size: 19px; cursor: pointer; }
+.dv-row small { grid-column: 2; font: var(--type-body-s); color: var(--color-text-2); }
+.dv-row .dv-mosaic { grid-row: 1 / 3; width: 52px; height: 52px; border-radius: var(--radius-s); overflow: hidden; }
+.dv-row .dv-mosaic > * { width: 100%; height: 100%; }
+.dv-row.back { background: transparent; grid-template-columns: 32px 1fr; min-height: 60px; font-size: 20px; }
+.dv-row.back .ms { font-size: 28px; }
+.dv-none { color: var(--color-text-2); text-align: center; font: var(--type-body); }
+.sheet .sheet-note { margin: -6px 20px 12px; font: var(--type-body-s); color: var(--color-text-2); }
+.sys-dialog .box > .ms { display: block; text-align: center; font-size: 28px; color: #0B57D0; margin-bottom: 12px; }
+:root[data-theme="dark"] .sys-dialog .box > .ms { color: #A8C7FA; }
+.sys-dialog .acts.col { flex-direction: column; align-items: stretch; gap: 4px; }
+.sys-dialog .acts.col button { text-align: center; padding: 12px; }
+
+/* Landscape (phone in a car mount): side rail with Exit and the tabs */
+@media (min-width: 761px) {
+  .phone.landscape { width: 868px; height: 412px; }
+  .phone.landscape .app { width: 846px; height: 390px; }
+  .phone.landscape .drive { padding: 30px 16px 12px 0; grid-template-columns: 132px 1fr; grid-template-rows: auto 1fr; grid-template-areas: "top body" "tabs body"; }
+  .phone.landscape .dv-top { padding: 0 12px 8px 16px; }
+  .phone.landscape .dv-exit { width: 100%; justify-content: center; }
+  .phone.landscape .dv-title { display: none; }
+  .phone.landscape .dv-tabs { grid-template-columns: 1fr; grid-auto-rows: 1fr; padding: 0 12px 0 16px; }
+  .phone.landscape .dv-tabs button { height: auto; flex-direction: column; gap: 4px; font-size: 15px; }
+  .phone.landscape .dv-body { padding: 0 0 0 8px; }
+  .phone.landscape .dv-player { flex-direction: row; gap: 36px; padding: 0 8px; }
+  .phone.landscape .dv-art { width: 200px; flex: none; }
+  .phone.landscape .dv-info { flex: 1; min-width: 0; }
+  .phone.landscape .dv-meta { text-align: left; }
+  .phone.landscape .dv-tiles { grid-template-columns: 1fr 1fr 1fr; }
+  .phone.landscape .dv-tile.accent { grid-column: auto; flex-direction: column; align-items: flex-start; justify-content: space-between; min-height: 120px; }
+  .phone.landscape .statusbar { padding-left: 32px; padding-right: 32px; }
+}
+
 /* ---------- Equalizer (D23) ---------- */
 .eqz-page { padding-bottom: 24px; }
 .eqz { display: flex; flex-direction: column; gap: 4px; }

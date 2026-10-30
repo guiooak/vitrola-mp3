@@ -16,6 +16,7 @@ Bottom navigation (always visible on main screens):               ▼
         └─ Settings ─► (system folder picker, dialogs, sheets)
 
 Now playing = full-screen overlay above everything (from the mini player or after Play/Shuffle)
+Driving mode = full-screen mode above Now playing (car button in Now playing, Settings › Driving, or automatic)
 Sheets: song menu, album menu, playlist menu, add to playlist, sort, queue, sleep timer
 Dialogs: file details, new/rename playlist, delete playlist, remove folder, lost access
 ```
@@ -39,8 +40,9 @@ Dialogs: file details, new/rename playlist, delete playlist, remove folder, lost
 | 9 | **Playlists** | Title + "+" (new playlist). "Automatic" group and "Your playlists" group (last row "New playlist"). | Playlists |
 | 9b | **Favorite albums** | Small title, count, albums grid; empty state. | — |
 | 10 | **Playlist** | ⋮ (rename/delete) only for user playlists. Art (icon tile for automatic lists, mosaic for user lists), name, meta, Play / Shuffle, rows; empty states. | Playlist |
-| 11 | **Settings** | Groups: Library folders, Playback, battery tip card, Appearance (segmented Automatic/Light/Dark), About. | Settings |
+| 11 | **Settings** | Groups: Library folders, Playback (incl. Equalizer), Driving (Driving mode, Start automatically in the car, Car), battery tip card, Appearance (segmented Automatic/Light/Dark), About. | Settings |
 | 11b | **Equalizer** (D23) | Pushed from Settings › Playback › Equalizer. "Use equalizer" switch, presets, 10 band sliders over a curve, bass boost. Hidden on Android 8 / unsupported devices. | Equalizer |
+| 11c | **Driving mode** (D24) | Full-screen mode above everything: Exit, tabs Now playing / Music, big controls and tiles (see 02 §13). Landscape layout with a side rail. Entered from the car button in Now playing, Settings › Driving, or automatically when the chosen car connects. | Driving mode · Driving mode · music · Driving mode · landscape |
 | 12 | **Now playing** | See 02 §5 and the record spec in 04. | Now playing |
 | 13 | **Queue** (sheet) | Title "Queue" + "N songs up next"; labels "Now playing" / "Up next"; played rows at 50% opacity; drag handle; remove (×) on upcoming rows; opens scrolled to the current song. | Queue |
 | 14 | **Song menu** (sheet) | Header (cover, title, artist). Play next · Add to end of queue · Add to playlist · Add to/Remove from favorite songs · Go to album · Go to artist · File details. Album/artist entries hidden for "Unknown album". | Song menu |

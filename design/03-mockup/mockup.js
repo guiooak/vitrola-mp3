@@ -11,6 +11,8 @@ const app = $('#app');
 const screensEl = $('#screens');
 const npEl = $('#np');
 const overlayEl = $('#overlay');
+const driveEl = document.createElement('div'); driveEl.className = 'drive'; driveEl.id = 'drive'; driveEl.setAttribute('aria-hidden', 'true');
+$('#np').after(driveEl);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LOCALE = 'en-US';
 
@@ -58,6 +60,8 @@ const INITIAL_STATE = () => ({
   timer: null,
   lyricsOpen: false, // the lyrics view replaces the record in Now playing
   lyricsAutoScroll: true, // global setting, saved: synced lyrics follow the song
+  // driving mode (D24): manual, or automatic when the chosen car's Bluetooth connects
+  drive: { on: false, tab: 'playing', sub: null, auto: false, car: null, autoEntered: false, btGranted: false, landscape: false },
   // equalizer (D23): global, saved; hidden on Android 8
   eq: { on: false, preset: 'flat', bands: Array(10).fill(0), custom: Array(10).fill(0), bass: 0 },
   angle: 0, spinningSince: 0,
@@ -255,6 +259,7 @@ function go(name, params = {}, anim = 'push') {
 }
 function back() {
   if (closeOverlay()) return;
+  if (S.drive.on) return S.drive.sub ? (S.drive.sub = null, renderDrive()) : exitDrive();
   if (npEl.classList.contains('open')) return S.lyricsOpen ? toggleLyrics(false) : closeNowPlaying();
   if (stack.length > 1) { stack.pop(); render('pop'); }
 }
@@ -663,6 +668,12 @@ const SCREENS = {
           <div class="row-i" data-action="toggle" data-k="resume"><div class="ic tinted">${iconHtml('history')}</div><div><div class="ti">Resume where you left off</div><div class="sb">When the app opens, the last song is ready to play</div></div><button class="switch" role="switch" aria-checked="${S.resume}" aria-label="Resume where you left off"></button></div>
           <div class="row-i" data-action="toggle" data-k="pauseOnUnplug"><div class="ic tinted">${iconHtml('headset_off')}</div><div><div class="ti">Pause when headphones disconnect</div><div class="sb">Wired or Bluetooth</div></div><button class="switch" role="switch" aria-checked="${S.pauseOnUnplug}" aria-label="Pause when headphones disconnect"></button></div>
         </div>
+        <div class="group-title">Driving</div>
+        <div class="group">
+          <div class="row-i" data-action="drive-open" tabindex="0"><div class="ic tinted">${iconHtml('directions_car')}</div><div><div class="ti">Driving mode</div><div class="sb">Big buttons and only the essentials while you drive</div></div>${iconHtml('chevron_right', 'chev')}</div>
+          <div class="row-i" data-action="drive-auto"><div class="ic tinted">${iconHtml('bluetooth')}</div><div><div class="ti">Start automatically in the car</div><div class="sb">${S.drive.auto && S.drive.car ? `When ${esc(S.drive.car)} connects` : 'When your phone connects to your car\'s Bluetooth'}</div></div><button class="switch" role="switch" aria-checked="${S.drive.auto}" aria-label="Start automatically in the car"></button></div>
+          ${S.drive.auto ? `<div class="row-i" data-action="drive-car" tabindex="0"><div class="ic tinted">${iconHtml('directions_car')}</div><div><div class="ti">Car</div><div class="sb">${esc(S.drive.car)}</div></div>${iconHtml('chevron_right', 'chev')}</div>` : ''}
+        </div>
         <div class="tip">${iconHtml('battery_alert')}<div><b>Music stops on its own?</b>Some phones (Xiaomi, Samsung, Motorola…) close background apps to save battery. Exempt Vitrola Mp3 from battery optimization.<br><button data-action="battery">Open battery settings</button></div></div>
         <div class="group-title">Appearance</div>
         <div class="seg theme-seg" role="group" aria-label="Theme">
@@ -807,6 +818,7 @@ function updatePlayer(slowDown = false) {
   updateProgress();
   const sh = $('.shade, .lock', app); if (sh) sh.dispatchEvent(new CustomEvent('refresh'));
   const q = $('#queue-list'); if (q) q.innerHTML = queueRows();
+  if (S.drive.on) renderDrive();
 }
 function updateProgress() {
   const m = current(); if (!m) return;
@@ -816,6 +828,8 @@ function updateProgress() {
   const t = $('#np-pos'); if (t) t.textContent = fmt(S.pos);
   const tt = $('#np-timer'); if (tt) tt.textContent = S.timer ? timerLabel() : '';
   $$('.notif .bar i').forEach(b => b.style.width = pct);
+  const dv = $('.dv-prog i'); if (dv) dv.style.width = pct;
+  const dvt = $('#dv-pos'); if (dvt) dvt.textContent = fmt(S.pos);
   updateLyrics();
 }
 function markActive() {
@@ -875,6 +889,7 @@ function renderNowPlaying() {
     <div class="np-top">
       <button class="icon-btn" data-action="close-np" aria-label="Collapse player">${iconHtml('expand_more')}</button>
       <div class="src"><small>${esc(S.source ? S.source.type : 'Playing')}</small><b>${esc(S.source ? S.source.name : a.title)}</b></div>
+      <button class="icon-btn" data-action="drive-open" aria-label="Driving mode">${iconHtml('directions_car')}</button>
       <button class="icon-btn" data-action="menu" data-mid="${m.id}" aria-label="More options">${iconHtml('more_vert')}</button>
     </div>
     <div class="np-disc">${record({ a, withArm: true, player: true })}</div>
@@ -901,6 +916,101 @@ function renderNowPlaying() {
   const seek = $('#np-seek', npEl);
   seek.addEventListener('input', () => { S.pos = +seek.value; seek.style.setProperty('--p', (S.pos / m.duration * 100) + '%'); $('#np-pos').textContent = fmt(S.pos); const b = $('#mini .prog i'); if (b) b.style.width = (S.pos / m.duration * 100) + '%'; updateLyrics(); });
   syncRecords();
+}
+
+/* ---------- Driving mode (D24) ----------
+   A simplified full-screen player for the car: big text, big buttons, two tabs (Now playing, Music),
+   no search, menus or dialogs. Screen stays on. Has its own landscape layout. */
+const PAIRED_DEVICES = ['HR-V Multimedia', 'JBL Flip 5', 'Galaxy Buds2 Pro', 'Pixel Watch 2'];
+function driveTiles() {
+  return [
+    ['shuffle-all', 'shuffle', 'Shuffle all'],
+    ['favorite-songs', 'favorite', 'Favorite songs'],
+    ['most-played', 'trending_up', 'Most played'],
+    ['recently-added', 'schedule', 'Recently added'],
+    ['playlists', 'queue_music', 'Playlists'],
+  ];
+}
+function drivePlaying() {
+  const m = current();
+  if (!m) return `<div class="dv-empty">${iconHtml('music_off')}<h2>Nothing playing</h2>
+    <button class="dv-big" data-action="drive-play" data-k="shuffle-all">${iconHtml('shuffle')}Shuffle all</button></div>`;
+  const a = album(m.album), fav = S.favoriteSongs.has(m.id);
+  return `<div class="dv-player">
+    <div class="dv-art">${record({ a, withArm: false, player: true })}</div>
+    <div class="dv-info">
+      <div class="dv-meta"><h2>${esc(m.title)}</h2><p>${esc(m.artist)}</p></div>
+      <div class="dv-progress"><div class="dv-prog"><i style="width:${S.pos / m.duration * 100}%"></i></div>
+        <div class="dv-times"><span id="dv-pos">${fmt(S.pos)}</span><span>${fmt(m.duration)}</span></div></div>
+      <div class="dv-ctrls">
+        <button class="dv-btn ${fav ? 'fav-on' : ''}" data-action="favorite" data-mid="${m.id}" aria-label="${fav ? 'Remove from favorite songs' : 'Add to favorite songs'}" aria-pressed="${fav}">${iconHtml('favorite', fav ? 'fill' : '')}</button>
+        <button class="dv-btn" data-action="previous" aria-label="Previous song">${iconHtml('skip_previous', 'fill')}</button>
+        <button class="dv-play ${S.playing ? 'is-playing' : ''}" data-action="play" aria-label="${S.playing ? 'Pause' : 'Play'}">${iconHtml(S.playing ? 'pause' : 'play_arrow', 'fill')}</button>
+        <button class="dv-btn" data-action="next" aria-label="Next song">${iconHtml('skip_next', 'fill')}</button>
+        <button class="dv-btn ${S.shuffle ? 'on' : ''}" data-action="shuffle" aria-label="Shuffle" aria-pressed="${S.shuffle}">${iconHtml('shuffle')}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function driveMusic() {
+  if (S.drive.sub === 'playlists') return `<div class="dv-list">
+    <button class="dv-row back" data-action="drive-sub" data-sub="">${iconHtml('arrow_back')}Playlists</button>
+    ${S.playlists.length ? S.playlists.map(p => `<button class="dv-row" data-action="drive-play" data-k="${p.id}"><span class="dv-mosaic">${mosaic(p.songs)}</span>${esc(p.name)}<small>${plural(p.songs.length, 'song', 'songs')}</small></button>`).join('')
+      : '<p class="dv-none">No playlists yet</p>'}</div>`;
+  return `<div class="dv-tiles">${driveTiles().map(([k, ic, n]) => `<button class="dv-tile ${k === 'shuffle-all' ? 'accent' : ''}" data-action="${k === 'playlists' ? 'drive-sub' : 'drive-play'}" data-k="${k}" data-sub="${k}">${iconHtml(ic, 'fill')}<span>${n}</span></button>`).join('')}</div>`;
+}
+function renderDrive() {
+  const d = S.drive;
+  driveEl.classList.toggle('open', d.on);
+  driveEl.setAttribute('aria-hidden', !d.on);
+  $('#phone').classList.toggle('landscape', d.on && d.landscape);
+  if (!d.on) { driveEl.innerHTML = ''; return; }
+  driveEl.innerHTML = `
+    <div class="dv-top">
+      <button class="dv-exit" data-action="drive-exit">${iconHtml('close')}Exit</button>
+      <div class="dv-title">${iconHtml('directions_car')}<span>Driving mode${d.autoEntered && d.car ? ` · ${esc(d.car)}` : ''}</span></div>
+    </div>
+    <nav class="dv-tabs" aria-label="Driving mode">
+      <button data-action="drive-tab" data-t="playing" ${d.tab === 'playing' ? 'aria-current="page"' : ''}>${iconHtml('album', d.tab === 'playing' ? 'fill' : '')}<span>Now playing</span></button>
+      <button data-action="drive-tab" data-t="music" ${d.tab === 'music' ? 'aria-current="page"' : ''}>${iconHtml('library_music', d.tab === 'music' ? 'fill' : '')}<span>Music</span></button>
+    </nav>
+    <div class="dv-body">${d.tab === 'playing' ? drivePlaying() : driveMusic()}</div>`;
+  syncRecords();
+  positionSnackbar();
+}
+function enterDrive(auto = false) {
+  ensureLibrary();
+  if (currentScreen === 'welcome' || currentScreen === 'scan') { S.libTab = 'artists'; root('library'); }
+  closeOverlay(true);
+  Object.assign(S.drive, { on: true, tab: 'playing', sub: null, autoEntered: auto });
+  renderDrive();
+  updatePanel(driveKey());
+}
+function exitDrive() {
+  Object.assign(S.drive, { on: false, autoEntered: false, landscape: false, sub: null });
+  renderDrive();
+  positionSnackbar();
+  updatePanelForCurrent();
+}
+const driveKey = () => S.drive.landscape ? 'drive-landscape' : S.drive.tab === 'music' ? 'drive-music' : 'drive';
+function drivePlay(k) {
+  const lib = library().map(m => m.id);
+  if (k === 'shuffle-all') playList(lib, Math.floor(Math.random() * lib.length), { type: 'Playing from', name: 'All songs' }, true);
+  else { const p = playlistData(k); if (!p || !p.ids.length) return snackbar('Nothing here yet'); playList(p.ids, 0, { type: 'Playing from playlist', name: p.name }, false); }
+  S.drive.tab = 'playing'; S.drive.sub = null; renderDrive(); updatePanel(driveKey());
+}
+function systemPermission(title, text, onAllow, onDeny) {
+  const dlg = document.createElement('div');
+  dlg.className = 'sys-dialog';
+  dlg.innerHTML = `<div class="box">${iconHtml('nearby')}<h3>${title}</h3>${text ? `<p>${text}</p>` : ''}
+    <div class="acts col"><button data-r="yes">Allow</button><button data-r="no">Don't allow</button></div></div>`;
+  app.appendChild(dlg);
+  dlg.addEventListener('click', e => { const r = e.target.closest('[data-r]'); if (!r) return; dlg.remove(); (r.dataset.r === 'yes' ? onAllow : onDeny)(); });
+}
+function chooseCar() {
+  openSheet(`<h3>Choose your car</h3>
+    <p class="sheet-note">Paired Bluetooth devices. Driving mode starts when this one connects.</p>
+    <div class="s-body">${PAIRED_DEVICES.map(n => `<button class="menu-i ${S.drive.car === n ? 'sel' : ''}" data-action="drive-set-car" data-name="${esc(n)}">${iconHtml(S.drive.car === n ? 'radio_button_checked' : 'radio_button_unchecked')}${esc(n)}</button>`).join('')}</div>`, 'drive-car');
 }
 
 /* ---------- Equalizer (D23) ----------
@@ -1167,6 +1277,7 @@ function positionSnackbar() {
   const area = $('#snack-area');
   const np = npEl.classList.contains('open');
   const b = $('#bottom');
+  if (S.drive.on) { area.style.bottom = (S.drive.landscape ? 16 : 104) + 'px'; return; }
   area.style.bottom = (np ? 40 : b.hidden ? 40 : b.offsetHeight + 12) + 'px';
 }
 
@@ -1402,7 +1513,7 @@ const ACTIONS = {
     p.songs.push(id); closeOverlay(); snackbar(`Added to "${esc(p.name)}"`, 'Undo', () => { p.songs = p.songs.filter(x => x !== id); }); },
   'play-next': b => { const id = b.dataset.mid; closeOverlay(); if (!current()) return playList([id], 0, { type: 'Playing', name: 'Queue' }); S.queue.splice(S.idx + 1, 0, id); S.originalQueue.push(id); snackbar('Will play next'); },
   'add-to-queue': b => { const id = b.dataset.mid; closeOverlay(); if (!current()) return playList([id], 0, { type: 'Playing', name: 'Queue' }); S.queue.push(id); S.originalQueue.push(id); snackbar('Added to the end of the queue'); },
-  'favorite': b => { closeOverlay(); toggleFavoriteSong(b.dataset.mid); },
+  'favorite': b => { closeOverlay(); toggleFavoriteSong(b.dataset.mid); if (S.drive.on) renderDrive(); },
   'favorite-album': b => { closeOverlay(); toggleFavoriteAlbum(b.dataset.id); },
   'favorite-albums': () => go('favorite-albums'),
   'file-info': b => fileInfo(b.dataset.mid),
@@ -1416,6 +1527,20 @@ const ACTIONS = {
   'queue': () => openQueue(),
   'lyrics': () => toggleLyrics(),
   'equalizer': () => go('equalizer'),
+  'drive-open': () => { if (npEl.classList.contains('open')) closeNowPlaying(); enterDrive(false); },
+  'drive-exit': () => exitDrive(),
+  'drive-tab': b => { S.drive.tab = b.dataset.t; S.drive.sub = null; renderDrive(); updatePanel(driveKey()); },
+  'drive-sub': b => { S.drive.sub = b.dataset.sub || null; renderDrive(); },
+  'drive-play': b => drivePlay(b.dataset.k),
+  'drive-auto': () => {
+    if (S.drive.auto) { S.drive.auto = false; render('none'); return snackbar('Driving mode won\'t start on its own'); }
+    const pick = () => { S.drive.btGranted = true; chooseCar(); };
+    if (S.drive.btGranted) return pick();
+    systemPermission('Allow <b>Vitrola Mp3</b> to find, connect to and determine the relative position of nearby devices?', '', pick,
+      () => snackbar('Vitrola Mp3 needs this permission to recognize your car'));
+  },
+  'drive-car': () => chooseCar(),
+  'drive-set-car': b => { S.drive.car = b.dataset.name; S.drive.auto = true; closeOverlay(); if (currentScreen === 'settings') render('none'); snackbar(`Driving mode will start when ${esc(S.drive.car)} connects`); },
   'eq-sheet': () => { openSheet(`<h3>Equalizer</h3><div class="s-body">${eqHtml()}</div>`, 'eq-sheet'); bindEq(overlayEl); },
   'eq-toggle': (b, e) => { S.eq.on = !S.eq.on; refreshEq(eqRoot()); snackbar(S.eq.on ? `Equalizer on · ${eqPresetName(S.eq.preset)}` : 'Equalizer off'); },
   'eq-preset': b => { const k = b.dataset.p; S.eq.preset = k; S.eq.bands = (k === 'custom' ? S.eq.custom : EQ_PRESETS[k][1]).slice(); S.eq.on = true; refreshEq(eqRoot()); },
@@ -1503,6 +1628,10 @@ const NOTES = {
   'lyrics': 'Synced lyrics from a .lrc file next to the song (D21). The current line is highlighted and stays in view; tap a line to jump there. Scroll by hand and "Back to current line" appears; following resumes on its own after 5 seconds. To read freely, turn off auto-scroll with the floating icon at the bottom right of the lyrics (it shows a dot while on). The choice is global and saved: it applies to every song until you change it. The current line is still highlighted. Tap the small record (or the lyrics button) to go back to the record. "Corcovado" has LRC text stored inside the MP3 and is synced too. The lyrics are invented placeholders.',
   'lyrics-plain': 'Plain lyrics from a .txt file (D21): shown as written, with no automatic scrolling. "Só Tinha de Ser com Você" (lyrics stored inside the MP3) and "Inútil Paisagem" (a .lrc without timestamps) look the same. The lyrics are invented placeholders.',
   'lyrics-none': 'No .lrc, no .txt and no lyrics inside the MP3: the lyrics view says how to add them. The lyrics button is always in Now playing, so the feature is easy to find.',
+  'drive': 'Driving mode (D24): a simplified player for the car, with big text and buttons and only the essentials (favorite, previous, play/pause, next, shuffle). No seeking, search, menus or dialogs. The screen stays on while it is open. Open it from the car button in Now playing or from Settings › Driving; in Settings it can also start on its own when your car\'s Bluetooth connects (try "Car Bluetooth connects" under Simulate).',
+  'drive-music': 'Driving mode › Music: a few big tiles that start playing right away and go back to Now playing. Playlists opens one simple list, never deeper.',
+  'drive-landscape': 'Driving mode with the phone lying in a car mount: the tabs move to a side rail, the record goes to the left and the controls to the right.',
+  'drive-car': 'Pick the car from the paired Bluetooth devices. Before this list, Android asks once for the "Nearby devices" permission.',
   'equalizer': 'Equalizer (D23): 10 fixed bands, the same on every phone. Pick a preset or drag the bands (that becomes "Custom", which is remembered). Bass boost and an on/off switch that keeps your settings. One setting for every song, saved. Also opens from the Now playing bottom row. On Android 8 the equalizer is hidden (its engine needs Android 9).',
   'eq-sheet': 'The equalizer opened from Now playing: the same controls as in Settings. The icon in Now playing shows a dot while the equalizer is on.',
   'queue': 'What already played, what\'s playing and what\'s up next. Jump to a song or remove it from the queue. (Drag to reorder is left for the app.)',
@@ -1535,6 +1664,9 @@ const SHORTCUTS = [
   ['lyrics-plain', 'Lyrics · plain text', () => { playElisTom(1, 20); S.lyricsOpen = true; openNowPlaying(); }],
   ['lyrics-none', 'Lyrics · none', () => { playElisTom(4, 20); S.lyricsOpen = true; openNowPlaying(); }],
   ['queue', 'Queue', () => { ensurePlaying(); openNowPlaying(); setTimeout(openQueue, 200); }],
+  ['drive', 'Driving mode', () => { ensurePlaying(); S.drive.landscape = false; enterDrive(false); }],
+  ['drive-music', 'Driving mode · music', () => { ensurePlaying(); S.drive.landscape = false; enterDrive(false); S.drive.tab = 'music'; renderDrive(); updatePanel('drive-music'); }],
+  ['drive-landscape', 'Driving mode · landscape', () => { ensurePlaying(); enterDrive(false); S.drive.landscape = true; renderDrive(); updatePanel('drive-landscape'); }],
   ['menu', 'Song menu', () => { ensureLibrary(); if (currentScreen !== 'library') { S.libTab = 'songs'; root('library'); } songMenu('elistom-1'); }],
   ['timer', 'Sleep timer', () => { ensurePlaying(); openNowPlaying(); setTimeout(openTimer, 200); }],
   ['empty', 'Empty library', () => { ensureLibrary(); S.folders = []; S.queue = []; S.playing = false; root('library'); updatePanel('empty'); }],
@@ -1544,6 +1676,7 @@ $('#jump').addEventListener('click', e => {
   const b = e.target.closest('[data-jump]'); if (!b) return;
   closeOverlay(true); $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
   if (npEl.classList.contains('open') && !['now-playing', 'queue', 'timer', 'lyrics', 'lyrics-plain', 'lyrics-none'].includes(b.dataset.jump)) closeNowPlaying();
+  if (S.drive.on && !b.dataset.jump.startsWith('drive')) exitDrive();
   SHORTCUTS.find(a => a[0] === b.dataset.jump)[2]();
   $('#panel').classList.remove('open');
 });
@@ -1553,6 +1686,7 @@ function updatePanel(key) {
 }
 function updatePanelForCurrent() {
   const def = SCREENS[currentScreen];
+  if (S.drive.on) return updatePanel(driveKey());
   updatePanel(npEl.classList.contains('open') ? npPanelKey() : def.key ? def.key(stack[stack.length - 1].params) : currentScreen);
 }
 
@@ -1591,6 +1725,16 @@ const SIMULATIONS = {
       <p>This happens when the folder is moved or renamed, or when access is revoked in Android settings. Choose the folder again to keep listening.</p>
       <div class="acts"><button class="btn btn-text" data-action="close-overlay">Not now</button><button class="btn btn-primary" data-action="choose-folder" data-origin="settings">Choose folder</button></div>`);
   },
+  'car': () => {
+    if (S.drive.on && S.drive.autoEntered) { exitDrive(); return snackbar(`${esc(S.drive.car)} disconnected · driving mode off`); }
+    if (!S.drive.auto || !S.drive.car) { ensureLibrary(); root('settings'); return snackbar('First turn on "Start automatically in the car" in Settings'); }
+    if (npEl.classList.contains('open')) closeNowPlaying();
+    enterDrive(true); snackbar(`Connected to ${esc(S.drive.car)} · driving mode on`);
+  },
+  'rotate': () => {
+    if (!S.drive.on) { ensurePlaying(); enterDrive(false); }
+    S.drive.landscape = !S.drive.landscape; renderDrive(); updatePanel(driveKey());
+  },
   'reset': () => reset(),
 };
 $$('[data-simulate]').forEach(b => b.addEventListener('click', () => { SIMULATIONS[b.dataset.simulate](); $('#panel').classList.remove('open'); }));
@@ -1613,6 +1757,7 @@ function playElisTom(i, pos) {
 }
 function reset() {
   S = INITIAL_STATE();
+  renderDrive();
   npEl.classList.remove('open');
   overlayEl.innerHTML = ''; $('#snack-area').innerHTML = '';
   $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());

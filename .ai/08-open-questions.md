@@ -22,6 +22,7 @@ Ask the maintainer before deciding these. Record the answer as a decision record
 | Q2b | Translation process | **Maintainer reviews and approves every pt-BR/es string via `i18n/translations.csv`; a language ships only when fully approved; no automatic translation** (D20). |
 | Q12 | Lyrics | **`.lrc` next to the song with the same name (synced), else `.txt` (plain, no auto-scroll), else lyrics embedded in the audio file; offline only** (D21, 2026-10-30). |
 | Q13 | Equalizer | **10 fixed bands via `DynamicsProcessing`, hidden on Android 8; Settings + Now playing; global; presets, bass boost, on/off** (D23, 2026-10-30). |
+| Q14 | Driving mode | **Manual + automatic for a chosen car (Nearby devices permission); Now playing + Music tiles; screen on; landscape** (D24, 2026-10-30). |
 | Q3 | Image file names | **`folder.(jpg|jpeg|png)` in any case, else the folder's only image** (D19). |
 
 ## Explicitly out of scope for now

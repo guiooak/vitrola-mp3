@@ -29,6 +29,7 @@ Items marked **Decided** come from the decision records in `docs/decisions/`. It
 - `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` (Android 14+ requires the typed permission), `WAKE_LOCK`.
 - `POST_NOTIFICATIONS` (Android 13+), requested when playback first starts, not at launch.
 - `MODIFY_AUDIO_SETTINGS` (normal permission, granted without a prompt) for the equalizer (D23).
+- `BLUETOOTH_CONNECT` (Android 12+, runtime "Nearby devices") requested **only** when the user turns on the driving mode automatic start, plus `BLUETOOTH` with `maxSdkVersion="30"` for Android 8–11 (D24).
 - Service declared with `android:foregroundServiceType="mediaPlayback"` and the `androidx.media3.session.MediaSessionService` intent filter.
 - No `INTERNET` permission needed. If you add it for any reason, log a decision (the app promises "nothing leaves your phone").
 - Battery: do not use `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`; open `Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS` from the Settings tip card.
@@ -96,7 +97,7 @@ Grouping rules:
 - **Artist folder** = the parent directory of the album folder when its name matches the artist name (normalized), otherwise the album folder's parent if it contains no audio files of its own. **Photo** = the D19 pick there.
 - Normalization for keys and search: Unicode NFD, strip diacritics, lowercase, trim, collapse spaces.
 
-Settings (DataStore): `subfolders`, `useFolderImages`, `resume`, `pauseOnUnplug`, `theme` (auto/light/dark), `lyricsAutoScroll` (default true, D21), `eqEnabled` (false), `eqPreset` (`flat`), `eqBands` / `eqCustomBands` (10 ints, dB), `eqBassBoost` (0–100) (D23), `librarySort` (az/recent/plays), `libraryTab` (default `artists` on every launch — do not persist a different start tab unless the maintainer asks).
+Settings (DataStore): `subfolders`, `useFolderImages`, `resume`, `pauseOnUnplug`, `theme` (auto/light/dark), `lyricsAutoScroll` (default true, D21), `eqEnabled` (false), `eqPreset` (`flat`), `eqBands` / `eqCustomBands` (10 ints, dB), `eqBassBoost` (0–100) (D23), `driveAuto` (false), `driveCarAddress`, `driveCarName` (D24), `librarySort` (az/recent/plays), `libraryTab` (default `artists` on every launch — do not persist a different start tab unless the maintainer asks).
 
 Playback state persistence (DataStore or a small table): queue track IDs, original order, index, position, shuffle, repeat, source (type + name + id).
 
@@ -119,6 +120,13 @@ Playback state persistence (DataStore or a small table): queue track IDs, origin
 - Generated cover: drawn in Compose (Canvas) with the deterministic rule in 04-design-system, keyed by album title. Never store it as a file.
 - Respect the "Use folder photos and covers" setting in the resolver.
 - Dominant color for the "Now playing" tint and the notification: AndroidX Palette on the resolved cover; for the generated cover use its background color.
+
+## Driving mode (D24)
+
+- UI: a `DrivingModeScreen` shown above the navigation (its own state, two tabs). While it is visible: `FLAG_KEEP_SCREEN_ON`, and the activity allows landscape (`screenOrientation` switched from portrait to sensor/user while the mode is open; portrait elsewhere in v1).
+- `DrivingModeController` (app scope): exposes `isOpen`, `openedAutomatically`. Car detection when `driveAuto` is on: a runtime `BroadcastReceiver` for `BluetoothDevice.ACTION_ACL_CONNECTED` / `ACTION_ACL_DISCONNECTED` (filtered by `driveCarAddress`) registered while the app or `PlaybackService` runs, plus a check of the device's connection state (A2DP/headset profile proxy `getConnectedDevices()`) when the activity resumes.
+- Connected + activity in the foreground → open the mode (automatic). Connected while in the background → open it on the next resume. Disconnected → close it only if it was opened automatically. Never start an activity from the background and never start playback.
+- Car picker: `BluetoothAdapter.bondedDevices` (needs `BLUETOOTH_CONNECT` on Android 12+); store address + name in DataStore.
 
 ## Equalizer (D23)
 

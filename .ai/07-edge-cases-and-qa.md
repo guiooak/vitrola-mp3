@@ -34,6 +34,14 @@
 - Settings survive app restart and process death; the effect is reapplied when the audio session changes (e.g. after an error or a new player).
 - All bands at +12 dB plus bass boost 100 % → no audible clipping (limiter).
 
+### Driving mode (D24)
+- Nothing playing → "Nothing playing" with Shuffle all. Empty favorites / playlist → snackbar "Nothing here yet", stays in the mode.
+- Nearby devices permission denied → the automatic start stays off, with the snackbar; permission revoked later → the automatic start stops working silently and Settings shows it off.
+- Chosen car connects with the app in the background → nothing visible; opening the app enters driving mode. Car connects while the app is open → enters at once.
+- Car disconnects → leaves only if the mode was opened automatically; playback continues (pausing is the headphones/noisy rule, D4).
+- Rotation between portrait and landscape keeps the tab and the playlists list; leaving the mode returns to the previous screen.
+- Screen does not turn off while the mode is open; it follows the normal timeout after leaving.
+
 ### Playback
 - **Broken/unsupported file** → skip with a snackbar; if every file in the queue fails, stop and show the snackbar once.
 - **Audio focus loss** (call) → pause; transient loss for navigation prompts → duck.
@@ -72,4 +80,5 @@
 16. Change the app language to Português (Brasil) and Español in system settings → all text switches, numbers and plurals are correct. A language appears only if the generator wrote its file, which means every row in `i18n/translations.csv` is `approved` and up to date (D20). Also check that a device set to a not-yet-approved language shows the app fully in English, with no mixed strings.
 17. Lyrics: open a song with a `.lrc` (line follows the song, tap a line to seek, manual scroll then "Back to current line", auto-scroll off, then check another song and an app restart keep it off), one with only a `.txt` (static, scrolls by hand), one with only embedded lyrics (plain), and one with nothing.
 18. Equalizer: pick presets, drag bands (Custom), bass boost, switch off/on; check the Settings status row, the Now playing dot, and an app restart; on an Android 8 device or emulator the equalizer does not appear.
-19. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).
+19. Driving mode: open it from Now playing and from Settings; play from each tile; Playlists list and back; favorite/shuffle; rotate to landscape; screen stays on; turn on the automatic start (permission + pick the car), connect and disconnect the car Bluetooth with the app in the foreground and in the background.
+20. Leave music playing with the screen off for 30+ minutes on a Samsung/Xiaomi device → keeps playing (or the battery tip explains why not).

@@ -132,6 +132,15 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - One global setting for every song and output, saved across restarts. Default: off, Flat, bass boost 0.
 - Full rules: [D23](../docs/decisions/0023-equalizer.md). Layout: the "Equalizer" shortcut in the mockup.
 
-## 13. Later (do not build without asking)
+## 13. Driving mode (D24) — P1
+
+- Full-screen mode with two tabs. **Now playing:** record with the cover, large title (2 lines) and artist, progress bar without seeking, five large controls (favorite, previous, play/pause 104dp, next, shuffle). **Music:** big tiles that play at once and return to Now playing — Shuffle all, Favorite songs, Most played, Recently added, Playlists (one simple list).
+- Exit button with a label; system back closes the playlists list, then exits. No search, menus, dialogs, queue editing, lyrics or equalizer inside the mode.
+- Screen kept on while open. Own landscape layout (side rail with Exit and tabs). Follows the app theme.
+- Entry: car button in the Now playing top bar; Settings › Driving › Driving mode.
+- Optional automatic start (off by default): Settings › Driving › Start automatically in the car → Nearby devices permission (Android 12+) → pick the car from paired Bluetooth devices. Opens when that car connects (app in the foreground, or the next time it opens); an automatically opened mode closes when the car disconnects. Never starts playback or brings the app to the front by itself.
+- Full rules: [D24](../docs/decisions/0024-driving-mode.md). Layout: the "Driving mode" shortcuts in the mockup.
+
+## 14. Later (do not build without asking)
 
 Android Auto, home-screen widget, crossfade, per-output equalizer settings, "side A / side B", vinyl crackle effect, Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.

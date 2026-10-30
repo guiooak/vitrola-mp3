@@ -2,7 +2,7 @@
 
 **Status:** ready to start · **Created:** 2026-10-26 · **Owner:** implementing agent · **Reviewer:** maintainer
 
-Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D23.
+Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D24.
 
 ## Working on a new machine
 
@@ -45,7 +45,7 @@ Setup:
 | 3 | Playback core | Background playback, mini player, Now playing with the record, notification, queue | **First installable build (debug APK)** |
 | 4 | Personal features | Resume, sleep timer, play counts, favorites, playlists | Answer Q4 (play count), Q5 (drag reorder) |
 | 5 | Search and lyrics | Three-section linked search; lyrics from `.lrc`/`.txt` files (D21) | **Approve the lyrics design in the mockup** (before the lyrics UI is built) |
-| 6 | Settings and polish | Settings screen, equalizer (D23), theme, battery tip, motion, accessibility, gestures | Answer Q6 (gestures); second build |
+| 6 | Settings and polish | Settings screen, equalizer (D23), driving mode (D24), theme, battery tip, motion, accessibility, gestures | Answer Q6 (gestures); second build |
 | 7 | Localization | pt-BR and es drafts → maintainer review → approved resources → languages enabled | **Review every translation (D20)**; answer Q11 (Spanish reviewer and variant) |
 | 8 | QA and release prep | Full test pass, performance, signing and Play Store readiness | Answer Q9; release-candidate build |
 
@@ -181,6 +181,7 @@ Tasks:
 - [ ] Motion pass: screen transitions, Now playing open/close, play-button morph, heart pulse, reduce motion everywhere.
 - [ ] Accessibility pass: content descriptions, 48dp targets, 200% font scale, TalkBack walkthrough, contrast check in both themes.
 - [ ] Gestures per Q6 (e.g. swipe down to close Now playing).
+- [ ] **Driving mode (D24):** screen with Now playing and Music tabs, portrait and landscape layouts, keep screen on; car button in Now playing and the Settings › Driving group; automatic start (Nearby devices permission, paired-device picker, connect/disconnect handling as in `.ai/03-architecture.md`).
 - [ ] **Equalizer (D23):** `EqualizerController` with `DynamicsProcessing` (10 bands, limiter, bass boost) in the playback service; availability check (API 28+ and effect creation) that hides every entry point; Equalizer screen and Now playing sheet as in the mockup; settings in DataStore.
 - [ ] Second build to the maintainer (CI pre-release).
 
@@ -237,3 +238,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-30 | — | — | Plan edited: embedded lyrics become the third fallback after `.lrc` and `.txt` (D21 revised). |
 | 2026-10-30 | 5 (design) | — | Lyrics view designed in the mockup and approved by the maintainer (synced, plain, none; global auto-scroll toggle). |
 | 2026-10-30 | — | — | Plan edited: equalizer (D23) added to Phase 6; its design was approved in the mockup the same day. |
+| 2026-10-30 | — | — | Plan edited: driving mode (D24) added to Phase 6; its design was approved in the mockup the same day. |
