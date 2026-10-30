@@ -52,6 +52,8 @@
 - **Shuffle toggled** mid-queue, **queue edited** while shuffled (play next / add to end / remove) → original order updated accordingly.
 - **Seek** while paused updates the position without starting playback.
 - **Reduce motion** on → no disc spin, no equalizer animation.
+- **Record label** (D26): album without an image but with an artist photo → the label shows the artist photo; neither → generated cover; pause at any moment → the record coasts and stops with the label upright (also after reopening the app and with reduce motion).
+- **Spinning record** off → no record spins anywhere (mini player, Now playing, lyrics, driving mode), while playing or paused; turning it on resumes without a jump; the setting survives a restart (D25).
 
 ### UI
 - 200% font scale, very long titles (ellipsize); RTL is not required (the three languages are LTR).

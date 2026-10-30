@@ -47,6 +47,7 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - **Cover fallback chain:** image in the album folder → picture embedded in the audio file → **generated cover** (see 04-design-system).
 - **Artist photo fallback chain:** image in the artist folder → the artist's first album cover, shown in a circle → generated cover.
 - Settings toggle **"Use folder photos and covers"** (default ON). When OFF, skip folder images (embedded → generated).
+- **Record label** (mini player, Now playing, lyrics, driving mode): album image → artist photo → generated cover. Only the label uses the artist photo as a fallback (D26).
 - Cropping: covers are square, center crop. Artist photos are circles in lists and a wide banner on the artist page; crop biased to the top (faces).
 - Where images appear: see the table in `docs/design/03-mockup.md#artist-photos-and-album-covers`.
 
@@ -71,7 +72,7 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - Mini player pinned above the bottom navigation on every main screen: thin progress line on top, small spinning record with the cover as label, title, artist, play/pause, next. Tapping it opens "Now playing".
 - "Now playing" (full screen, slides up): source label ("Playing from album · Elis & Tom"), collapse button, ⋮ song menu, **the record** (cover as label, spinning, tonearm), title, artist chip with small photo + album name, heart, seek bar with times, controls (shuffle, previous, play/pause, next, repeat), sleep timer status, bottom row (sleep timer, queue, file details).
 - The background takes a light tint of the album's dominant color (mockup: 16% mix with the background color).
-- Record animation rules: see 04-design-system → Motion.
+- Record animation rules: see 04-design-system → Motion. When the record is still, its label always rests upright (D26).
 
 ## 6. Favorites (D13) — P0
 
@@ -101,7 +102,7 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 - Library folders (list with location + song count, remove), Add folder, Include subfolders, Use folder photos and covers, Look for new songs.
 - Playback: Sleep timer, Resume where you left off, Pause when headphones disconnect.
 - Battery tip card: "Music stops on its own?" with a button that opens the system battery optimization settings (do **not** request the exemption directly).
-- Appearance: Automatic / Light / Dark theme.
+- Appearance: Automatic / Light / Dark theme, and a **Spinning record** switch (default on; off keeps every record still, D25).
 - About: logo, version, "No ads. Nothing leaves your phone."
 
 ## 10. Languages (D18) — P0

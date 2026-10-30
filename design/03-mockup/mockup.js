@@ -60,6 +60,7 @@ const INITIAL_STATE = () => ({
   timer: null,
   lyricsOpen: false, // the lyrics view replaces the record in Now playing
   lyricsAutoScroll: true, // global setting, saved: synced lyrics follow the song
+  spinRecord: true, // global setting, saved (D25): when off, the record stays still
   // driving mode (D24): manual, or automatic when the chosen car's Bluetooth connects
   drive: { on: false, tab: 'playing', sub: null, auto: false, car: null, autoEntered: false, btGranted: false, landscape: false },
   // equalizer (D23): global, saved; hidden on Android 8
@@ -163,6 +164,13 @@ function photoInner(name) {
   const first = D.albums.find(a => a.artistName === name && library().some(m => m.album === a.id)) || D.albums.find(a => a.artistName === name);
   return first ? coverInner(first) : generatedCover({ title: name });
 }
+// Record label (D26): album image → artist image → the generated cover (the usual fallback look)
+function labelInner(a) {
+  if (a.noMetadata || hasImage(a)) return coverInner(a);
+  const info = artistInfo(a.artistName);
+  if (S.useFolderImages && (info.url || info.photo)) return photoInner(a.artistName);
+  return coverInner(a);
+}
 const photo = (name, fit = 'xMidYMid slice') => `<svg viewBox="0 0 200 200" preserveAspectRatio="${fit}" aria-hidden="true">${photoInner(name)}</svg>`;
 
 // Artist and album folders (to show the right image while browsing folders)
@@ -196,7 +204,7 @@ function record({ a = null, withArm = true, player = false, demo = false } = {})
   const grooves = [];
   for (let r = R - 10; r > L + 6; r -= (withArm ? 9 : 8)) grooves.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" style="stroke:var(--color-groove)" stroke-width="1.3" stroke-opacity="${grooves.length % 2 ? .55 : 1}"/>`);
   const label = a
-    ? `<g clip-path="url(#lb${id})"><svg x="${cx - L}" y="${cy - L}" width="${L * 2}" height="${L * 2}" viewBox="0 0 200 200">${coverInner(a)}</svg></g>`
+    ? `<g clip-path="url(#lb${id})"><svg x="${cx - L}" y="${cy - L}" width="${L * 2}" height="${L * 2}" viewBox="0 0 200 200">${labelInner(a)}</svg></g>`
     : `<circle cx="${cx}" cy="${cy}" r="${L}" fill="#7A1F2B"/>`;
   const armSvg = withArm ? `
     <g class="tonearm" style="transform-origin:296px 24px">
@@ -225,24 +233,32 @@ function record({ a = null, withArm = true, player = false, demo = false } = {})
 /* Continuous rotation of the player records: the angle is global, so the
    mini player and the full screen spin together and never "jump" on re-render. */
 const TURN = T.motion.duration['record-spin'];
-const currentAngle = () => S.playing ? S.angle + (performance.now() - S.spinningSince) / TURN * 360 : S.angle;
+const currentAngle = () => S.playing && S.spinRecord ? S.angle + (performance.now() - S.spinningSince) / TURN * 360 : S.angle;
+// When the record stops (pause, or "Spinning record" turned off) it coasts to the next upright
+// angle, so the label image always rests in its normal position (D26). The coast starts at the
+// spinning speed and eases out; the stop angle is a multiple of 360°.
+const SPIN_SPEED = 360 / TURN; // degrees per ms
+function coastTo(cur) {
+  const to = Math.ceil((cur + 30) / 360) * 360;
+  const dist = to - cur, dur = 600 + dist * 3;
+  const y1 = Math.min(1, SPIN_SPEED * dur / dist * 0.25); // initial slope matches the spinning speed
+  S.coast = { from: cur, to, dur, easing: `cubic-bezier(.25,${y1.toFixed(3)},.4,1)` };
+  return to;
+}
 function syncRecords(slowDown = false) {
+  const coast = slowDown ? S.coast : null;
+  if (slowDown) S.coast = null;
   $$('svg[data-record]').forEach(svg => {
     const g = $('.rotor', svg);
     svg.classList.toggle('down', S.playing);
-    if (reduceMotion) { g.style.animation = 'none'; return; }
-    if (S.playing) {
+    if (S.playing && S.spinRecord && !reduceMotion) {
       g.style.transform = '';
       g.style.animation = `spin ${TURN}ms linear ${-((currentAngle() % 360) / 360) * TURN}ms infinite`;
-    } else if (slowDown) {
-      const from = S.angle - 50;
-      g.style.animation = 'none';
-      g.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${S.angle}deg)` }], { duration: 800, easing: 'cubic-bezier(.2,.6,.4,1)' });
-      g.style.transform = `rotate(${S.angle}deg)`;
-    } else {
-      g.style.animation = 'none';
-      g.style.transform = `rotate(${S.angle}deg)`;
+      return;
     }
+    g.style.animation = 'none';
+    if (coast && !reduceMotion) g.animate([{ transform: `rotate(${coast.from}deg)` }, { transform: `rotate(${coast.to}deg)` }], { duration: coast.dur, easing: coast.easing });
+    g.style.transform = `rotate(${S.angle}deg)`;
   });
 }
 
@@ -679,6 +695,9 @@ const SCREENS = {
         <div class="seg theme-seg" role="group" aria-label="Theme">
           ${[['auto', 'Automatic'], ['light', 'Light'], ['dark', 'Dark']].map(([k, n]) => `<button data-action="theme" data-theme-choice="${k}" aria-pressed="${theme === k}">${n}</button>`).join('')}
         </div>
+        <div class="group">
+          <div class="row-i" data-action="toggle" data-k="spinRecord"><div class="ic tinted">${iconHtml('album')}</div><div><div class="ti">Spinning record</div><div class="sb">The record turns while music plays</div></div><button class="switch" role="switch" aria-checked="${S.spinRecord}" aria-label="Spinning record"></button></div>
+        </div>
         <div class="about">
           <img class="logo-p" src="../01-logo/export/vitrola-mp3-horizontal-positive.svg" alt="Vitrola Mp3">
           <img class="logo-n" src="../01-logo/export/vitrola-mp3-horizontal-negative.svg" alt="Vitrola Mp3" style="margin:0 auto 8px">
@@ -768,7 +787,7 @@ function play(on = !S.playing) {
   if (!current()) return;
   if (on === S.playing) { updatePlayer(); return; }
   if (on) { S.spinningSince = performance.now(); S.playing = true; }
-  else { S.angle = currentAngle() + 50; S.playing = false; }
+  else { const cur = currentAngle(); S.angle = S.spinRecord && !reduceMotion ? coastTo(cur) : Math.ceil(cur / 360) * 360; S.playing = false; }
   updatePlayer(!on);
 }
 function next(auto = false) {
@@ -1561,8 +1580,11 @@ const ACTIONS = {
     else if (v === 'end') { S.timer = { endOfSong: true }; snackbar('Music will stop at the end of this track'); }
     else { S.timer = { end: Date.now() + v * 60000 }; snackbar(`Music will stop in ${v} min`); }
     if (npEl.classList.contains('open')) renderNowPlaying(); if (currentScreen === 'settings') render('none'); },
-  'toggle': b => { const k = b.dataset.k; S[k] = !S[k]; const sw = $('.switch', b); sw && sw.setAttribute('aria-checked', S[k]);
+  'toggle': b => { const k = b.dataset.k;
+    if (k === 'spinRecord') { if (S.spinRecord) S.angle = S.playing && !reduceMotion ? coastTo(currentAngle()) : S.angle; else S.spinningSince = performance.now(); }
+    S[k] = !S[k]; const sw = $('.switch', b); sw && sw.setAttribute('aria-checked', S[k]);
     if (k === 'useFolderImages') { setTimeout(() => { render('none'); renderMini(); }, 250); snackbar(S[k] ? 'Using folder photos and covers' : 'Using app-generated covers'); }
+    if (k === 'spinRecord') { syncRecords(true); snackbar(S[k] ? 'The record spins again' : 'The record stays still'); }
     if (k === 'subfolders') { setTimeout(() => render('none'), 250); snackbar(S[k] ? 'Subfolders included' : `Only files directly in the chosen folders · ${plural(library().length, 'song', 'songs')}`); } },
   'remove-folder': b => { const p = S.folders.find(x => x.id === b.dataset.id); const n = songsInFolder(p.path, true).length;
     openDialog(`${iconHtml('folder_off', 'danger')}<h4>Remove "${esc(p.name)}"?</h4><p>${plural(n, 'song leaves', 'songs leave')} the library. The files stay on your phone.</p>
@@ -1623,7 +1645,7 @@ const NOTES = {
   'playlists': 'Automatic playlists (favorite songs, favorite albums, most played, recently added) and your own.',
   'favorite-albums': 'Albums marked with the heart, on the album page or in its ⋮ menu.',
   'playlist': 'Playlist details. The ⋮ at the top lets you rename or delete it.',
-  'settings': 'Library folders (add and remove), subfolders, folder images, timer, resume, headphones, battery tip and theme.',
+  'settings': 'Library folders (add and remove), subfolders, folder images, equalizer, timer, resume, headphones, driving mode, battery tip, theme and "Spinning record" (turn it off to keep the record still everywhere; D25).',
   'now-playing': 'The album cover becomes the record label. The arm drops when playing and lifts when paused, and the record slows down. The background takes a hint of the cover color. Tap the info icon to see the file.',
   'lyrics': 'Synced lyrics from a .lrc file next to the song (D21). The current line is highlighted and stays in view; tap a line to jump there. Scroll by hand and "Back to current line" appears; following resumes on its own after 5 seconds. To read freely, turn off auto-scroll with the floating icon at the bottom right of the lyrics (it shows a dot while on). The choice is global and saved: it applies to every song until you change it. The current line is still highlighted. Tap the small record (or the lyrics button) to go back to the record. "Corcovado" has LRC text stored inside the MP3 and is synced too. The lyrics are invented placeholders.',
   'lyrics-plain': 'Plain lyrics from a .txt file (D21): shown as written, with no automatic scrolling. "Só Tinha de Ser com Você" (lyrics stored inside the MP3) and "Inútil Paisagem" (a .lrc without timestamps) look the same. The lyrics are invented placeholders.',
@@ -1698,7 +1720,7 @@ const SIMULATIONS = {
     closeOverlay(true); $$('.sys, .sys-dialog, .sys-tag, .shade, .lock', app).forEach(x => x.remove());
     if (npEl.classList.contains('open')) closeNowPlaying();
     const last = current();
-    if (S.playing) { S.angle = currentAngle(); S.playing = false; }
+    if (S.playing) { S.angle = Math.ceil(currentAngle() / 360) * 360; S.playing = false; }
     if (!S.resume) { S.queue = []; }
     S.libTab = 'artists'; root('library');
     if (last && S.resume) snackbar(`Picking up where you left off: "${esc(last.title)}" at ${fmt(S.pos)}`, 'Play', () => play(true));

@@ -61,7 +61,7 @@ design/
   03-mockup/         index.html, mockup.css, mockup.js, data.js
   index.html         landing page
 docs/
-  decisions/         ADRs D1–D24, one file each, plus README index and template
+  decisions/         ADRs D1–D26, one file each, plus README index and template
   design/            01-logo.md, 02-style-guide.md, 03-mockup.md
 ```
 

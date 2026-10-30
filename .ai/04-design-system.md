@@ -79,10 +79,10 @@ Motion durations/easings go into `VitrolaTokens.motion` (see below).
 
 Geometry from `record()` in `design/03-mockup/mockup.js` (SVG units):
 
-- **Now playing:** viewBox 320×300. Disc center (150, 160), radius 130, rim stroke 3 `#6A5B50`, grooves every 9 units between r=120 and the label (alternating opacity 1 / 0.55, color `groove`), two highlight arcs (white 17% and 8%), **label radius 50 = the album cover clipped to a circle**, mustard ring on the label edge, spindle hole r=5 in the background color.
+- **Now playing:** viewBox 320×300. Disc center (150, 160), radius 130, rim stroke 3 `#6A5B50`, grooves every 9 units between r=120 and the label (alternating opacity 1 / 0.55, color `groove`), two highlight arcs (white 17% and 8%), **label radius 50 = the label image clipped to a circle: album image → artist photo → generated cover (D26)**, mustard ring on the label edge, spindle hole r=5 in the background color.
 - **Tonearm:** pivot (296, 24); path (296,24) → (282,150) → (240,190), stroke 8 `metal` with a soft shadow; mustard headshell at the end; counterweight above the pivot.
 - **Mini player:** viewBox 200×200, center (100,100), radius 96, label radius 38, no arm.
-- States: playing → arm down (rotation 0°) and disc spinning; paused → arm lifted **−14° around the pivot** and disc slowing down to a stop.
+- States: playing → arm down (rotation 0°) and disc spinning; paused → arm lifted **−14° around the pivot** and disc coasting to a stop **upright** (label in its normal position, D26).
 
 Generated cover (fallback) — deterministic, from the album title:
 - `h` = 32-bit unsigned hash: for each code point `h = (h * 31 + code) mod 2^32`.
@@ -102,10 +102,11 @@ Generated cover (fallback) — deterministic, from the album title:
 | `record-spin` | 1800 ms per turn (33⅓ rpm), linear | Disc rotation |
 
 - Easings: `standard` (0.2, 0, 0, 1), `decelerate` (0.05, 0.7, 0.1, 1) for things entering, `accelerate` (0.3, 0, 0.8, 0.15) for things leaving.
-- **Rotation continuity:** keep one global angle for the current song's disc so the mini player and Now playing spin in sync and never jump when recomposed. On pause, add 50° over 800 ms with easing (0.2, 0.6, 0.4, 1), then stop.
+- **Rotation continuity:** keep one global angle for the current song's disc so the mini player and Now playing spin in sync and never jump when recomposed. On pause (or when "Spinning record" is turned off while playing), coast to the next upright angle: `to = ceil((angle + 30) / 360) × 360`, duration `600 + 3 × (to − angle)` ms, easing `cubic-bezier(.25, y1, .4, 1)` with `y1 = min(1, 0.25 × spinSpeed × duration / distance)` so it starts at the spinning speed (spinSpeed = 360° / 1800 ms). A record shown already stopped is drawn upright (D26).
 - Screen transitions: push = new screen slides in from the right, old one shifts 25% left and dims; pop = reverse; tab switch = fade + 8dp rise.
 - Now playing opens with a slide up (500 ms, decelerate) and closes with 300 ms accelerate.
 - Favorite heart on the album page pulses (scale 1.25) when turned on.
+- **Spinning record setting** (D25): when `spinRecord` is off, every record stays still, upright (the shared angle stops advancing, D26); the tonearm and other animations are unchanged.
 - **Reduce motion** (system "remove animations" / animator scale 0): disc does not spin, equalizer bars stop, transitions become short fades.
 
 ## Accessibility

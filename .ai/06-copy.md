@@ -191,6 +191,7 @@ The lyrics themselves are never translated.
 | Pause when headphones disconnect — Wired or Bluetooth |
 | Tip: **Music stops on its own?** Some phones (Xiaomi, Samsung, Motorola…) close background apps to save battery. Exempt Vitrola Mp3 from battery optimization. Button: Open battery settings |
 | Theme: Automatic · Light · Dark |
+| Spinning record — The record turns while music plays · snackbars: The record stays still · The record spins again |
 | About: Version %s · No ads. Nothing leaves your phone. |
 | Remove folder dialog: **Remove "%s"?** — %s leave(s) the library. The files stay on your phone. Cancel / Remove · snackbar "Folder "%s" removed" + Undo |
 | Snackbars: Folder added · %s · Folder added · no songs found · "%s" is already in the library · Subfolders included · Only files directly in the chosen folders · %s · Using folder photos and covers · Using app-generated covers · Looking for new songs… · Library up to date · %s, nothing new |

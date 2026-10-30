@@ -49,7 +49,8 @@
         ['Mora na Filosofia', d(6, 10)], ['Neolithic Man', d(4, 51)], ['Nostalgia', d(1, 17)]] },
     { id: 'refavela', title: 'Refavela', artist: 'gil', year: 1977, images: ['folder.jpg'],
       tracks: [['Ilê Ayê', d(3, 46)], ['Aqui e Agora', d(4, 30)], ['Refavela', d(3, 53)], ['Sandra', d(4, 24)], ['Babá Alapalá', d(3, 58)]] },
-    { id: 'expresso', title: 'Expresso 2222', artist: 'gil', year: 1972, images: ['folder.jpg'],
+    // No image in the album folder: covers are generated, and the record label uses the artist photo (D26)
+    { id: 'expresso', title: 'Expresso 2222', artist: 'gil', year: 1972, images: [],
       tracks: [['Back in Bahia', d(4, 10)], ['O Canto da Ema', d(3, 25)], ['Expresso 2222', d(3, 23)], ['Oriente', d(6, 9)]] },
     // Two images and no folder.*: ambiguous → app-generated cover
     { id: 'cabeca', title: 'Cabeça Dinossauro', artist: 'titas', year: 1986, images: ['booklet-1.jpg', 'booklet-2.jpg'],

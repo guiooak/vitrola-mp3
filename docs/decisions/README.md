@@ -30,6 +30,8 @@ Architecture Decision Records (ADRs) for Vitrola Mp3: one file per product or te
 | D22 | [Decisions are recorded as ADR files](0022-decision-records.md) | Accepted | 2026-10-30 |
 | D23 | [Equalizer with 10 fixed bands (Android DynamicsProcessing)](0023-equalizer.md) | Accepted | 2026-10-30 |
 | D24 | [Driving mode](0024-driving-mode.md) | Accepted | 2026-10-30 |
+| D25 | [Setting to keep the record still](0025-spinning-record-setting.md) | Accepted | 2026-10-30 |
+| D26 | [Record label image and upright resting position](0026-record-label-image.md) | Accepted | 2026-10-30 |
 
 ## Adding a decision
 
