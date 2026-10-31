@@ -61,6 +61,7 @@ const INITIAL_STATE = () => ({
   lyricsOpen: false, // the lyrics view replaces the record in Now playing
   lyricsAutoScroll: true, // global setting, saved: synced lyrics follow the song
   spinRecord: true, // global setting, saved (D25): when off, the record stays still
+  fade: { on: false, secs: 5 }, // global setting, saved (D29): fade out, then fade in between songs
   // driving mode (D24): manual, or automatic when the chosen car's Bluetooth connects
   drive: { on: false, tab: 'playing', sub: null, auto: false, car: null, autoEntered: false, btGranted: false },
   landscape: false, // phone orientation (D28): every screen has a landscape layout
@@ -754,6 +755,11 @@ const SCREENS = {
         <div class="group">
           <div class="row-i" data-action="timer" tabindex="0"><div class="ic tinted">${iconHtml('bedtime')}</div><div><div class="ti">Sleep timer</div><div class="sb" id="timer-status">${timerText}</div></div>${iconHtml('chevron_right', 'chev')}</div>
           <div class="row-i" data-action="equalizer" tabindex="0"><div class="ic tinted">${iconHtml('tune')}</div><div><div class="ti">Equalizer</div><div class="sb">${eqStatus()}</div></div>${iconHtml('chevron_right', 'chev')}</div>
+          <div class="row-i" data-action="fade-toggle"><div class="ic tinted">${iconHtml('transition_fade')}</div><div><div class="ti">Fade between songs</div><div class="sb" id="fade-status">${fadeStatus()}</div></div><button class="switch" role="switch" aria-checked="${S.fade.on}" aria-label="Fade between songs"></button></div>
+          <div class="fade-len" ${S.fade.on ? '' : 'hidden'}>
+            <div class="eqz-bass-head"><span>Fade length</span><span id="fade-val">${S.fade.secs} s</span></div>
+            <div class="np-seek"><input type="range" id="fade-secs" min="1" max="12" step="1" value="${S.fade.secs}" aria-label="Fade length in seconds" style="--p:${(S.fade.secs - 1) / 11 * 100}%"></div>
+          </div>
           <div class="row-i" data-action="toggle" data-k="resume"><div class="ic tinted">${iconHtml('history')}</div><div><div class="ti">Resume where you left off</div><div class="sb">When the app opens, the last song is ready to play</div></div><button class="switch" role="switch" aria-checked="${S.resume}" aria-label="Resume where you left off"></button></div>
           <div class="row-i" data-action="toggle" data-k="pauseOnUnplug"><div class="ic tinted">${iconHtml('headset_off')}</div><div><div class="ti">Pause when headphones disconnect</div><div class="sb">Wired or Bluetooth</div></div><button class="switch" role="switch" aria-checked="${S.pauseOnUnplug}" aria-label="Pause when headphones disconnect"></button></div>
         </div>
@@ -778,6 +784,8 @@ const SCREENS = {
         </div>`;
     },
     mount: el => {
+      const f = $('#fade-secs', el);
+      f && f.addEventListener('input', () => { S.fade.secs = +f.value; f.style.setProperty('--p', `${(S.fade.secs - 1) / 11 * 100}%`); $('#fade-val', el).textContent = `${S.fade.secs} s`; $('#fade-status', el).textContent = fadeStatus(); });
       const t = setInterval(() => { if (!el.isConnected) return clearInterval(t); const sb = $('#timer-status', el); if (sb && S.timer && !S.timer.endOfSong) sb.textContent = timerLabel(); }, 1000);
     },
   },
@@ -1185,6 +1193,9 @@ function setBand(root, i, v) {
   S.eq.bands[i] = v; S.eq.custom = S.eq.bands.slice(); S.eq.preset = 'custom'; S.eq.on = true;
   refreshEq(root);
 }
+// Fade between songs (D29): the ending song fades out, then the next one fades in. Skipped for
+// manual changes and for the next track of the same album played in order.
+const fadeStatus = () => S.fade.on ? `Fade out, then fade in · ${S.fade.secs} s` : 'Off';
 function bindEq(root) {
   $$('.eqz-band', root).forEach(b => {
     const i = +b.dataset.i;
@@ -1664,6 +1675,9 @@ const ACTIONS = {
     else if (v === 'end') { S.timer = { endOfSong: true }; snackbar('Music will stop at the end of this track'); }
     else { S.timer = { end: Date.now() + v * 60000 }; snackbar(`Music will stop in ${v} min`); }
     if (npEl.classList.contains('open')) renderNowPlaying(); if (currentScreen === 'settings') render('none'); },
+  'fade-toggle': b => { S.fade.on = !S.fade.on; $('.switch', b).setAttribute('aria-checked', S.fade.on);
+    $('#fade-status').textContent = fadeStatus(); $('.fade-len').hidden = !S.fade.on;
+    snackbar(S.fade.on ? 'Songs will fade out and in' : 'Songs change without fading'); },
   'toggle': b => { const k = b.dataset.k;
     if (k === 'spinRecord') { if (S.spinRecord) S.angle = S.playing && !reduceMotion ? coastTo(currentAngle()) : S.angle; else S.spinningSince = performance.now(); }
     S[k] = !S[k]; const sw = $('.switch', b); sw && sw.setAttribute('aria-checked', S[k]);
@@ -1729,7 +1743,7 @@ const NOTES = {
   'playlists': 'Automatic playlists (favorite songs, favorite albums, most played, recently added) and your own.',
   'favorite-albums': 'Albums marked with the heart, on the album page or in its ⋮ menu.',
   'playlist': 'Playlist details. The ⋮ at the top lets you rename or delete it.',
-  'settings': 'Library folders (add and remove), subfolders, folder images, equalizer, timer, resume, headphones, driving mode, battery tip, theme and "Spinning record" (turn it off to keep the record still everywhere; D25).',
+  'settings': 'Library folders (add and remove), subfolders, folder images, equalizer, timer, fade between songs (switch + length 1–12 s; D29), resume, headphones, driving mode, battery tip, theme and "Spinning record" (turn it off to keep the record still everywhere; D25).',
   'now-playing': 'Touch the spinning record: holding it stops the music, turning it faster or slower speeds the music up or slows it down (the bubble shows the speed here; in the app you hear it), and letting go returns to normal (D27). The tonearm stays on the record while music plays and goes back to its rest when you pause or the queue ends. ' + 'The album cover becomes the record label. The arm drops when playing and lifts when paused, and the record slows down. The background takes a hint of the cover color. Tap the info icon to see the file.',
   'lyrics': 'Synced lyrics from a .lrc file next to the song (D21). The current line is highlighted and stays in view; tap a line to jump there. Scroll by hand and "Back to current line" appears; following resumes on its own after 5 seconds. To read freely, turn off auto-scroll with the floating icon at the bottom right of the lyrics (it shows a dot while on). The choice is global and saved: it applies to every song until you change it. The current line is still highlighted. Tap the small record (or the lyrics button) to go back to the record. "Corcovado" has LRC text stored inside the MP3 and is synced too. The lyrics are invented placeholders.',
   'lyrics-plain': 'Plain lyrics from a .txt file (D21): shown as written, with no automatic scrolling. "Só Tinha de Ser com Você" (lyrics stored inside the MP3) and "Inútil Paisagem" (a .lrc without timestamps) look the same. The lyrics are invented placeholders.',

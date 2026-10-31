@@ -189,6 +189,7 @@ The lyrics themselves are never translated.
 | Sleep timer — (status) |
 | Resume where you left off — When the app opens, the last song is ready to play |
 | Pause when headphones disconnect — Wired or Bluetooth |
+| Fade between songs — Off · Fade out, then fade in · %d s · slider: Fade length · %d s · snackbars: Songs will fade out and in · Songs change without fading |
 | Tip: **Music stops on its own?** Some phones (Xiaomi, Samsung, Motorola…) close background apps to save battery. Exempt Vitrola Mp3 from battery optimization. Button: Open battery settings |
 | Theme: Automatic · Light · Dark |
 | Spinning record — The record turns while music plays · snackbars: The record stays still · The record spins again |

@@ -102,7 +102,7 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 ## 9. Settings — P0
 
 - Library folders (list with location + song count, remove), Add folder, Include subfolders, Use folder photos and covers, Look for new songs.
-- Playback: Sleep timer, Resume where you left off, Pause when headphones disconnect.
+- Playback: Sleep timer, Equalizer (D23), **Fade between songs** (off by default; when on, a Fade length slider 1–12 s, default 5 s: the ending song fades out, then the next fades in, never overlapping; no fade for manual skips, for the next track of the same album played in order, or after the last song; D29), Resume where you left off, Pause when headphones disconnect.
 - Battery tip card: "Music stops on its own?" with a button that opens the system battery optimization settings (do **not** request the exemption directly).
 - Appearance: Automatic / Light / Dark theme, and a **Spinning record** switch (default on; off keeps every record still, D25).
 - About: logo, version, "No ads. Nothing leaves your phone."
@@ -152,4 +152,4 @@ Music/<Genre>/<Artist>/<Album (Year)>/01 - Track.mp3
 
 ## 15. Later (do not build without asking)
 
-Android Auto, home-screen widget, crossfade, per-output equalizer settings, "side A / side B", vinyl crackle effect, reverse scratch (turning the record backwards plays backwards, and speeds below 0.1×, D27), Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.
+Android Auto, home-screen widget, crossfade (overlapping songs; D29 does fade out, then fade in), per-output equalizer settings, "side A / side B", vinyl crackle effect, reverse scratch (turning the record backwards plays backwards, and speeds below 0.1×, D27), Wear OS, Spotify integration (researched: the Spotify APIs cannot play audio inside this app; out of scope), languages beyond the three in D18.

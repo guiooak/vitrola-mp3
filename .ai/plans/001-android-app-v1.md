@@ -2,7 +2,7 @@
 
 **Status:** ready to start · **Created:** 2026-10-26 · **Owner:** implementing agent · **Reviewer:** maintainer
 
-Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D28.
+Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D29.
 
 ## Working on a new machine
 
@@ -177,12 +177,13 @@ Tests: unit tests with the mockup examples ("aguas", "milton", "esquina", no mat
 ## Phase 6 · Settings and polish
 
 Tasks:
-- [ ] Settings screen: library folders (add/remove + Undo), include subfolders, use folder photos and covers, look for new songs, sleep timer, resume, pause on headphones disconnect, battery tip (opens `ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS`), theme, Spinning record switch (D25), about.
+- [ ] Settings screen: library folders (add/remove + Undo), include subfolders, use folder photos and covers, look for new songs, sleep timer, resume, pause on headphones disconnect, fade between songs with its length slider (D29), battery tip (opens `ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS`), theme, Spinning record switch (D25), about.
 - [ ] Automatic rescan on app open (incremental, background).
 - [ ] Motion pass: screen transitions, Now playing open/close, play-button morph, heart pulse, reduce motion everywhere.
 - [ ] Accessibility pass: content descriptions, 48dp targets, 200% font scale, TalkBack walkthrough, contrast check in both themes.
 - [ ] Gestures per Q6 (e.g. swipe down to close Now playing).
 - [ ] **Driving mode (D24):** screen with Now playing and Music tabs, portrait and landscape layouts, keep screen on; car button in Now playing and the Settings › Driving group; automatic start (Nearby devices permission, paired-device picker, connect/disconnect handling as in `.ai/03-architecture.md`).
+- [ ] **Fade between songs (D29):** `FadeController` in the playback service (position-driven `player.volume`, fade in on automatic transitions, instant on manual ones, gapless for the next track of the same album in order); unit tests for the curve and the skip rules.
 - [ ] **Equalizer (D23):** `EqualizerController` with `DynamicsProcessing` (10 bands, limiter, bass boost) in the playback service; availability check (API 28+ and effect creation) that hides every entry point; Equalizer screen and Now playing sheet as in the mockup; settings in DataStore.
 - [ ] Second build to the maintainer (CI pre-release).
 
@@ -245,3 +246,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-30 | — | — | Plan edited: tonearm rules and touch-the-record gesture (D27) added to the Phase 3 record component task. |
 | 2026-10-30 | — | — | Plan edited: landscape for every screen (D28) is a ground rule; navigation shell gets the rail. |
 | 2026-10-30 | — | — | Plan edited: touch-the-record speed range is 0.1–3× (D27 revised); tonearm rest angle corrected to −20°. |
+| 2026-10-30 | — | — | Plan edited: fade between songs (D29) added to the Phase 6 Settings task; the fade itself belongs to the playback service. |
