@@ -482,6 +482,9 @@ svg.demo.down .rotor { animation: spin var(--duration-record-spin) linear infini
 .dialog-wrap { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; pointer-events: none; }
 .dialog { background: var(--color-surface); border-radius: var(--radius-xl); padding: 24px; width: 100%; max-width: 330px; box-shadow: var(--elevation-3); pointer-events: auto; transform: scale(.92); opacity: 0; transition: all var(--duration-medium) var(--easing-decelerate); }
 .dialog.on { transform: none; opacity: 1; }
+.dialog { position: relative; }
+/* Close icon floating in the top-right corner (info dialogs without actions, like File details) */
+.dialog .dlg-x { position: absolute; top: 8px; right: 8px; }
 .dialog > .ms { color: var(--color-primary); font-size: 28px; }
 .dialog > .ms.danger { color: var(--color-error); }
 .dialog h4 { font: var(--type-title-m); margin: 12px 0 8px; }
