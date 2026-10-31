@@ -67,7 +67,7 @@ Motion durations/easings go into `VitrolaTokens.motion` (see below).
 | Switch | 52×32dp, primary when on. |
 | Search field | 52dp pill, surface-2; focused = surface + 2dp primary border; clear button. |
 | Sheet | top radius xl, grab handle 36×4dp, scrim behind; slides up with decelerate easing. |
-| Dialog | radius xl, 24dp padding, leading 28dp icon (error color for destructive), text buttons. |
+| Dialog | radius xl, 24dp padding, leading 28dp icon (error color for destructive). **Close X** (48dp icon button, `close` icon, content description "Close") floating 8dp from the top-right corner of every dialog; no Cancel / Close / Not now buttons. Only the main action, right-aligned (filled; error color when destructive); information-only dialogs (File details) have no buttons. The X, the scrim and system back all close it (D30). |
 | Snackbar | inverted (text color background), radius m, action in `snackbar-action`; 3 s, or 5 s when it has an action; sits above the mini player/nav, or 40dp from the bottom on "Now playing". |
 | Empty state | dashed-ring record illustration (140dp), title-m heading, body-s text, primary action. |
 | Scan progress | 6dp bar with moving diagonal mustard stripes. |

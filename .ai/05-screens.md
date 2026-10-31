@@ -18,7 +18,7 @@ Bottom navigation (always visible on main screens):               ▼
 Now playing = full-screen overlay above everything (from the mini player or after Play/Shuffle)
 Driving mode = full-screen mode above Now playing (car button in Now playing, Settings › Driving, or automatic)
 Sheets: song menu, album menu, playlist menu, add to playlist, sort, queue, sleep timer
-Dialogs: file details, new/rename playlist, delete playlist, remove folder, lost access
+Dialogs (all with the close X in the top-right corner and no Cancel button, D30): file details, new/rename playlist, delete playlist, remove folder, lost access
 ```
 
 - Each tab keeps its own back stack (Navigation Compose nested graphs). Re-selecting the current tab scrolls to top / pops to the tab root.

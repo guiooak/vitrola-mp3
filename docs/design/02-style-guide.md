@@ -124,7 +124,7 @@ All of them are interactive in the guide.
 | **Bottom navigation** | 4 tabs with a pill indicator. |
 | **Search, folders, settings** | Pill-shaped field. 64dp rows with a square icon. Switch for options. |
 | **Scan** | Bar with animated stripes and a "412 / 664" count. |
-| **Snackbar and dialog** | The snackbar uses the `snackbar-action` color. Destructive dialogs explain the consequence ("the files stay on your phone"). |
+| **Snackbar and dialog** | The snackbar uses the `snackbar-action` color. Destructive dialogs explain the consequence ("the files stay on your phone"). Every dialog closes with an X in its top-right corner; there are no Cancel or Close buttons, only the main action when there is one ([D30](../decisions/0030-dialogs-close-with-x.md)). |
 | **Empty state** | Illustrated empty record, a friendly title and the main action. |
 
 ## Motion

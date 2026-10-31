@@ -25,7 +25,8 @@ Suggested keys are given; adjust naming to your conventions.
 | `action_back` | Back |
 | `action_play` / `action_pause` | Play / Pause |
 | `action_shuffle` | Shuffle |
-| `action_cancel` / `action_close` / `action_save` / `action_create` / `action_remove` / `action_delete` / `action_undo` / `action_clear` | Cancel / Close / Save / Create / Remove / Delete / Undo / Clear |
+| `action_close` (the dialog X's content description) / `action_save` / `action_create` / `action_remove` / `action_delete` / `action_undo` / `action_clear` | Close / Save / Create / Remove / Delete / Undo / Clear |
+| `cd_playlist_options` / `cd_fade_length` | Playlist options (playlist ⋮ menu) / Fade length in seconds (slider, D29) |
 | `action_choose_folder` | Choose folder |
 | `cd_more_options` | More options |
 | `cd_more_options_for` | More options for %1$s |
@@ -101,9 +102,9 @@ Suggested keys are given; adjust naming to your conventions.
 |---|
 | Title: Playlists · Groups: Automatic · Your playlists · Row: New playlist |
 | Automatic lists: Favorite songs · Favorite albums · Most played · Recently added · label "Automatic" |
-| New playlist dialog: **New playlist**, placeholder "Playlist name", Cancel / Create |
-| Rename dialog: **Rename playlist**, Cancel / Save · snackbar "Playlist renamed" |
-| Delete dialog: **Delete "%s"?** — The playlist goes away, but the songs stay in your library and on your phone. Cancel / Delete · snackbar "Playlist "%s" deleted" + Undo |
+| New playlist dialog: **New playlist**, placeholder "Playlist name", Create |
+| Rename dialog: **Rename playlist**, Save · snackbar "Playlist renamed" |
+| Delete dialog: **Delete "%s"?** — The playlist goes away, but the songs stay in your library and on your phone. Delete · snackbar "Playlist "%s" deleted" + Undo |
 | Add to playlist sheet: **Add to playlist** · New playlist · snackbars "Added to "%s"" (+ Undo), "Already in "%s"" |
 | Empty favorites: **Nothing here yet** — Tap the heart on a song, in the player or in the ⋮ menu, to see it here. |
 | Empty user playlist: **Nothing here yet** — Use the ⋮ menu on any song and choose "Add to playlist". |
@@ -194,7 +195,7 @@ The lyrics themselves are never translated.
 | Theme: Automatic · Light · Dark |
 | Spinning record — The record turns while music plays · snackbars: The record stays still · The record spins again |
 | About: Version %s · No ads. Nothing leaves your phone. |
-| Remove folder dialog: **Remove "%s"?** — %s leave(s) the library. The files stay on your phone. Cancel / Remove · snackbar "Folder "%s" removed" + Undo |
+| Remove folder dialog: **Remove "%s"?** — %s leave(s) the library. The files stay on your phone. Remove · snackbar "Folder "%s" removed" + Undo |
 | Snackbars: Folder added · %s · Folder added · no songs found · "%s" is already in the library · Subfolders included · Only files directly in the chosen folders · %s · Using folder photos and covers · Using app-generated covers · Looking for new songs… · Library up to date · %s, nothing new |
 
 ## Errors and system events
@@ -202,6 +203,6 @@ The lyrics themselves are never translated.
 | Situation | Text |
 |---|---|
 | Broken file | Couldn't play "%s". Skipped to the next one. |
-| Lost folder access (dialog) | **We lost access to the "%s" folder** — This happens when the folder is moved or renamed, or when access is revoked in Android settings. Choose the folder again to keep listening. Buttons: Not now / Choose folder |
+| Lost folder access (dialog) | **We lost access to the "%s" folder** — This happens when the folder is moved or renamed, or when access is revoked in Android settings. Choose the folder again to keep listening. Button: Choose folder |
 | Headphones disconnected | Headphones disconnected · music paused (action: Resume) |
 | Resume on launch | Picking up where you left off: "%1$s" at %2$s (action: Play) |

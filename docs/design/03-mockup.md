@@ -141,6 +141,7 @@ Example: searching "águas" brings Elis Regina (artist), Elis & Tom (album) and 
 - **Folder management lives in Settings:** the library's "Folders" filter is for browsing only.
 - **Layered search:** artists, albums and songs always in separate sections, with linked items.
 - **Destructive actions** (remove folder, delete playlist, remove from queue) ask for confirmation when they can't be undone, or show "Undo" in the snackbar.
+- **Dialogs close with an X** in the top-right corner, with no Cancel button: only the main action remains, and information dialogs have no buttons ([D30](../decisions/0030-dialogs-close-with-x.md)).
 - **Files without metadata** show up by file name, grouped under "Unknown album" and "Unknown artist".
 - **Transparency:** the app always shows where each song comes from (folder at the bottom of the album, "File details").
 - **Lyrics** replace the record inside Now playing instead of opening a new screen, so the controls stay at hand. The lyrics button is always visible, even for songs without lyrics, so the feature is easy to discover; the view stays open when the player is collapsed and reopened.

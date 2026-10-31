@@ -2,7 +2,7 @@
 
 **Status:** ready to start · **Created:** 2026-10-26 · **Owner:** implementing agent · **Reviewer:** maintainer
 
-Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D29.
+Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D30.
 
 ## Working on a new machine
 
@@ -64,7 +64,7 @@ Tasks:
 - [ ] Gradle project per Q7 (proposed: root project + `:app` module), Kotlin, Compose, Material 3, Hilt, Room, Media3, WorkManager, DataStore, Coil, Navigation Compose. `applicationId = com.guioak.vitrolamp3`, `minSdk 26`, latest required `targetSdk` (D1, D2, D5).
 - [ ] `.gitignore` for Android (never commit `local.properties`, keystores, `build/`).
 - [ ] **Token codegen** from `design/02-style-guide/tokens.json` → Kotlin (`ui/theme`): colors (light/dark), typography scale, spacing, radii, elevations, motion. Gradle task or script; document how to rerun it (D9).
-- [ ] `VitrolaTheme` with the M3 mapping in `.ai/04-design-system.md`, `VitrolaTokens` `CompositionLocal`, theme setting stub (auto/light/dark), **no dynamic color** (D8), edge-to-edge.
+- [ ] `VitrolaTheme` with the M3 mapping in `.ai/04-design-system.md`, `VitrolaTokens` `CompositionLocal`, theme setting stub (auto/light/dark), **no dynamic color** (D8), edge-to-edge. Shared `VitrolaDialog` (close X in the corner, optional main action, no Cancel; D30) and bottom sheet components.
 - [ ] Bundle Fraunces and Outfit fonts (OFL) in `res/font`.
 - [ ] Icons: vector drawables for the Material Symbols Rounded set listed in 04-design-system.
 - [ ] Launcher icon from `design/01-logo/export/android/` (adaptive + monochrome), notification icon.
@@ -247,3 +247,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-30 | — | — | Plan edited: landscape for every screen (D28) is a ground rule; navigation shell gets the rail. |
 | 2026-10-30 | — | — | Plan edited: touch-the-record speed range is 0.1–3× (D27 revised); tonearm rest angle corrected to −20°. |
 | 2026-10-30 | — | — | Plan edited: fade between songs (D29) added to the Phase 6 Settings task; the fade itself belongs to the playback service. |
+| 2026-10-30 | — | — | Plan edited: shared dialog component with the close X (D30) added to the Phase 0 theme task. |

@@ -1352,9 +1352,10 @@ function openSheet(html, key) {
   requestAnimationFrame(() => { $('.scrim', overlayEl).classList.add('on'); $('.sheet', overlayEl).classList.add('on'); });
   if (key) updatePanel(key);
 }
+// Every dialog closes with the X in its top-right corner (or the scrim / back); no Cancel buttons.
 function openDialog(html, key) {
   closeOverlay(true);
-  overlayEl.innerHTML = `<div class="scrim" data-action="close-overlay"></div><div class="dialog-wrap"><div class="dialog" role="alertdialog" aria-modal="true">${html}</div></div>`;
+  overlayEl.innerHTML = `<div class="scrim" data-action="close-overlay"></div><div class="dialog-wrap"><div class="dialog" role="alertdialog" aria-modal="true"><button class="icon-btn dlg-x" data-action="close-overlay" aria-label="Close">${iconHtml('close')}</button>${html}</div></div>`;
   requestAnimationFrame(() => { $('.scrim', overlayEl).classList.add('on'); $('.dialog', overlayEl).classList.add('on'); const f = $('input', overlayEl); f && f.focus(); });
   if (key) updatePanel(key);
 }
@@ -1412,8 +1413,7 @@ function songMenu(id) {
 }
 function fileInfo(id) {
   const m = song(id);
-  openDialog(`<button class="icon-btn dlg-x" data-action="close-overlay" aria-label="Close">${iconHtml('close')}</button>
-    ${iconHtml('description')}<h4>File details</h4>
+  openDialog(`${iconHtml('description')}<h4>File details</h4>
     <p style="display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin-bottom:0">
       <b>File</b><span style="word-break:break-all">${esc(m.file)}</span>
       <b>Folder</b><span>${esc(m.folder)}</span>
@@ -1609,15 +1609,15 @@ const ACTIONS = {
       <button class="menu-i" data-action="delete-playlist" data-id="${p.id}" style="color:var(--color-error)">${iconHtml('delete')}Delete playlist</button></div>`); },
   'rename-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
     openDialog(`${iconHtml('edit')}<h4>Rename playlist</h4><input class="field" id="playlist-name" value="${esc(p.name)}" maxlength="40">
-      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-primary" data-action="save-name" data-id="${p.id}">Save</button></div>`); },
+      <div class="acts"><button class="btn btn-primary" data-action="save-name" data-id="${p.id}">Save</button></div>`); },
   'save-name': b => { const v = $('#playlist-name').value.trim(); if (!v) return; S.playlists.find(x => x.id === b.dataset.id).name = v; closeOverlay(); render('none'); snackbar('Playlist renamed'); },
   'delete-playlist': b => { const p = S.playlists.find(x => x.id === b.dataset.id);
     openDialog(`${iconHtml('delete', 'danger')}<h4>Delete "${esc(p.name)}"?</h4><p>The playlist goes away, but the songs stay in your library and on your phone.</p>
-      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-danger" data-action="confirm-delete" data-id="${p.id}">Delete</button></div>`); },
+      <div class="acts"><button class="btn btn-danger" data-action="confirm-delete" data-id="${p.id}">Delete</button></div>`); },
   'confirm-delete': b => { const i = S.playlists.findIndex(x => x.id === b.dataset.id); const [p] = S.playlists.splice(i, 1);
     closeOverlay(); back(); snackbar(`Playlist "${esc(p.name)}" deleted`, 'Undo', () => { S.playlists.splice(i, 0, p); render('none'); }); },
   'new-playlist': b => openDialog(`${iconHtml('queue_music')}<h4>New playlist</h4><input class="field" id="playlist-name" placeholder="Playlist name" maxlength="40">
-      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-primary" data-action="create-playlist" data-mid="${b.dataset.mid || ''}">Create</button></div>`, 'new-playlist'),
+      <div class="acts"><button class="btn btn-primary" data-action="create-playlist" data-mid="${b.dataset.mid || ''}">Create</button></div>`, 'new-playlist'),
   'create-playlist': b => { const v = $('#playlist-name').value.trim(); if (!v) { $('#playlist-name').focus(); return; }
     const p = { id: 'pl' + uid(), name: v, songs: b.dataset.mid ? [b.dataset.mid] : [] }; S.playlists.push(p); closeOverlay();
     if (b.dataset.mid) snackbar(`Added to "${esc(v)}"`); else go('playlist', { id: p.id }); if (currentScreen === 'playlists') render('none'); },
@@ -1686,7 +1686,7 @@ const ACTIONS = {
     if (k === 'subfolders') { setTimeout(() => render('none'), 250); snackbar(S[k] ? 'Subfolders included' : `Only files directly in the chosen folders · ${plural(library().length, 'song', 'songs')}`); } },
   'remove-folder': b => { const p = S.folders.find(x => x.id === b.dataset.id); const n = songsInFolder(p.path, true).length;
     openDialog(`${iconHtml('folder_off', 'danger')}<h4>Remove "${esc(p.name)}"?</h4><p>${plural(n, 'song leaves', 'songs leave')} the library. The files stay on your phone.</p>
-      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Cancel</button><button class="btn btn-danger" data-action="confirm-remove" data-id="${p.id}">Remove</button></div>`, 'remove-folder'); },
+      <div class="acts"><button class="btn btn-danger" data-action="confirm-remove" data-id="${p.id}">Remove</button></div>`, 'remove-folder'); },
   'confirm-remove': b => { const i = S.folders.findIndex(x => x.id === b.dataset.id); const [p] = S.folders.splice(i, 1); closeOverlay();
     if (current() && !inLibrary(current())) { S.queue = []; S.playing = false; }
     render('none'); snackbar(`Folder "${esc(p.name)}" removed`, 'Undo', () => { S.folders.splice(i, 0, p); render('none'); }); },
@@ -1843,7 +1843,7 @@ const SIMULATIONS = {
     if (S.playing) play(false);
     openDialog(`${iconHtml('folder_off', 'danger')}<h4>We lost access to the "${esc(p.name)}" folder</h4>
       <p>This happens when the folder is moved or renamed, or when access is revoked in Android settings. Choose the folder again to keep listening.</p>
-      <div class="acts"><button class="btn btn-text" data-action="close-overlay">Not now</button><button class="btn btn-primary" data-action="choose-folder" data-origin="settings">Choose folder</button></div>`);
+      <div class="acts"><button class="btn btn-primary" data-action="choose-folder" data-origin="settings">Choose folder</button></div>`);
   },
   'car': () => {
     if (S.drive.on && S.drive.autoEntered) { exitDrive(); return snackbar(`${esc(S.drive.car)} disconnected · driving mode off`); }

@@ -234,11 +234,13 @@
   .snack { background: var(--color-text); color: var(--color-background); border-radius: var(--radius-m); padding: 6px 6px 6px 16px; display: flex; align-items: center; gap: 12px; font: var(--type-body-s); max-width: 420px; width: 100%; box-shadow: var(--elevation-3); }
   .snack span { flex: 1; }
   .snack button { background: none; border: 0; color: var(--color-snackbar-action); font: var(--type-label); padding: 10px 12px; border-radius: var(--radius-s); cursor: pointer; }
-  .dialog { background: var(--color-surface); border-radius: var(--radius-xl); padding: 24px; max-width: 340px; box-shadow: var(--elevation-3); border: 1px solid var(--color-border); }
+  .dialog { position: relative; background: var(--color-surface); border-radius: var(--radius-xl); padding: 24px; max-width: 340px; box-shadow: var(--elevation-3); border: 1px solid var(--color-border); }
   .dialog .ms { color: var(--color-error); font-size: 28px; }
   .dialog h4 { font: var(--type-title-m); margin: 12px 0 8px; }
   .dialog p { margin: 0 0 20px; color: var(--color-text-2); font: var(--type-body-s); }
   .dialog .acts { display: flex; justify-content: flex-end; gap: 4px; }
+  .dialog .dlg-x { position: absolute; top: 8px; right: 8px; }
+  .dialog .dlg-x .ms { color: var(--color-text); font-size: 24px; }
   .btn-danger { background: var(--color-error); color: var(--color-surface); }
 
   /* Empty state */
@@ -499,10 +501,11 @@
     <div class="demo">
       <div class="snack"><span>Folder added · 248 songs</span><button>Undo</button></div>
       <div class="dialog">
+        <button class="icon-btn dlg-x" aria-label="Close"><span class="ms">close</span></button>
         <span class="ms">folder_off</span>
         <h4>Remove "Records/MPB"?</h4>
         <p>The 1,032 songs in this folder leave the library. The files stay on your phone.</p>
-        <div class="acts"><button class="btn btn-text">Cancel</button><button class="btn btn-danger">Remove</button></div>
+        <div class="acts"><button class="btn btn-danger">Remove</button></div>
       </div>
     </div>
 

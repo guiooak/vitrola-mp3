@@ -23,8 +23,16 @@ Ask the maintainer before deciding these. Record the answer as a decision record
 | Q12 | Lyrics | **`.lrc` next to the song with the same name (synced), else `.txt` (plain, no auto-scroll), else lyrics embedded in the audio file; offline only** (D21, 2026-10-30). |
 | Q13 | Equalizer | **10 fixed bands via `DynamicsProcessing`, hidden on Android 8; Settings + Now playing; global; presets, bass boost, on/off** (D23, 2026-10-30). |
 | Q14 | Driving mode | **Manual + automatic for a chosen car (Nearby devices permission); Now playing + Music tiles; screen on; landscape** (D24, 2026-10-30). |
+| Q15 | Spinning record and label | **A global switch keeps every record still (D25); the label shows the album image, else the artist photo, else the generated cover, resting upright (D26)** (2026-10-30). |
+| Q16 | Touching the record and the tonearm | **Hold = music stops, turn = speed 0.1–3× with pitch, backwards = hold; the tonearm rests only when playback stops and waits for the user, always animated** (D27, 2026-10-30). |
+| Q17 | Landscape | **Every screen adapts; navigation rail, two-pane layouts, state kept on rotation** (D28, 2026-10-30). |
+| Q18 | Transitions between songs | **Fade out, then fade in (no overlap), global switch with a 1–12 s length; no fade for manual skips or continuous albums** (D29, 2026-10-30). |
+| Q19 | Dialog buttons | **Every dialog closes with an X in the corner; no Cancel buttons** (D30, 2026-10-30). |
 | Q3 | Image file names | **`folder.(jpg|jpeg|png)` in any case, else the folder's only image** (D19). |
 
 ## Explicitly out of scope for now
 
-Android Auto, widget, per-output equalizer settings, crossfade, downloading lyrics from the internet, Wear OS, Spotify integration (its APIs cannot play audio inside this app), cloud/streaming features, accounts, analytics, ads.
+The same list as "Later" in [02-product-requirements.md §15](02-product-requirements.md), plus what is out of scope:
+
+- **Later (ask before building):** Android Auto, home-screen widget, crossfade (overlapping songs; D29 fades out, then in), per-output equalizer settings, "side A / side B", vinyl crackle effect, reverse scratch and speeds below 0.1× (D27), Wear OS, languages beyond the three in D18.
+- **Out of scope:** downloading lyrics from the internet (D21 is offline only), Spotify integration (its APIs cannot play audio inside this app), cloud/streaming features, accounts, analytics, ads.

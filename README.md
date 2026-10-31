@@ -21,7 +21,16 @@ An Android music player for the MP3s stored on your phone. It works offline, nee
 
 - **Only your folders:** you choose the music folders and nothing outside them enters the library (WhatsApp audio, for example).
 - **Plays in the background:** music keeps going with the screen off or in another app, with controls in the notification, on the lock screen and on your headphones.
-- **Turntable soul:** on "now playing", the album cover becomes the label of a spinning vinyl record.
+- **Turntable soul:** on "now playing", the album cover becomes the label of a spinning vinyl record. Touch it to hold or speed up the music, like a real turntable.
+
+Also planned for the first version:
+
+- **Lyrics** from `.lrc` (synced) or `.txt` files next to each song, or embedded in the MP3.
+- **Equalizer** with 10 bands, presets and bass boost.
+- **Driving mode** with big buttons, opening by itself when the phone connects to the car.
+- **Fade between songs**, adjustable from 1 to 12 seconds.
+- **Portrait and landscape** on every screen, plus light and dark themes.
+- **English, Brazilian Portuguese and Spanish.**
 
 ## How the project is being built
 

@@ -35,6 +35,7 @@ Architecture Decision Records (ADRs) for Vitrola Mp3: one file per product or te
 | D27 | [Touching the record, and when the tonearm rests](0027-touch-the-record-and-tonearm.md) | Accepted | 2026-10-30 |
 | D28 | [Every screen adapts to landscape](0028-landscape.md) | Accepted | 2026-10-30 |
 | D29 | [Fade between songs](0029-fade-between-songs.md) | Accepted | 2026-10-30 |
+| D30 | [Dialogs close with an X](0030-dialogs-close-with-x.md) | Accepted | 2026-10-30 |
 
 ## Adding a decision
 
