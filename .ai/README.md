@@ -1,6 +1,6 @@
 # .ai — Handoff for the implementing agent
 
-This folder is the starting point for any AI agent that builds the **Vitrola Mp3** Android app. The implementing agent works on a different machine than the design phase did: this repository is the only shared context. It collects every relevant decision made during discovery and design, written so you can implement without re-reading the whole design history.
+This folder is the starting point for any AI agent that builds the **Vitrola Mp3** Android app. The implementing agent works on the maintainer's computer (setup in [plan 001](plans/001-android-app-v1.md#working-on-the-maintainers-computer)), but no chat history from the design phase carries over: this repository is the only shared context. It collects every relevant decision made during discovery and design, written so you can implement without re-reading the whole design history.
 
 ## Reading order
 

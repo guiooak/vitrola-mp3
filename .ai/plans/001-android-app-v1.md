@@ -4,16 +4,23 @@
 
 Build the first complete version of the Vitrola Mp3 Android app, matching the approved mockup (D17) and every decision up to D30.
 
-## Working on a new machine
+## Working on the maintainer's computer
 
-The implementing agent runs on **a different machine** from the one used during design. Nothing from that session exists there except what is in this repository: no chat history, no local memory, no scratch files. Everything you need is in `CLAUDE.md`, `.ai/` and `docs/`. If something seems missing, ask the maintainer instead of guessing.
+The app is built on **the maintainer's own computer**, in this checkout (`~/Documents/Repositories/vitrola-mp3`), with the maintainer's phone connected by USB. The design sessions ran here too, but none of their chat history carries over: everything you need is in `CLAUDE.md`, `.ai/` and `docs/`. If something seems missing, ask the maintainer instead of guessing.
 
-Setup:
-- Clone `https://github.com/guiooak/vitrola-mp3` (`main`). You need your own GitHub credentials with push access to `main`; the Pages workflow keeps publishing `design/` on its own.
-- Install JDK 17 and the Android SDK (command-line tools or Android Studio), plus `python3` and `ffmpeg` (test library script). `uv` and `curl` are only needed to re-export logo SVGs (`design/01-logo/scripts/export.sh`).
-- Preview the design locally with `python3 -m http.server 8765 --directory design` (also defined in `.claude/launch.json`), or use the live site https://guiooak.github.io/vitrola-mp3/.
-- You don't have the maintainer's music library. Phase 0 adds a script that **generates** a test library mirroring `design/03-mockup/data.js` (see Phase 0). Push its output to an emulator with `adb push` and pick it through the system picker. Never commit audio or image files from it.
-- Real-device checks (Samsung/Xiaomi battery behavior, Bluetooth headsets, the maintainer's own folders) are done by the maintainer with the APKs that CI builds at the checkpoints (see "Delivering builds" in Phase 0).
+The machine: Ubuntu 24.04, 4 cores, about 15 GB of RAM and about 40 GB of free disk, with KVM available for the emulator. Git already has push access to `main`; the Pages workflow keeps publishing `design/` on its own.
+
+Setup (the maintainer installs these; installing needs `sudo`, which you don't have):
+- **JDK 17:** `sudo apt install -y openjdk-17-jdk`. Java 21 is also installed, but only as a runtime; point Gradle at 17 (`org.gradle.java.home` in `~/.gradle/gradle.properties`, or a Gradle toolchain).
+- **Android Studio**, which brings the Android SDK, `adb` and the emulator: `sudo snap install android-studio --classic`, then open it once and run the Standard setup. The SDK lands in `~/Android/Sdk`; write `sdk.dir` in `local.properties`, which is never committed.
+- **ffmpeg**, for the test library script: `sudo apt install -y ffmpeg`. `python3` and `curl` are already installed; `uv` is only needed to re-export logo SVGs (`design/01-logo/scripts/export.sh`).
+- Before Phase 0, check `javac -version`, `adb version` and `~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --version`. If any is missing, tell the maintainer the exact command above instead of working around it.
+- Preview the design with `python3 -m http.server 8765 --directory design` (also defined in `.claude/launch.json`), or use the live site https://guiooak.github.io/vitrola-mp3/.
+
+Testing:
+- **Prefer the maintainer's phone over USB** (`adb devices`; the maintainer enables USB debugging). Sound, Bluetooth, notifications, the lock screen and battery behavior are only trustworthy on a real device.
+- The emulator works (KVM), but RAM is limited: with Android Studio, Gradle and an emulator running together the machine gets tight. Start it only when needed (for example for Android 8 or a second screen size), and close it afterwards.
+- The maintainer's real music is on the phone. Phase 0 adds a script that **generates** a test library mirroring `design/03-mockup/data.js` (see Phase 0). Push it with `adb push` to a separate folder (for example `/sdcard/Music/Vitrola test/`) and pick that folder through the system picker. Never touch the maintainer's own music folders. Never commit audio or image files from the test library.
 
 ## Talking to the maintainer
 
@@ -70,16 +77,17 @@ Tasks:
 - [ ] Launcher icon from `design/01-logo/export/android/` (adaptive + monochrome), notification icon.
 - [ ] Navigation shell: bottom navigation (Library, Playlists, Search, Settings) with per-tab back stacks, placeholder screens, mini player slot; in landscape a navigation rail with the mini player at the bottom of the content (D28).
 - [ ] Strings infrastructure: `strings.xml` with the catalog from `.ai/06-copy.md`; create `i18n/translations.csv` in the D20 format (columns incl. `quantity` and `en_hash_*`, English filled, pt-BR/es empty) and the generator: it validates keys, placeholders and plural quantities, escapes XML, detects stale rows by hash, and writes `values-pt-rBR`/`values-es` plus `locales_config` **only for languages whose rows are all approved** (D20). At this point it writes none.
-- [ ] CI per Q8 (proposed: GitHub Actions running `./gradlew lint testDebugUnitTest assembleDebug` on pushes that touch the app).
-- [ ] **Delivering builds** (proposed; log it as a decision with Q8). APKs for the maintainer always come from CI, never from a local machine:
-  - CI signs them with one **shared debug keystore** kept as a GitHub Actions secret (base64), not in the repository. Every build then has the same signature, so a new APK installs over the old one and the maintainer keeps their library, favorites and playlists. A locally built APK has a different debug key and would force an uninstall.
-  - Checkpoint builds are published as a **GitHub pre-release** (tag `v0.N-debug`) with the APK attached and a short "what to try" list, so the maintainer can download it straight on the phone.
-  - `versionCode` increases on every build (e.g. from the CI run number) so Android accepts the update.
+- [ ] CI per Q8 (optional; proposed: GitHub Actions running `./gradlew lint testDebugUnitTest assembleDebug` on pushes that touch the app). It only checks the code; it does not deliver builds.
+- [ ] **Delivering builds** (proposed; log it as a decision with Q8). Builds for the maintainer are made **on this computer** and installed on the phone over USB:
+  - `./gradlew installDebug`, with the phone connected. Every build uses the same debug keystore (`~/.android/debug.keystore`), so a new APK installs over the old one and the maintainer keeps their library, favorites and playlists.
+  - **Never delete or regenerate that keystore.** Ask the maintainer to back it up. An APK signed with any other key, such as a CI build, would force an uninstall and lose that data, so APKs from CI are never installed on the maintainer's phone.
+  - At each checkpoint, tag the commit `v0.N-debug` and give the maintainer a short "what to try" list in the conversation.
+  - `versionCode` increases at every checkpoint.
   - The release key (Phase 8, Q9) is separate and never used for these builds.
-- [ ] **Test library generator:** `tools/make_test_library.py` (python3 + ffmpeg, no other dependencies) writes a library mirroring `design/03-mockup/data.js` into a folder given as an argument (default `build/test-library/`, ignored by git): `Music/<Genre>/<Artist>/<Album (Year)>/NN - Title.mp3` as short tagged MP3s (a few seconds of tone, title/artist/album/track/year tags, some with embedded art), plus `folder.jpg`, a `Folder.PNG` case, an "only image" case, an ambiguous two-image case, untagged files, a corrupt `.mp3`, and lyrics cases (a synced `.lrc`, a `.lrc` without timestamps, a `.txt` only, both `.lrc` and `.txt`, an upper-case `.LRC`, a Windows-1252 `.txt`, an MP3 with an embedded `USLT` and one whose `USLT` holds LRC text; D21). Same input → same output, so tests are repeatable on any machine. Document it in `README.md` with the `adb push` command.
+- [ ] **Test library generator:** `tools/make_test_library.py` (python3 + ffmpeg, no other dependencies) writes a library mirroring `design/03-mockup/data.js` into a folder given as an argument (default `build/test-library/`, ignored by git): `Music/<Genre>/<Artist>/<Album (Year)>/NN - Title.mp3` as short tagged MP3s (a few seconds of tone, title/artist/album/track/year tags, some with embedded art), plus `folder.jpg`, a `Folder.PNG` case, an "only image" case, an ambiguous two-image case, untagged files, a corrupt `.mp3`, and lyrics cases (a synced `.lrc`, a `.lrc` without timestamps, a `.txt` only, both `.lrc` and `.txt`, an upper-case `.LRC`, a Windows-1252 `.txt`, an MP3 with an embedded `USLT` and one whose `USLT` holds LRC text; D21). Same input → same output, so tests are repeatable. Document it in `README.md` with the `adb push` command.
 - [ ] Update `README.md` (how to build) and log the layout/CI decisions.
 
-Done when: `./gradlew assembleDebug` succeeds, the app opens to a themed shell in light and dark, and CI is green.
+Done when: `./gradlew assembleDebug` succeeds, the app installs on the maintainer's phone and opens to a themed shell in light and dark, and CI (if added) is green.
 
 ---
 
@@ -136,7 +144,7 @@ Tasks:
 - [ ] Queue sheet (jump, remove + Undo; drag handle visual only until Q5 is answered).
 - [ ] Media notification and lock screen with artwork; custom heart command (wired in Phase 4).
 - [ ] Broken file: skip + snackbar.
-- [ ] Publish the first **debug APK** through CI as a GitHub pre-release (see "Delivering builds" in Phase 0) with a short "what to try" list.
+- [ ] Install the first **debug build** on the maintainer's phone (see "Delivering builds" in Phase 0), tag it `v0.1-debug` and give a short "what to try" list.
 
 Tests: unit tests for queue/shuffle/repeat/previous logic; manual checks from `.ai/07-edge-cases-and-qa.md` items 4–6, 11, 12, 15.
 
@@ -185,7 +193,7 @@ Tasks:
 - [ ] **Driving mode (D24):** screen with Now playing and Music tabs, portrait and landscape layouts, keep screen on; car button in Now playing and the Settings › Driving group; automatic start (Nearby devices permission, paired-device picker, connect/disconnect handling as in `.ai/03-architecture.md`).
 - [ ] **Fade between songs (D29):** `FadeController` in the playback service (position-driven `player.volume`, fade in on automatic transitions, instant on manual ones, gapless for the next track of the same album in order); unit tests for the curve and the skip rules.
 - [ ] **Equalizer (D23):** `EqualizerController` with `DynamicsProcessing` (10 bands, limiter, bass boost) in the playback service; availability check (API 28+ and effect creation) that hides every entry point; Equalizer screen and Now playing sheet as in the mockup; settings in DataStore.
-- [ ] Second build to the maintainer (CI pre-release).
+- [ ] Second build installed on the maintainer's phone (`v0.2-debug`).
 
 Done when: QA items 10 and 14 pass, every screen works in English at 200% font scale and in dark theme, and the maintainer's feedback from the first build is addressed. (QA item 16, languages, belongs to Phase 7.)
 
@@ -223,7 +231,8 @@ Done when: the maintainer approves the release candidate.
 | SAF scanning is slow on large libraries | `DocumentsContract` queries instead of `DocumentFile`, incremental scans, background work with progress |
 | OEM battery killers stop playback | Proper foreground service, battery tip card, test on Samsung/Xiaomi |
 | Embedded-art extraction is expensive | Extract lazily through a Coil fetcher with disk cache; never store bitmaps in Room |
-| A new APK will not install over the old one | All maintainer builds come from CI with the shared debug key and an increasing `versionCode` |
+| A new APK will not install over the old one | All maintainer builds are made on this computer with the same debug keystore (backed up, never regenerated) and an increasing `versionCode` |
+| The computer runs short of memory | Test on the phone over USB; start the emulator only when needed; close Android Studio during long command-line builds if necessary |
 | Record animation jank | Single global angle, `graphicsLayer` rotation, no recomposition per frame |
 | Translations block release | Drafts start after Phase 2 and are reviewed in parallel; if a language is not approved in time, ship without it (English fallback) |
 | Lost folder permissions | Check on every launch, clear dialog, never crash on missing documents |
@@ -248,3 +257,4 @@ Add one line per completed phase: date, commit, notes.
 | 2026-10-30 | — | — | Plan edited: touch-the-record speed range is 0.1–3× (D27 revised); tonearm rest angle corrected to −20°. |
 | 2026-10-30 | — | — | Plan edited: fade between songs (D29) added to the Phase 6 Settings task; the fade itself belongs to the playback service. |
 | 2026-10-30 | — | — | Plan edited: shared dialog component with the close X (D30) added to the Phase 0 theme task. |
+| 2026-10-31 | — | — | Plan edited: the app is built on the maintainer's computer; setup, testing and build delivery changed to local builds installed on the phone over USB; CI becomes optional checks only. |
